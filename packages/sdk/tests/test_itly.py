@@ -60,21 +60,38 @@ class TestItly(unittest.TestCase):
         assert custom_plugin is not None and custom_plugin.id() == 'custom'
 
         log_text = '\n'.join(log_lines)
-        assert log_text == '''[itly-plugin-custom] load() environment='PRODUCTION'
-[itly-plugin-custom] validate() event='context'
-[itly-plugin-custom] validate() event='identify'
-[itly-plugin-custom] identify() user_id='user-id' properties={"user_prop": 1}
-[itly-plugin-custom] alias() user_id='test-user-id' previous_id='user-id'
-[itly-plugin-custom] validate() event='group'
-[itly-plugin-custom] group() user_id='test-user-id' group_id='a-group-id' properties={"group_prop": "test value"}
-[itly-plugin-custom] validate() event='page'
-[itly-plugin-custom] page() user_id='test-user-id' category='page category' name='page name' properties={"page_prop": "a page property"}
-[itly-plugin-custom] validate() event='Event No Properties'
-[itly-plugin-custom] track() user_id='test-user-id' event='Event No Properties' properties={"requiredString": "A required string", "optionalEnum": "Value 1"}
-[itly-plugin-custom] validate() event='Event With All Properties'
-[itly-plugin-custom] track() user_id='test-user-id' event='Event With All Properties' properties={"requiredString": "A required string", "optionalEnum": "Value 1", "required_string": "A required string", "required_number": 2.0, "required_integer": 42, "required_enum": "Enum1", "required_boolean": false, "required_const": "some-const-value", "required_array": ["required", "array"], "optional_string": "I'm optional!"}
+        assert log_text == '''[itly-plugin-custom] load()
+[itly-core] validate(event=context, properties={"requiredString": "A required string", "optionalEnum": "Value 1"})
+[itly-plugin-custom] validate(event=context, properties={"requiredString": "A required string", "optionalEnum": "Value 1"})
+[itly-core] validate(event=identify, properties={"user_prop": 1})
+[itly-plugin-custom] validate(event=identify, properties={"user_prop": 1})
+[itly-core] identify(user_id=user-id, properties={"user_prop": 1})
+[itly-plugin-custom] identify(user_id=user-id, properties={"user_prop": 1})
+[itly-core] alias(user_id=test-user-id, previous_id=user-id)
+[itly-plugin-custom] alias(user_id=test-user-id, previous_id=user-id)
+[itly-core] validate(event=group, properties={"group_prop": "test value"})
+[itly-plugin-custom] validate(event=group, properties={"group_prop": "test value"})
+[itly-core] group(user_id=test-user-id, group_id=a-group-id, properties={"group_prop": "test value"})
+[itly-plugin-custom] group(user_id=test-user-id, group_id=a-group-id, properties={"group_prop": "test value"})
+[itly-core] validate(event=page, properties={"page_prop": "a page property"})
+[itly-plugin-custom] validate(event=page, properties={"page_prop": "a page property"})
+[itly-core] page(user_id=test-user-id, category=page category, name=page name, properties={"page_prop": "a page property"})
+[itly-plugin-custom] page(user_id=test-user-id, category=page category, name=page name, properties={"page_prop": "a page property"})
+[itly-core] validate(event=Event No Properties, properties=None)
+[itly-plugin-custom] validate(event=Event No Properties, properties=None)
+[itly-core] track(user_id=test-user-id, event=Event No Properties, properties={"requiredString": "A required string", "optionalEnum": "Value 1"})
+[itly-plugin-custom] track(user_id=test-user-id, event=Event No Properties, properties={"requiredString": "A required string", "optionalEnum": "Value 1"})
+[itly-core] validate(event=Event With All Properties, properties={"required_string": "A required string", "required_number": 2.0, "required_integer": 42, "required_enum": "Enum1", "required_boolean": false, "required_const": "some-const-value", "required_array": ["required", "array"], "optional_string": "I'm optional!"})
+[itly-plugin-custom] validate(event=Event With All Properties, properties={"required_string": "A required string", "required_number": 2.0, "required_integer": 42, "required_enum": "Enum1", "required_boolean": false, "required_const": "some-const-value", "required_array": ["required", "array"], "optional_string": "I'm optional!"})
+[itly-core] track(user_id=test-user-id, event=Event With All Properties, properties={"requiredString": "A required string", "optionalEnum": "Value 1", "required_string": "A required string", "required_number": 2.0, "required_integer": 42, "required_enum": "Enum1", "required_boolean": false, "required_const": "some-const-value", "required_array": ["required", "array"], "optional_string": "I'm optional!"})
+[itly-plugin-custom] track(user_id=test-user-id, event=Event With All Properties, properties={"requiredString": "A required string", "optionalEnum": "Value 1", "required_string": "A required string", "required_number": 2.0, "required_integer": 42, "required_enum": "Enum1", "required_boolean": false, "required_const": "some-const-value", "required_array": ["required", "array"], "optional_string": "I'm optional!"})
+[itly-core] flush()
 [itly-plugin-custom] flush()
-[itly-plugin-custom] validate() event='EventMaxIntForTest'
-[itly-plugin-custom] track() user_id='test-user-id' event='EventMaxIntForTest' properties={"requiredString": "A required string", "optionalEnum": "Value 1", "int_max_10": 20}
+[itly-core] validate(event=EventMaxIntForTest, properties={"int_max_10": 20})
+[itly-plugin-custom] validate(event=EventMaxIntForTest, properties={"int_max_10": 20})
+[itly-core] track(user_id=test-user-id, event=EventMaxIntForTest, properties={"requiredString": "A required string", "optionalEnum": "Value 1", "int_max_10": 20})
+[itly-plugin-custom] track(user_id=test-user-id, event=EventMaxIntForTest, properties={"requiredString": "A required string", "optionalEnum": "Value 1", "int_max_10": 20})
+[itly-core] flush()
 [itly-plugin-custom] flush()
+[itly-core] shutdown()
 [itly-plugin-custom] shutdown()'''

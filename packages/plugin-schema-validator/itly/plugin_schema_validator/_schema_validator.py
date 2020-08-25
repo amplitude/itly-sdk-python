@@ -11,10 +11,9 @@ ValidationResponseHandler = Callable[[ValidationResponse, Event, Optional[str]],
 
 
 class SchemaValidatorPlugin(Plugin):
-    def __init__(self, schemas, validation_error_handler=None):
-        # type: (Dict[str, str], Optional[ValidationResponseHandler]) -> None
+    def __init__(self, schemas):
+        # type: (Dict[str, str]) -> None
         self._schemas = schemas  # type: Dict[str, str]
-        self._validation_error_handler = validation_error_handler  # type: Optional[ValidationResponseHandler]
         self._validators = {}  # type: Dict[str, jsonschema.Draft7Validator]
 
     def id(self):
@@ -36,40 +35,30 @@ class SchemaValidatorPlugin(Plugin):
             if self._is_system_event(schema_key):
                 # pass system events by default
                 if self._is_empty_event(event):
-                    return ValidationResponse.ok()
-                return ValidationResponse.error(
-                    plugin_id=self.id(),
+                    return self._create_valid_response()
+                return self._create_invalid_response(
                     message="'{0}' schema is empty but properties were found. properties={1}".format(event.name, event.properties)
                 )
 
-            return ValidationResponse.error(
-                plugin_id=self.id(),
+            return self._create_invalid_response(
                 message="Event {0} not found in tracking plan.".format(event.name)
             )
 
         if self._is_empty_event(event):
-            return ValidationResponse.ok()
+            return self._create_valid_response()
 
         try:
             self._validators[schema_key].validate(instance=event.properties.to_json())
         except jsonschema.ValidationError as ex:
-            return ValidationResponse.error(
-                plugin_id=self.id(),
+            return self._create_invalid_response(
                 message="Passed in {0} properties did not validate against your tracking plan. {1}".format(event.name, ex)
             )
         except Exception as ex:
-            return ValidationResponse.error(
-                plugin_id=self.id(),
+            return self._create_invalid_response(
                 message="Passed in {0} properties did not validate against your tracking plan. An unknown error occurred during validation. {1}".format(event.name, ex)
             )
 
-        return ValidationResponse.ok()
-
-    def validation_error(self, validation, event):
-        # type: (ValidationResponse, Event) -> None
-        if self._validation_error_handler is not None:
-            schema_key = self._get_schema_key(event)
-            self._validation_error_handler(validation, event, self._schemas.get(schema_key, None))
+        return self._create_valid_response()
 
     @staticmethod
     def _get_schema_key(event):

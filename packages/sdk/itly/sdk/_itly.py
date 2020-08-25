@@ -1,5 +1,4 @@
 import copy
-from threading import Lock
 from typing import Optional, List
 
 from ._environment import Environment
@@ -25,12 +24,11 @@ class Itly(object):
         self._validationOptions = None  # type: Optional[ValidationOptions]
         self._logger = Logger.NONE  # type: Logger
         self._is_shutdown = False  # type: bool
-        self._lock = Lock()
 
     def load(self, options):
         # type: (Options) -> None
         if self._options is not None:
-            raise Exception('Itly is already initialized.')
+            raise Exception('Itly is already initialized. itly.load() should only be called once.')
 
         self._options = copy.copy(options)
         if self._options.validation is None:
@@ -38,29 +36,33 @@ class Itly(object):
                                                  if self._options.environment == Environment.PRODUCTION
                                                  else DEFAULT_DEV_VALIDATION_OPTIONS)
 
-        if not self._is_initialized_and_enabled():
+        self._logger = LoggerPrefixSafeDecorator(self._options.logger, LOG_PREFIX)
+
+        if self._options.disabled:
+            self._logger.info('disabled = True')
             return
 
-        self._logger = LoggerPrefixSafeDecorator(self._options.logger, LOG_PREFIX)
         self._plugins = [PluginSafeDecorator(plugin, self._logger) for plugin in self._options.plugins]
         self._validationOptions = self._options.validation
 
-        for plugin in self._plugins:
+        for plugin in self._options.plugins:
             plugin_logger = LoggerPrefixSafeDecorator(self._options.logger, '[itly-plugin-{0}] '.format(plugin.id()))
+            plugin = PluginSafeDecorator(plugin, plugin_logger)
+            self._plugins.append(plugin)
             plugin_options = PluginOptions(environment=self._options.environment, logger=plugin_logger)
             plugin.load(plugin_options)
 
         context_event = Event(
             name='context',
-            properties=options.context if options.context else Properties(),
+            properties=options.context,
             event_id='context',
             version='0-0-0',
         )
         self._validate(context_event)
 
     def alias(self, user_id, previous_id):
-        # type: (str, Optional[str]) -> None
-        if not self._is_initialized_and_enabled():
+        # type: (str, str) -> None
+        if self._disabled():
             return
 
         for plugin in self._plugins:
@@ -68,12 +70,12 @@ class Itly(object):
 
     def identify(self, user_id, identify_properties=None):
         # type: (str, Optional[Properties]) -> None
-        if not self._is_initialized_and_enabled():
+        if self._disabled():
             return
 
         identify_event = Event(
             name='identify',
-            properties=identify_properties if identify_properties else Properties(),
+            properties=identify_properties,
             event_id='identify',
             version='0-0-0',
         )
@@ -84,12 +86,12 @@ class Itly(object):
 
     def group(self, user_id, group_id, group_properties=None):
         # type: (str, str, Optional[Properties]) -> None
-        if not self._is_initialized_and_enabled():
+        if self._disabled():
             return
 
         group_event = Event(
             name='group',
-            properties=group_properties if group_properties else Properties(),
+            properties=group_properties,
             event_id='group',
             version='0-0-0',
         )
@@ -100,12 +102,12 @@ class Itly(object):
 
     def page(self, user_id, category, name, page_properties=None):
         # type: (str, str, str, Optional[Properties]) -> None
-        if not self._is_initialized_and_enabled():
+        if self._disabled():
             return
 
         page_event = Event(
             name='page',
-            properties=page_properties if page_properties else Properties(),
+            properties=page_properties,
             event_id='page',
             version='0-0-0',
         )
@@ -116,7 +118,7 @@ class Itly(object):
 
     def track(self, user_id, event):
         # type: (str, Event) -> None
-        if not self._is_initialized_and_enabled():
+        if self._disabled():
             return
         if not self._should_be_tracked(event):
             return
@@ -133,7 +135,7 @@ class Itly(object):
 
     def flush(self):
         # type: () -> None
-        if not self._is_initialized_and_enabled():
+        if self._disabled():
             return
 
         for plugin in self._plugins:
@@ -141,12 +143,10 @@ class Itly(object):
 
     def shutdown(self):
         # type: () -> None
-        if not self._is_initialized_and_enabled():
+        if self._disabled():
             return
 
-        with self._lock:
-            self._is_shutdown = True
-
+        self._is_shutdown = True
         for plugin in self._plugins:
             plugin.shutdown()
 
@@ -173,7 +173,7 @@ class Itly(object):
         # If validation failed call validationError hook
         for plugin in self._plugins:
             for validation in failed_validations:
-                plugin.validation_error(validation, event)
+                plugin.on_validation_error(validation, event)
 
         assert self._validationOptions is not None
         if self._validationOptions.error_on_invalid:
@@ -181,15 +181,14 @@ class Itly(object):
 
         return False
 
-    def _is_initialized_and_enabled(self):
+    def _disabled(self):
         # type: () -> bool
-        with self._lock:
-            if self._is_shutdown:
-                raise Exception('Itly is shutdown. No more requests are possible.')
+        if self._is_shutdown:
+            raise Exception('Itly is shutdown. No more requests are possible.')
         if self._options is None:
             raise Exception('Itly is not yet initialized. Have you called `itly.load()` on app start?')
 
-        return not self._options.disabled
+        return self._options.disabled
 
     def _should_be_tracked(self, event):
         # type: (Event) -> bool
