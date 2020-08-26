@@ -84,7 +84,7 @@ class LoggerPrefixSafeDecorator(Logger):
             self._logger.debug(self._prefix + message)
         except Exception as e:
             self._fallback_logger.debug(self._prefix + message)
-            self._fallback_logger.error(self._prefix + 'Error in logger.debug(). {0}.'.format(str(e)))
+            self._fallback_logger.error(self._prefix + 'Error in logger.debug(). {0}.'.format(e))
 
     def info(self, message):
         # type: (str) -> None
@@ -92,7 +92,7 @@ class LoggerPrefixSafeDecorator(Logger):
             self._logger.info(self._prefix + message)
         except Exception as e:
             self._fallback_logger.info(self._prefix + message)
-            self._fallback_logger.error(self._prefix + 'Error in logger.info(). {0}.'.format(str(e)))
+            self._fallback_logger.error(self._prefix + 'Error in logger.info(). {0}.'.format(e))
 
     def warn(self, message):
         # type: (str) -> None
@@ -100,7 +100,7 @@ class LoggerPrefixSafeDecorator(Logger):
             self._logger.warn(self._prefix + message)
         except Exception as e:
             self._fallback_logger.warn(self._prefix + message)
-            self._fallback_logger.error(self._prefix + 'Error in logger.warn(). {0}.'.format(str(e)))
+            self._fallback_logger.error(self._prefix + 'Error in logger.warn(). {0}.'.format(e))
 
     def error(self, message):
         # type: (str) -> None
@@ -108,4 +108,4 @@ class LoggerPrefixSafeDecorator(Logger):
             self._logger.error(self._prefix + message)
         except Exception as e:
             self._fallback_logger.error(self._prefix + message)
-            self._fallback_logger.error(self._prefix + 'Error in logger.error(). {0}.'.format(str(e)))
+            self._fallback_logger.error(self._prefix + 'Error in logger.error(). {0}.'.format(e))

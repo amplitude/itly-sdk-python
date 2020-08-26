@@ -13,16 +13,16 @@ Endpoint = namedtuple("Endpoint", ["url", "is_json"])
 
 
 class AmplitudeClient(object):
-    def __init__(self, api_key, max_queue_size, on_error, events_endpoint=None, identification_endpoint=None):
-        # type: (str, int, Callable[[str], None], Optional[str], Optional[str]) -> None
+    def __init__(self, api_key, on_error, events_endpoint=None, identification_endpoint=None):
+        # type: (str, Callable[[str], None], Optional[str], Optional[str]) -> None
         self.api_key = api_key
         self.on_error = on_error
-        self._queue = queue.Queue(maxsize=max_queue_size)  # type: queue.Queue
+        self._queue = AsyncConsumer.create_queue()  # type: queue.Queue
         self._endpoints = {
             "events": Endpoint(url=events_endpoint or "https://api.amplitude.com/2/httpapi", is_json=True),
             "identification": Endpoint(url=identification_endpoint or "https://api.amplitude.com/identify", is_json=False),
         }
-        self._consumer = AsyncConsumer(self._queue, self._send, on_error)
+        self._consumer = AsyncConsumer(self._queue, self._send)
         atexit.register(self.join)
         self._consumer.start()
 
@@ -81,4 +81,4 @@ class AmplitudeClient(object):
 
     def flush(self):
         # type: () -> None
-        self._queue.join()
+        self._consumer.flush()

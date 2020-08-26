@@ -1,1 +1,1 @@
-from ._schema_validator import SchemaValidatorPlugin, ValidationResponseHandler
+from ._schema_validator import SchemaValidatorPlugin

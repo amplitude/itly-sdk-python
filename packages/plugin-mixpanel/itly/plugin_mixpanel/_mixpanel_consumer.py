@@ -8,14 +8,14 @@ from itly.sdk import AsyncConsumer, AsyncConsumerMessage
 
 
 class MixpanelConsumer(object):
-    def __init__(self, api_key, max_queue_size, on_error, api_host=None):
-        # type: (str, int, Callable[[str], None], Optional[str]) -> None
+    def __init__(self, api_key, on_error, api_host=None):
+        # type: (str, Callable[[str], None], Optional[str]) -> None
         self.api_key = api_key
         self.on_error = on_error
         self._consumer = Consumer(api_host=api_host)
         self._consumer._endpoints["alias"] = self._consumer._endpoints["events"]
-        self._queue = queue.Queue(maxsize=max_queue_size)  # type: queue.Queue
-        self._async_consumer = AsyncConsumer(self._queue, self._send, on_error)
+        self._queue = AsyncConsumer.create_queue()  # type: queue.Queue
+        self._async_consumer = AsyncConsumer(self._queue, self._send)
         atexit.register(self.join)
         self._async_consumer.start()
 
@@ -43,4 +43,4 @@ class MixpanelConsumer(object):
 
     def flush(self):
         # type: () -> None
-        self._queue.join()
+        self._async_consumer.flush()

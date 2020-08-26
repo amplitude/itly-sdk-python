@@ -1,13 +1,11 @@
 import json
-from typing import Dict, Optional, Callable
+from typing import Dict
 
 import jsonschema
 
 from itly.sdk import Plugin, Event, ValidationResponse, PluginOptions
 
 SYSTEM_EVENTS = ['identify', 'context', 'group', 'page']
-
-ValidationResponseHandler = Callable[[ValidationResponse, Event, Optional[str]], None]
 
 
 class SchemaValidatorPlugin(Plugin):

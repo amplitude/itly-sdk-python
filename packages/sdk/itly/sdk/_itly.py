@@ -42,7 +42,6 @@ class Itly(object):
             self._logger.info('disabled = True')
             return
 
-        self._plugins = [PluginSafeDecorator(plugin, self._logger) for plugin in self._options.plugins]
         self._validationOptions = self._options.validation
 
         for plugin in self._options.plugins:
@@ -55,8 +54,6 @@ class Itly(object):
         context_event = Event(
             name='context',
             properties=options.context,
-            event_id='context',
-            version='0-0-0',
         )
         self._validate(context_event)
 
@@ -76,8 +73,6 @@ class Itly(object):
         identify_event = Event(
             name='identify',
             properties=identify_properties,
-            event_id='identify',
-            version='0-0-0',
         )
 
         if self._should_be_tracked(identify_event):
@@ -92,8 +87,6 @@ class Itly(object):
         group_event = Event(
             name='group',
             properties=group_properties,
-            event_id='group',
-            version='0-0-0',
         )
 
         if self._should_be_tracked(group_event):
@@ -108,8 +101,6 @@ class Itly(object):
         page_event = Event(
             name='page',
             properties=page_properties,
-            event_id='page',
-            version='0-0-0',
         )
 
         if self._should_be_tracked(page_event):

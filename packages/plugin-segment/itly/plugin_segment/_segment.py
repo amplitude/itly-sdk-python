@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, List, Any
 
 import analytics
 
@@ -6,20 +6,18 @@ from itly.sdk import Plugin, PluginOptions, Properties, Event
 
 
 class SegmentOptions(object):
-    def __init__(self, host=None, debug=False, max_queue_size=10000, send=True, on_error=None):
-        # type: (str, bool, int, bool, Callable) -> None
-        self.host = host
-        self.debug = debug
-        self.max_queue_size = max_queue_size
-        self.send = send
-        self.on_error = on_error
+    def __init__(self, host=None, debug=False, send=True):
+        # type: (Optional[str], bool, bool) -> None
+        self.host = host  # type: Optional[str]
+        self.debug = debug  # type: bool
+        self.send = send  # type: bool
 
 
 class SegmentPlugin(Plugin):
     def __init__(self, write_key, options):
         # type: (str, SegmentOptions) -> None
-        self._write_key = write_key
-        self._options = options
+        self._write_key = write_key  # type: str
+        self._options = options  # type: SegmentOptions
         self._client = None  # type: Optional[analytics.Client]
 
     def id(self):
@@ -29,7 +27,7 @@ class SegmentPlugin(Plugin):
     def load(self, options):
         # type: (PluginOptions) -> None
         self._client = analytics.Client(write_key=self._write_key, host=self._options.host, debug=self._options.debug,
-                                        max_queue_size=self._options.max_queue_size, send=self._options.send, on_error=self._options.on_error)
+                                        send=self._options.send, on_error=self._on_error)
 
     def alias(self, user_id, previous_id):
         # type: (str, str) -> None
@@ -74,3 +72,8 @@ class SegmentPlugin(Plugin):
         # type: () -> None
         assert self._client is not None
         self._client.join()
+
+    def _on_error(self, err, batch):
+        # type: (str, List[Any]) -> None
+        message = "Error. {0}".format(err)
+        self._logger.error(message)

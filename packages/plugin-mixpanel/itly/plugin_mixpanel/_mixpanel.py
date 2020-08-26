@@ -7,17 +7,16 @@ from ._mixpanel_consumer import MixpanelConsumer
 
 
 class MixpanelOptions(object):
-    def __init__(self, max_queue_size=10000, api_host=None):
-        # type: (int, Optional[str]) -> None
-        self.max_queue_size = max_queue_size
-        self.api_host = api_host
+    def __init__(self, api_host=None):
+        # type: (Optional[str]) -> None
+        self.api_host = api_host  # type: Optional[str]
 
 
 class MixpanelPlugin(Plugin):
     def __init__(self, api_key, options):
         # type: (str, MixpanelOptions) -> None
-        self._api_key = api_key
-        self._options = options
+        self._api_key = api_key  # type: str
+        self._options = options  # type: MixpanelOptions
         self._client = None  # type: Optional[MixpanelClient]
         self._consumer = None  # type: Optional[MixpanelConsumer]
         self._logger = Logger.NONE  # type: Logger
@@ -28,7 +27,7 @@ class MixpanelPlugin(Plugin):
 
     def load(self, options):
         # type: (PluginOptions) -> None
-        self._consumer = MixpanelConsumer(api_key=self._api_key, max_queue_size=self._options.max_queue_size, on_error=self._on_error, api_host=self._options.api_host)
+        self._consumer = MixpanelConsumer(api_key=self._api_key, on_error=self._on_error, api_host=self._options.api_host)
         self._client = MixpanelClient(token=self._api_key, consumer=self._consumer)
         self._logger = options.logger
 
@@ -69,5 +68,5 @@ class MixpanelPlugin(Plugin):
 
     def _on_error(self, err):
         # type: (str) -> None
-        message = "Error. {0}".format(str(err))
+        message = "Error. {0}".format(err)
         self._logger.error(message)
