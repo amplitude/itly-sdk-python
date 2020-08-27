@@ -25,7 +25,7 @@ class IterativelyClient(object):
         self.on_error = on_error
         self._queue = AsyncConsumer.create_queue()  # type: queue.Queue
         self._consumer = AsyncConsumer(self._queue, do_upload=self._send, upload_size=upload_size, upload_interval=upload_interval)
-        atexit.register(self.join)
+        atexit.register(self.shutdown)
         self._consumer.start()
 
     def track(self, track_type, event=None, properties=None, validation=None):
@@ -69,14 +69,9 @@ class IterativelyClient(object):
         if response.status_code >= 300:
             self.on_error('Unexpected status code {0}'.format(response.status_code))
 
-    def join(self):
+    def shutdown(self):
         # type: () -> None
-        self._consumer.pause()
-        try:
-            self._consumer.join()
-        except RuntimeError:
-            # consumer thread has not started
-            pass
+        self._consumer.shutdown()
 
     def _enqueue(self, message):
         # type: (AsyncConsumerMessage) -> None

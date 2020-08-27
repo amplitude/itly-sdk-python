@@ -1,1 +1,1 @@
-from ._segment import SegmentPlugin, SegmentOptions
+from ._segment_plugin import SegmentPlugin, SegmentOptions

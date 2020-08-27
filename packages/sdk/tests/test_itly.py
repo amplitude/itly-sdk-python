@@ -1,10 +1,78 @@
 import enum
 import unittest
-from typing import List
+from datetime import datetime
+from typing import List, Optional
 
-from itly.sdk import itly, Options, Environment, Event, Properties
-from .custom_logger import CustomLogger
-from .custom_plugin import CustomPlugin
+from itly.sdk import itly, Options, Environment, Event, Properties, Logger, Plugin, PluginOptions, ValidationResponse
+
+
+class CustomLogger(Logger):
+    def __init__(self, log_lines):
+        # type: (List[str]) -> None
+        self.log_lines = log_lines
+
+    def debug(self, message):
+        # type: (str) -> None
+        self.log_lines.append(message)
+
+    def info(self, message):
+        # type: (str) -> None
+        self.log_lines.append(message)
+
+    def warn(self, message):
+        # type: (str) -> None
+        self.log_lines.append(message)
+
+    def error(self, message):
+        # type: (str) -> None
+        self.log_lines.append(message)
+
+
+class CustomPlugin(Plugin):
+    def id(self):
+        return 'custom'
+
+    def load(self, options):
+        # type: (PluginOptions) -> None
+        pass
+
+    def alias(self, user_id, previous_id, timestamp=None):
+        # type: (str, str, Optional[datetime]) -> None
+        pass
+
+    def identify(self, user_id, properties, timestamp=None):
+        # type: (str, Optional[Properties], Optional[datetime]) -> None
+        pass
+
+    def group(self, user_id, group_id, properties, timestamp=None):
+        # type: (str, str, Optional[Properties], Optional[datetime]) -> None
+        pass
+
+    def page(self, user_id, category, name, properties, timestamp=None):
+        # type: (str, Optional[str], Optional[str], Optional[Properties], Optional[datetime]) -> None
+        pass
+
+    def track(self, user_id, event, timestamp=None):
+        # type: (str, Event, Optional[datetime]) -> None
+        pass
+
+    def flush(self):
+        # type: () -> None
+        pass
+
+    def shutdown(self):
+        # type: () -> None
+        pass
+
+    # Validation methods
+
+    def validate(self, event):
+        # type: (Event) -> ValidationResponse
+        return self._create_valid_response()
+
+    def on_validation_error(self, validation, event):
+        # type: (ValidationResponse, Event) -> None
+        pass
 
 
 class TestEnum(enum.Enum):

@@ -31,7 +31,6 @@ class AsyncConsumer(Thread):
             self.upload()
 
     def pause(self):
-        # type: () -> None
         self._running = False
 
     def upload(self):
@@ -82,3 +81,11 @@ class AsyncConsumer(Thread):
         self._queue.put(AsyncConsumerMessage(message_type='flush', data=event))
         event.wait()
 
+    def shutdown(self):
+        # type: () -> None
+        self._running = False
+        try:
+            self.join()
+        except RuntimeError:
+            # consumer thread has not started
+            pass

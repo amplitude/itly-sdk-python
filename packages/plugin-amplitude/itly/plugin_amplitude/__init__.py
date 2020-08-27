@@ -1,1 +1,1 @@
-from ._amplitude import AmplitudePlugin, AmplitudeOptions
+from ._amplitude_plugin import AmplitudePlugin, AmplitudeOptions

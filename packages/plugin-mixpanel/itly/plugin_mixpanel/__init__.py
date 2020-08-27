@@ -1,1 +1,1 @@
-from ._mixpanel import MixpanelPlugin, MixpanelOptions
+from ._mixpanel_plugin import MixpanelPlugin, MixpanelOptions

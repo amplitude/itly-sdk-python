@@ -1,5 +1,6 @@
 import abc
 from abc import abstractmethod
+from datetime import datetime
 from typing import Optional
 
 import six
@@ -24,24 +25,24 @@ class Plugin(object):
         # type: (PluginOptions) -> None
         pass
 
-    def alias(self, user_id, previous_id):
-        # type: (str, str) -> None
+    def alias(self, user_id, previous_id, timestamp=None):
+        # type: (str, str, Optional[datetime]) -> None
         pass
 
-    def identify(self, user_id, properties):
-        # type: (str, Optional[Properties]) -> None
+    def identify(self, user_id, properties, timestamp=None):
+        # type: (str, Optional[Properties], Optional[datetime]) -> None
         pass
 
-    def group(self, user_id, group_id, properties):
-        # type: (str, str, Optional[Properties]) -> None
+    def group(self, user_id, group_id, properties, timestamp=None):
+        # type: (str, str, Optional[Properties], Optional[datetime]) -> None
         pass
 
-    def page(self, user_id, category, name, properties):
-        # type: (str, Optional[str], Optional[str], Optional[Properties]) -> None
+    def page(self, user_id, category, name, properties, timestamp=None):
+        # type: (str, Optional[str], Optional[str], Optional[Properties], Optional[datetime]) -> None
         pass
 
-    def track(self, user_id, event):
-        # type: (str, Event) -> None
+    def track(self, user_id, event, timestamp=None):
+        # type: (str, Event, Optional[datetime]) -> None
         pass
 
     def flush(self):
@@ -91,8 +92,8 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error('Error in load(). {0}.'.format(e))
 
-    def alias(self, user_id, previous_id):
-        # type: (str, str) -> None
+    def alias(self, user_id, previous_id, timestamp=None):
+        # type: (str, str, Optional[datetime]) -> None
         if self._plugin.__class__.alias != Plugin.alias:
             self._logger.info('alias(user_id={0}, previous_id={1})'.format(user_id, previous_id))
         try:
@@ -100,8 +101,8 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error('Error in alias(). {0}.'.format(e))
 
-    def identify(self, user_id, properties):
-        # type: (str, Optional[Properties]) -> None
+    def identify(self, user_id, properties, timestamp=None):
+        # type: (str, Optional[Properties], Optional[datetime]) -> None
         if self._plugin.__class__.identify != Plugin.identify:
             self._logger.info('identify(user_id={0}, properties={1})'.format(user_id, properties))
         try:
@@ -109,8 +110,8 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error('Error in identify(). {0}.'.format(e))
 
-    def group(self, user_id, group_id, properties):
-        # type: (str, str, Optional[Properties]) -> None
+    def group(self, user_id, group_id, properties, timestamp=None):
+        # type: (str, str, Optional[Properties], Optional[datetime]) -> None
         if self._plugin.__class__.group != Plugin.group:
             self._logger.info('group(user_id={0}, group_id={1}, properties={2})'.format(user_id, group_id, properties))
         try:
@@ -118,8 +119,8 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error('Error in group(). {0}.'.format(e))
 
-    def page(self, user_id, category, name, properties):
-        # type: (str, Optional[str], Optional[str], Optional[Properties]) -> None
+    def page(self, user_id, category, name, properties, timestamp=None):
+        # type: (str, Optional[str], Optional[str], Optional[Properties], Optional[datetime]) -> None
         if self._plugin.__class__.page != Plugin.page:
             self._logger.info('page(user_id={0}, category={1}, name={2}, properties={3})'.format(user_id, category, name, properties))
         try:
@@ -127,8 +128,8 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error('Error in page(). {0}.'.format(e))
 
-    def track(self, user_id, event):
-        # type: (str, Event) -> None
+    def track(self, user_id, event, timestamp=None):
+        # type: (str, Event, Optional[datetime]) -> None
         if self._plugin.__class__.track != Plugin.track:
             self._logger.info('track(user_id={0}, event={1}, properties={2})'.format(user_id, event.name, event.properties))
         try:
