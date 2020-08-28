@@ -12,14 +12,14 @@ Request = NamedTuple("Request", [("endpoint", str), ("data", str)])
 
 
 class MixpanelConsumer(object):
-    def __init__(self, api_key, upload_size, upload_interval, on_error, api_host=None, send_request=None):
+    def __init__(self, api_key, flush_queue_size, flush_interval, on_error, api_host=None, send_request=None):
         # type: (str, int, timedelta, Callable[[str], None], Optional[str], Optional[Callable[[Request], None]]) -> None
         self.api_key = api_key
         self.on_error = on_error
         self._consumer = Consumer(api_host=api_host)
         self._consumer._endpoints["alias"] = self._consumer._endpoints["events"]
         self._queue = AsyncConsumer.create_queue()  # type: queue.Queue
-        self._async_consumer = AsyncConsumer(message_queue=self._queue, do_upload=self._upload_batch, upload_size=upload_size, upload_interval=upload_interval)
+        self._async_consumer = AsyncConsumer(message_queue=self._queue, do_upload=self._upload_batch, flush_queue_size=flush_queue_size, flush_interval=flush_interval)
         self._send_request = send_request if send_request is not None else self._send_request_default  # type: Callable[[Request], None]
         atexit.register(self.shutdown)
         self._async_consumer.start()

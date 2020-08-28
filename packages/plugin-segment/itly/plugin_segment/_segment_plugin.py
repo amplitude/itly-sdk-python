@@ -1,16 +1,15 @@
 from datetime import datetime, timedelta
 from typing import Callable, Optional
 
-from itly.sdk import Plugin, PluginOptions, Properties, Event
+from itly.sdk import Plugin, PluginOptions, Properties, Event, Logger
 from ._segment_client import SegmentClient, Request
 
 
 class SegmentOptions(object):
-    def __init__(self, flush_at=10, flush_interval=1000, host=None, send_request=None):
-        # type: (int, int, Optional[str], Optional[Callable[[Request], None]]) -> None
-        self.flush_at = flush_at  # type: int
-        self.send_request = send_request  # type: Optional[Callable[[Request], None]]
-        self.flush_interval = flush_interval  # type: int
+    def __init__(self, flush_queue_size=10, flush_interval_ms=1000, host=None):
+        # type: (int, int, Optional[str]) -> None
+        self.flush_queue_size = flush_queue_size  # type: int
+        self.flush_interval_ms = flush_interval_ms  # type: int
         self.host = host  # type: Optional[str]
 
 
@@ -20,6 +19,8 @@ class SegmentPlugin(Plugin):
         self._write_key = write_key  # type: str
         self._options = options  # type: SegmentOptions
         self._client = None  # type: Optional[SegmentClient]
+        self._logger = Logger.NONE  # type: Logger
+        self._send_request = None  # type : Optional[Callable[[Request], None]]
 
     def id(self):
         # type: () -> str
@@ -28,8 +29,9 @@ class SegmentPlugin(Plugin):
     def load(self, options):
         # type: (PluginOptions) -> None
         self._client = SegmentClient(write_key=self._write_key, on_error=self._on_error,
-                                     upload_size=self._options.flush_at, upload_interval=timedelta(milliseconds=self._options.flush_interval),
-                                     host=self._options.host, send_request=self._options.send_request)
+                                     flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
+                                     host=self._options.host, send_request=self._send_request)
+        self._logger = options.logger
 
     def alias(self, user_id, previous_id, timestamp=None):
         # type: (str, str, Optional[datetime]) -> None

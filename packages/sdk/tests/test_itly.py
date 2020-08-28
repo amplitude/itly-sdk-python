@@ -70,8 +70,8 @@ class CustomPlugin(Plugin):
         # type: (Event) -> ValidationResponse
         return self._create_valid_response()
 
-    def on_validation_error(self, validation, event):
-        # type: (ValidationResponse, Event) -> None
+    def on_validation_error(self, validation, event, timestamp=None):
+        # type: (ValidationResponse, Event, Optional[datetime]) -> None
         pass
 
 

@@ -1,1 +1,1 @@
-from ._iteratively import IterativelyPlugin, IterativelyOptions
+from ._iteratively_plugin import IterativelyPlugin, IterativelyOptions

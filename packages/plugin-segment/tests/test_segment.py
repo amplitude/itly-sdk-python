@@ -11,11 +11,12 @@ class TestSegment(unittest.TestCase):
     def test_segment(self):
         requests = []
         options = SegmentOptions(
-            flush_at=3,
-            flush_interval=1000,
-            send_request=lambda request: requests.append(request)
+            flush_queue_size=3,
+            flush_interval_ms=1000,
         )
         p = SegmentPlugin('My-Key', options)
+        p._send_request = lambda request: requests.append(request)
+
         assert p.id() == 'segment'
         try:
             p.load(PluginOptions(environment=Environment.DEVELOPMENT))
@@ -142,8 +143,7 @@ class TestSegment(unittest.TestCase):
 
     @staticmethod
     def _clean_requests(requests):
-        for rr in requests:
-            for r in rr:
-                for request in rr.data:
-                    if 'messageId' in request:
-                        del request['messageId']
+        for request in requests:
+            for item in request.data:
+                if 'messageId' in item:
+                    del item['messageId']

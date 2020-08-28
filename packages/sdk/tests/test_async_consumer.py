@@ -13,8 +13,8 @@ class TestAsyncConsumer(unittest.TestCase):
         consumer = AsyncConsumer(
             message_queue=q,
             do_upload=lambda batch: batches.append([msg.data for msg in batch]),
-            upload_size=3,
-            upload_interval=timedelta(seconds=1)
+            flush_queue_size=3,
+            flush_interval=timedelta(seconds=1)
         )
         try:
             consumer.start()

@@ -12,13 +12,13 @@ Request = NamedTuple('Request', [('data', Any)])
 
 
 class SegmentClient(analytics.Client):
-    def __init__(self, write_key, on_error, upload_size, upload_interval, host, send_request):
+    def __init__(self, write_key, on_error, flush_queue_size, flush_interval, host, send_request):
         # type: (str, Callable[[str], None], int, timedelta, Optional[str], Optional[Callable[[Request], None]]) -> None
         super(SegmentClient, self).__init__(write_key=write_key, host=host, send=False, on_error=lambda e, _: on_error(e))
         self._host = host
         self.queue = AsyncConsumer.create_queue()  # type: queue.Queue
         self._send_request = send_request if send_request is not None else self._send_request_default  # type: Callable[[Request], None]
-        self.consumer = AsyncConsumer(message_queue=self.queue, do_upload=self._upload_batch, upload_size=upload_size, upload_interval=upload_interval)
+        self.consumer = AsyncConsumer(message_queue=self.queue, do_upload=self._upload_batch, flush_queue_size=flush_queue_size, flush_interval=flush_interval)
         atexit.register(self.shutdown)
         self.consumer.start()
 

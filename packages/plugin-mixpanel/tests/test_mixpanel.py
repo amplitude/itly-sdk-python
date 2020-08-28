@@ -11,11 +11,12 @@ class TestMixpanel(unittest.TestCase):
     def test_mixpanel(self):
         requests = []
         options = MixpanelOptions(
-            flush_at=3,
-            flush_interval=1000,
-            send_request=lambda request: requests.append(request)
+            flush_queue_size=3,
+            flush_interval_ms=1000,
         )
         p = MixpanelPlugin('My-Key', options)
+        p._send_request = lambda request: requests.append(request)
+
         assert p.id() == 'mixpanel'
         try:
             p.load(PluginOptions(environment=Environment.DEVELOPMENT))

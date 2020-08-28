@@ -8,12 +8,11 @@ from ._mixpanel_consumer import Request
 
 
 class MixpanelOptions(object):
-    def __init__(self, api_host=None, flush_at=10, flush_interval=1000, send_request=None):
-        # type: (Optional[str], int, int, Optional[Callable[[Request], None]]) -> None
+    def __init__(self, api_host=None, flush_queue_size=10, flush_interval_ms=1000):
+        # type: (Optional[str], int, int) -> None
         self.api_host = api_host  # type: Optional[str]
-        self.flush_at = flush_at  # type: int
-        self.flush_interval = flush_interval  # type: int
-        self.send_request = send_request  # type: Optional[Callable[[Request], None]]
+        self.flush_queue_size = flush_queue_size  # type: int
+        self.flush_interval_ms = flush_interval_ms  # type: int
 
 
 class MixpanelPlugin(Plugin):
@@ -23,6 +22,7 @@ class MixpanelPlugin(Plugin):
         self._options = options  # type: MixpanelOptions
         self._client = None  # type: Optional[MixpanelClient]
         self._logger = Logger.NONE  # type: Logger
+        self._send_request = None  # type: Optional[Callable[[Request], None]]
 
     def id(self):
         # type: () -> str
@@ -31,8 +31,8 @@ class MixpanelPlugin(Plugin):
     def load(self, options):
         # type: (PluginOptions) -> None
         self._client = MixpanelClient(api_key=self._api_key, on_error=self._on_error,
-                                      upload_size=self._options.flush_at, upload_interval=timedelta(milliseconds=self._options.flush_interval),
-                                      api_host=self._options.api_host, send_request=self._options.send_request)
+                                      flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
+                                      api_host=self._options.api_host, send_request=self._send_request)
         self._logger = options.logger
 
     def alias(self, user_id, previous_id, timestamp=None):

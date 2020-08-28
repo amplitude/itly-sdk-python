@@ -14,7 +14,7 @@ Request = NamedTuple("Request", [("url", str), ("is_json", bool), ("data", Any)]
 
 
 class AmplitudeClient(object):
-    def __init__(self, api_key, on_error, upload_size, upload_interval, events_endpoint, identification_endpoint, send_request):
+    def __init__(self, api_key, on_error, flush_queue_size, flush_interval, events_endpoint, identification_endpoint, send_request):
         # type: (str, Callable[[str], None], int, timedelta, Optional[str], Optional[str], Optional[Callable[[Request], None]]) -> None
         self.api_key = api_key
         self.on_error = on_error
@@ -24,7 +24,7 @@ class AmplitudeClient(object):
             "identification": Endpoint(url=identification_endpoint or "https://api.amplitude.com/identify", is_json=False),
         }
         self._send_request = send_request if send_request is not None else self._send_request_default  # type: Callable[[Request], None]
-        self._consumer = AsyncConsumer(message_queue=self._queue, do_upload=self._upload_batch, upload_size=upload_size, upload_interval=upload_interval)
+        self._consumer = AsyncConsumer(message_queue=self._queue, do_upload=self._upload_batch, flush_queue_size=flush_queue_size, flush_interval=flush_interval)
         atexit.register(self.shutdown)
         self._consumer.start()
 

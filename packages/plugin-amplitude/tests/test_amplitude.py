@@ -11,11 +11,12 @@ class TestAmplitude(unittest.TestCase):
     def test_amplitude(self):
         requests = []
         options = AmplitudeOptions(
-            flush_at=3,
-            flush_interval=1000,
-            send_request=lambda request: requests.append(request)
+            flush_queue_size=3,
+            flush_interval_ms=1000,
         )
         p = AmplitudePlugin('My-Key', options)
+        p._send_request = lambda request: requests.append(request)
+
         assert p.id() == 'amplitude'
         try:
             p.load(PluginOptions(environment=Environment.DEVELOPMENT))

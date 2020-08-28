@@ -59,8 +59,8 @@ class Plugin(object):
         # type: (Event) -> ValidationResponse
         return self._create_valid_response()
 
-    def on_validation_error(self, validation, event):
-        # type: (ValidationResponse, Event) -> None
+    def on_validation_error(self, validation, event, timestamp=None):
+        # type: (ValidationResponse, Event, Optional[datetime]) -> None
         pass
 
     def _create_valid_response(self):
@@ -165,11 +165,11 @@ class PluginSafeDecorator(Plugin):
             self._logger.error('Error in validate(). {0}.'.format(e))
             return self._create_invalid_response(message=str(e))
 
-    def on_validation_error(self, validation, event):
-        # type: (ValidationResponse, Event) -> None
+    def on_validation_error(self, validation, event, timestamp=None):
+        # type: (ValidationResponse, Event, Optional[datetime]) -> None
         if self._plugin.__class__.on_validation_error != Plugin.on_validation_error:
             self._logger.info("on_validation_error(event={0}, validation='{1}')".format(event.name, validation.message))
         try:
-            self._plugin.on_validation_error(validation, event)
+            self._plugin.on_validation_error(validation, event, timestamp)
         except Exception as e:
             self._logger.error('Error in on_validation_error(). {0}.'.format(e))
