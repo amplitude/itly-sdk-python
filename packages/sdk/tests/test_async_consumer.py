@@ -23,22 +23,22 @@ class TestAsyncConsumer(unittest.TestCase):
             q.put(AsyncConsumerMessage(message_type='data', data='2'))
 
             time.sleep(0.1)
-            assert batches == []
+            self.assertEqual(batches, [])
 
             q.put(AsyncConsumerMessage(message_type='data', data='3'))
             time.sleep(0.1)
 
-            assert batches == [["1", "2", "3"]]
+            self.assertEqual(batches, [["1", "2", "3"]])
 
             q.put(AsyncConsumerMessage(message_type='data', data='4'))
 
             time.sleep(0.1)
-            assert batches == [["1", "2", "3"]]
+            self.assertEqual(batches, [["1", "2", "3"]])
 
             consumer.flush()
 
             time.sleep(0.1)
-            assert batches == [["1", "2", "3"], ["4"]]
+            self.assertEqual(batches, [["1", "2", "3"], ["4"]])
 
             consumer.flush()
             consumer.flush()
@@ -47,21 +47,21 @@ class TestAsyncConsumer(unittest.TestCase):
             q.put(AsyncConsumerMessage(message_type='data', data='6'))
 
             time.sleep(0.1)
-            assert batches == [["1", "2", "3"], ["4"]]
+            self.assertEqual(batches, [["1", "2", "3"], ["4"]])
 
             time.sleep(1)
-            assert batches == [["1", "2", "3"], ["4"], ["5", "6"]]
+            self.assertEqual(batches, [["1", "2", "3"], ["4"], ["5", "6"]])
 
             q.put(AsyncConsumerMessage(message_type='message', data='7'))
             q.put(AsyncConsumerMessage(message_type='data', data='8'))
 
             time.sleep(0.1)
-            assert batches == [["1", "2", "3"], ["4"], ["5", "6"], ["7"]]
+            self.assertEqual(batches, [["1", "2", "3"], ["4"], ["5", "6"], ["7"]])
 
             consumer.flush()
 
             time.sleep(0.1)
-            assert batches == [["1", "2", "3"], ["4"], ["5", "6"], ["7"], ["8"]]
+            self.assertEqual(batches, [["1", "2", "3"], ["4"], ["5", "6"], ["7"], ["8"]])
 
             q.put(AsyncConsumerMessage(message_type='data', data='9'))
             q.put(AsyncConsumerMessage(message_type='data', data='10'))
@@ -69,4 +69,4 @@ class TestAsyncConsumer(unittest.TestCase):
             consumer.shutdown()
 
             time.sleep(0.1)
-            assert batches == [["1", "2", "3"], ["4"], ["5", "6"], ["7"], ["8"], ["9", "10"]]
+            self.assertEqual(batches, [["1", "2", "3"], ["4"], ["5", "6"], ["7"], ["8"], ["9", "10"]])

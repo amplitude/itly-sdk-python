@@ -97,7 +97,7 @@ class PluginSafeDecorator(Plugin):
         if self._plugin.__class__.alias != Plugin.alias:
             self._logger.info('alias(user_id={0}, previous_id={1})'.format(user_id, previous_id))
         try:
-            self._plugin.alias(user_id, previous_id)
+            self._plugin.alias(user_id, previous_id, timestamp)
         except Exception as e:
             self._logger.error('Error in alias(). {0}.'.format(e))
 
@@ -106,7 +106,7 @@ class PluginSafeDecorator(Plugin):
         if self._plugin.__class__.identify != Plugin.identify:
             self._logger.info('identify(user_id={0}, properties={1})'.format(user_id, properties))
         try:
-            self._plugin.identify(user_id, properties)
+            self._plugin.identify(user_id, properties, timestamp)
         except Exception as e:
             self._logger.error('Error in identify(). {0}.'.format(e))
 
@@ -115,7 +115,7 @@ class PluginSafeDecorator(Plugin):
         if self._plugin.__class__.group != Plugin.group:
             self._logger.info('group(user_id={0}, group_id={1}, properties={2})'.format(user_id, group_id, properties))
         try:
-            self._plugin.group(user_id, group_id, properties)
+            self._plugin.group(user_id, group_id, properties, timestamp)
         except Exception as e:
             self._logger.error('Error in group(). {0}.'.format(e))
 
@@ -124,7 +124,7 @@ class PluginSafeDecorator(Plugin):
         if self._plugin.__class__.page != Plugin.page:
             self._logger.info('page(user_id={0}, category={1}, name={2}, properties={3})'.format(user_id, category, name, properties))
         try:
-            self._plugin.page(user_id, category, name, properties)
+            self._plugin.page(user_id, category, name, properties, timestamp)
         except Exception as e:
             self._logger.error('Error in page(). {0}.'.format(e))
 
@@ -133,7 +133,7 @@ class PluginSafeDecorator(Plugin):
         if self._plugin.__class__.track != Plugin.track:
             self._logger.info('track(user_id={0}, event={1}, properties={2})'.format(user_id, event.name, event.properties))
         try:
-            self._plugin.track(user_id, event)
+            self._plugin.track(user_id, event, timestamp)
         except Exception as e:
             self._logger.error('Error in track(). {0}.'.format(e))
 

@@ -10,5 +10,3 @@ from ._plugin import Plugin
 from ._async_consumer import AsyncConsumer, AsyncConsumerMessage
 
 from ._itly import Itly
-
-itly = Itly()

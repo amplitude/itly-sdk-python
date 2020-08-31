@@ -24,6 +24,9 @@ class Properties(object):
         # type: () -> int
         return len(self._properties)
 
+    def __contains__(self, item):
+        return item in self._properties
+
     @staticmethod
     def concat(properties):
         # type: (List[Optional[Properties]]) -> Properties

@@ -1,8 +1,9 @@
 import enum
 import unittest
+from typing import Optional, List
 
 from itly.plugin_schema_validator import SchemaValidatorPlugin
-from itly.sdk import PluginOptions, Environment, Properties, Event
+from itly.sdk import PluginOptions, Environment, Properties, Event, Logger
 
 DEFAULT_SCHEMAS = {
     'context': '{"$id":"https://iterative.ly/company/77b37977-cb3a-42eb-bce3-09f5f7c3adb7/context","$schema":"http://json-schema.org/draft-07/schema#","title":"Context","description":"","type":"object","properties":{"requiredString":{"description":"description for context requiredString","type":"string"},"optionalEnum":{"description":"description for context optionalEnum","enum":["Value 1","Value 2"]}},"additionalProperties":false,"required":["requiredString"]}',
@@ -21,20 +22,171 @@ DEFAULT_SCHEMAS = {
 }
 
 
-class OptionalEnum(enum.Enum):
-    VALUE_1 = 'Value 1'
-    VALUE_2 = 'Value 2'
+class Context(Event):
+    class OptionalEnum(enum.Enum):
+        VALUE_1 = 'Value 1'
+        VALUE_2 = 'Value 2'
+
+    def __init__(self, required_string, optional_enum=None):
+        # type: (str, Optional[Context.OptionalEnum]) -> None
+        properties = {
+            "requiredString": required_string
+        }
+        if optional_enum is not None:
+            properties['optionalEnum'] = optional_enum.value
+        super(Context, self).__init__(
+            "context",
+            Properties(**properties),
+        )
+
+
+class Group(Event):
+    def __init__(self, required_boolean, optional_string=None):
+        # type: (bool, Optional[str]) -> None
+        properties = {
+            "requiredBoolean": required_boolean
+        }
+        if optional_string is not None:
+            properties['optionalString'] = optional_string
+        super(Group, self).__init__(
+            "group",
+            Properties(**properties),
+        )
+
+
+class Identify(Event):
+    def __init__(self, required_number, optional_array=None):
+        # type: (float, Optional[List[str]]) -> None
+        properties = {
+            "requiredNumber": required_number
+        }
+        if optional_array is not None:
+            properties['optionalArray'] = optional_array
+        super(Identify, self).__init__(
+            "identify",
+            Properties(**properties),
+        )
+
+
+class EventWithAllProperties(Event):
+    class RequiredEnum(enum.Enum):
+        ENUM_1 = "Enum1"
+        ENUM_2 = "Enum2"
+
+    def __init__(self, required_array, required_boolean, required_enum, required_integer, required_number, required_string, optional_string=None):
+        # type: (List[str], bool, EventWithAllProperties.RequiredEnum, int, float, str, Optional[str]) -> None
+        properties = {
+            "requiredArray": required_array,
+            "requiredBoolean": required_boolean,
+            "requiredConst": "some-const-value",
+            "requiredEnum": required_enum.value,
+            "requiredInteger": required_integer,
+            "requiredNumber": required_number,
+            "requiredString": required_string
+        }
+        if optional_string is not None:
+            properties['optionalString'] = optional_string
+        super(EventWithAllProperties, self).__init__(
+            "Event With All Properties",
+            Properties(**properties),
+        )
+
+
+class EventWithConstTypes(Event):
+    def __init__(self):
+        # type: () -> None
+        properties = {
+            "Boolean Const": True,
+            "Integer Const": 10,
+            "Number Const": 2.2,
+            "String Const": "String-Constant",
+            "String Const WIth Quotes": "\"String \"Const With\" Quotes\"",
+            "String Int Const": 0
+        }
+        super(EventWithConstTypes, self).__init__(
+            "Event With Const Types",
+            Properties(**properties),
+        )
+
+
+class EventMaxIntForTest(Event):
+    def __init__(self, int_max_10):
+        # type: (int) -> None
+        properties = {
+            "intMax10": int_max_10
+        }
+
+        super(EventMaxIntForTest, self).__init__(
+            "EventMaxIntForTest",
+            Properties(**properties),
+        )
 
 
 class TestSchemaValidatorPlugin(unittest.TestCase):
-    def test_context_with_properties_valid(self):
+    def test_validate_context_with_properties_valid(self):
         plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
-        plugin.load(PluginOptions(environment=Environment.PRODUCTION))
-        validation = plugin.validate(Event(
-            'context',
-            Properties(
-                requiredString="Required context string",
-                optionalEnum=OptionalEnum.VALUE_1
-            )
+        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        validation = plugin.validate(Context(
+            required_string="Required context string",
+            optional_enum=Context.OptionalEnum.VALUE_1
         ))
-        assert validation.valid is True
+        self.assertTrue(validation.valid)
+
+    def test_validate_group_with_properties_valid(self):
+        plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
+        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        validation = plugin.validate(Group(
+            required_boolean=False,
+            optional_string="I'm optional!"
+        ))
+        self.assertTrue(validation.valid)
+
+    def test_validate_identify_with_properties_valid(self):
+        plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
+        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        validation = plugin.validate(Identify(
+            required_number=2.0,
+            optional_array=['optional']
+        ))
+        self.assertTrue(validation.valid)
+
+    def test_validate_event_with_all_properties_valid(self):
+        plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
+        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        validation = plugin.validate(EventWithAllProperties(
+            required_array=['required', 'string'],
+            required_boolean=True,
+            required_enum=EventWithAllProperties.RequiredEnum.ENUM_1,
+            required_integer=42,
+            required_number=2.0,
+            required_string="don't forget this. it's required.",
+        ))
+        self.assertTrue(validation.valid)
+
+    def test_validate_event_with_const_types_valid(self):
+        plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
+        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        validation = plugin.validate(EventWithConstTypes())
+        self.assertTrue(validation.valid)
+
+    def test_validate_invalid_event_not_valid(self):
+        plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
+        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        validation = plugin.validate(EventMaxIntForTest(int_max_10=20))
+        self.assertFalse(validation.valid)
+        self.assertEqual(validation.message, """Passed in EventMaxIntForTest properties did not validate against your tracking plan. 20 is greater than the maximum of 10
+
+Failed validating 'maximum' in schema['properties']['intMax10']:
+    {'description': 'property to test schema validation',
+     'maximum': 10,
+     'type': 'integer'}
+
+On instance['intMax10']:
+    20""")
+
+    def test_validate_unknown_event_exception(self):
+        plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
+        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        with self.assertRaises(ValueError) as ctx:
+            plugin.validate(Event('unknown'))
+        self.assertEqual(str(ctx.exception), "Event 'unknown' not found in tracking plan.")
