@@ -1,14 +1,14 @@
 from datetime import timedelta, datetime
 from typing import Optional, Callable
 
-from itly.sdk import Plugin, PluginOptions, Properties, Event, Environment, ValidationResponse
+from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Environment, ValidationResponse
 from ._iteratively_client import IterativelyClient, TrackType, Request
 
 
 class IterativelyOptions(object):
-    def __init__(self, url, environment=Environment.DEVELOPMENT, omit_values=False, flush_queue_size=10, flush_interval_ms=1000, disabled=None):
-        # type: (str, Environment, bool, int, int, Optional[bool]) -> None
-        self.url = url  # type: str
+    def __init__(self, url=None, environment=Environment.DEVELOPMENT, omit_values=False, flush_queue_size=10, flush_interval_ms=1000, disabled=None):
+        # type: (Optional[str], Environment, bool, int, int, Optional[bool]) -> None
+        self.url = url  # type: Optional[str]
         self.environment = environment  # type: Environment
         self.omit_values = omit_values  # type: bool
         self.flush_queue_size = flush_queue_size  # type: int
@@ -29,11 +29,12 @@ class IterativelyPlugin(Plugin):
         return 'iteratively'
 
     def load(self, options):
-        # type: (PluginOptions) -> None
+        # type: (PluginLoadOptions) -> None
         if self._options.disabled:
             options.logger.info("disabled")
             return
 
+        assert self._options.url is not None
         self._client = IterativelyClient(api_endpoint=self._options.url, api_key=self._api_key,
                                          flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
                                          omit_values=self._options.omit_values, on_error=self._on_error, send_request=self._send_request)

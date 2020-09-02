@@ -7,7 +7,7 @@ import six
 
 from ._event import Event
 from ._logger import Logger
-from ._plugin_options import PluginOptions
+from ._plugin_options import PluginLoadOptions
 from ._properties import Properties
 from ._validation_response import ValidationResponse
 
@@ -22,7 +22,7 @@ class Plugin(object):
     # Tracking methods
 
     def load(self, options):
-        # type: (PluginOptions) -> None
+        # type: (PluginLoadOptions) -> None
         pass
 
     def alias(self, user_id, previous_id, timestamp=None):
@@ -85,7 +85,7 @@ class PluginSafeDecorator(Plugin):
     # Tracking methods
 
     def load(self, options):
-        # type: (PluginOptions) -> None
+        # type: (PluginLoadOptions) -> None
         self._logger.info('load()')
         try:
             self._plugin.load(options)
@@ -139,7 +139,8 @@ class PluginSafeDecorator(Plugin):
 
     def flush(self):
         # type: () -> None
-        self._logger.info('flush()')
+        if self._plugin.__class__.flush != Plugin.flush:
+            self._logger.info('flush()')
         try:
             self._plugin.flush()
         except Exception as e:
@@ -147,7 +148,8 @@ class PluginSafeDecorator(Plugin):
 
     def shutdown(self):
         # type: () -> None
-        self._logger.info('shutdown()')
+        if self._plugin.__class__.shutdown != Plugin.shutdown:
+            self._logger.info('shutdown()')
         try:
             self._plugin.shutdown()
         except Exception as e:

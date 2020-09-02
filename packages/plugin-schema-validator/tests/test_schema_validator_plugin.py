@@ -3,7 +3,7 @@ import unittest
 from typing import Optional, List
 
 from itly.plugin_schema_validator import SchemaValidatorPlugin
-from itly.sdk import PluginOptions, Environment, Properties, Event, Logger
+from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 DEFAULT_SCHEMAS = {
     'context': '{"$id":"https://iterative.ly/company/77b37977-cb3a-42eb-bce3-09f5f7c3adb7/context","$schema":"http://json-schema.org/draft-07/schema#","title":"Context","description":"","type":"object","properties":{"requiredString":{"description":"description for context requiredString","type":"string"},"optionalEnum":{"description":"description for context optionalEnum","enum":["Value 1","Value 2"]}},"additionalProperties":false,"required":["requiredString"]}',
@@ -125,7 +125,7 @@ class EventMaxIntForTest(Event):
 class TestSchemaValidatorPlugin(unittest.TestCase):
     def test_validate_context_with_properties_valid(self):
         plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
-        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        plugin.load(PluginLoadOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
         validation = plugin.validate(Context(
             required_string="Required context string",
             optional_enum=Context.OptionalEnum.VALUE_1
@@ -134,7 +134,7 @@ class TestSchemaValidatorPlugin(unittest.TestCase):
 
     def test_validate_group_with_properties_valid(self):
         plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
-        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        plugin.load(PluginLoadOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
         validation = plugin.validate(Group(
             required_boolean=False,
             optional_string="I'm optional!"
@@ -143,7 +143,7 @@ class TestSchemaValidatorPlugin(unittest.TestCase):
 
     def test_validate_identify_with_properties_valid(self):
         plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
-        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        plugin.load(PluginLoadOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
         validation = plugin.validate(Identify(
             required_number=2.0,
             optional_array=['optional']
@@ -152,7 +152,7 @@ class TestSchemaValidatorPlugin(unittest.TestCase):
 
     def test_validate_event_with_all_properties_valid(self):
         plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
-        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        plugin.load(PluginLoadOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
         validation = plugin.validate(EventWithAllProperties(
             required_array=['required', 'string'],
             required_boolean=True,
@@ -165,13 +165,13 @@ class TestSchemaValidatorPlugin(unittest.TestCase):
 
     def test_validate_event_with_const_types_valid(self):
         plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
-        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        plugin.load(PluginLoadOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
         validation = plugin.validate(EventWithConstTypes())
         self.assertTrue(validation.valid)
 
     def test_validate_invalid_event_not_valid(self):
         plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
-        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        plugin.load(PluginLoadOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
         validation = plugin.validate(EventMaxIntForTest(int_max_10=20))
         self.assertFalse(validation.valid)
         self.assertEqual(validation.message, """Passed in EventMaxIntForTest properties did not validate against your tracking plan. 20 is greater than the maximum of 10
@@ -186,7 +186,7 @@ On instance['intMax10']:
 
     def test_validate_unknown_event_exception(self):
         plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
-        plugin.load(PluginOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
+        plugin.load(PluginLoadOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
         with self.assertRaises(ValueError) as ctx:
             plugin.validate(Event('unknown'))
         self.assertEqual(str(ctx.exception), "Event 'unknown' not found in tracking plan.")

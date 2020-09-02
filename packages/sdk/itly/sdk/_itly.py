@@ -6,7 +6,7 @@ from ._event import Event
 from ._logger import Logger, LoggerPrefixSafeDecorator
 from ._options import Options
 from ._plugin import Plugin, PluginSafeDecorator
-from ._plugin_options import PluginOptions
+from ._plugin_options import PluginLoadOptions
 from ._properties import Properties
 from ._validation_options import ValidationOptions
 from ._validation_response import ValidationResponse
@@ -44,13 +44,13 @@ class Itly(object):
 
         self._validationOptions = self._options.validation
 
-        self._logger.debug('load')
+        self._logger.debug('load()')
 
         for plugin in self._options.plugins:
             plugin_logger = LoggerPrefixSafeDecorator(self._options.logger, '[plugin-{0}] '.format(plugin.id()))
             plugin = PluginSafeDecorator(plugin, plugin_logger)
             self._plugins.append(plugin)
-            plugin_options = PluginOptions(environment=self._options.environment, logger=plugin_logger)
+            plugin_options = PluginLoadOptions(environment=self._options.environment, logger=plugin_logger)
             plugin.load(plugin_options)
 
         context_event = Event(
@@ -139,7 +139,7 @@ class Itly(object):
         if self._disabled():
             return
 
-        self._logger.debug('shutdown')
+        self._logger.debug('shutdown()')
 
         self._is_shutdown = True
         for plugin in self._plugins:

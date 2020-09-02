@@ -3,7 +3,7 @@ from typing import Dict
 
 import jsonschema
 
-from itly.sdk import Plugin, Event, ValidationResponse, PluginOptions
+from itly.sdk import Plugin, Event, ValidationResponse, PluginLoadOptions
 
 
 class SchemaValidatorPlugin(Plugin):
@@ -17,7 +17,7 @@ class SchemaValidatorPlugin(Plugin):
         return 'schema-validator'
 
     def load(self, options):
-        # type: (PluginOptions) -> None
+        # type: (PluginLoadOptions) -> None
         for schema_key, raw_schema in self._schemas.items():
             schema = json.loads(raw_schema)
             jsonschema.Draft7Validator.check_schema(schema)

@@ -3,7 +3,7 @@ import unittest
 from datetime import datetime
 from typing import List, Optional, Tuple
 
-from itly.sdk import Itly, Options, Environment, Event, Properties, Logger, Plugin, PluginOptions, ValidationResponse, ValidationOptions
+from itly.sdk import Itly, Options, Environment, Event, Properties, Logger, Plugin, PluginLoadOptions, ValidationResponse, ValidationOptions
 
 
 class CustomLogger(Logger):
@@ -33,7 +33,7 @@ class CustomPlugin(Plugin):
         return 'custom'
 
     def load(self, options):
-        # type: (PluginOptions) -> None
+        # type: (PluginLoadOptions) -> None
         pass
 
     def alias(self, user_id, previous_id, timestamp=None):

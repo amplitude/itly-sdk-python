@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from itly.plugin_amplitude import AmplitudePlugin, AmplitudeOptions
 from itly.plugin_amplitude._amplitude_client import Request
-from itly.sdk import PluginOptions, Environment, Properties, Event, Logger
+from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 
 class TestAmplitude(unittest.TestCase):
@@ -19,7 +19,7 @@ class TestAmplitude(unittest.TestCase):
 
         self.assertEqual(p.id(), 'amplitude')
         try:
-            p.load(PluginOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
+            p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
             p.identify("user-1", Properties(item1='value1', item2=2))
             time.sleep(0.1)

@@ -2,7 +2,7 @@ import time
 from datetime import datetime, timedelta
 from typing import Optional, Callable
 
-from itly.sdk import Plugin, PluginOptions, Properties, Event, Logger
+from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 from ._mixpanel_client import MixpanelClient
 from ._mixpanel_consumer import Request
 
@@ -29,7 +29,7 @@ class MixpanelPlugin(Plugin):
         return 'mixpanel'
 
     def load(self, options):
-        # type: (PluginOptions) -> None
+        # type: (PluginLoadOptions) -> None
         self._client = MixpanelClient(api_key=self._api_key, on_error=self._on_error,
                                       flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
                                       api_host=self._options.api_host, send_request=self._send_request)

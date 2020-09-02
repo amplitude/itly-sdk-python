@@ -4,4 +4,4 @@ from ._environment import Environment
 from ._logger import Logger
 
 
-PluginOptions = NamedTuple('PluginOptions', [('environment', Environment), ('logger', Logger)])
+PluginLoadOptions = NamedTuple('PluginLoadOptions', [('environment', Environment), ('logger', Logger)])

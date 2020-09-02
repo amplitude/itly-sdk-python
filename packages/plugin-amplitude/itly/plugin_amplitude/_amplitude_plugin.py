@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 from typing import Optional, Callable
 
-from itly.sdk import Plugin, PluginOptions, Properties, Event, Logger
+from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 from ._amplitude_client import AmplitudeClient, Request
 
 
@@ -28,7 +28,7 @@ class AmplitudePlugin(Plugin):
         return 'amplitude'
 
     def load(self, options):
-        # type: (PluginOptions) -> None
+        # type: (PluginLoadOptions) -> None
         self._client = AmplitudeClient(api_key=self._api_key, on_error=self._on_error,
                                        flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
                                        events_endpoint=self._options.events_endpoint, identification_endpoint=self._options.identification_endpoint,

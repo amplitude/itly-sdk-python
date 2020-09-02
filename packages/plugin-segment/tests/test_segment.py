@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from itly.plugin_segment import SegmentPlugin, SegmentOptions
 from itly.plugin_segment._segment_client import Request
-from itly.sdk import PluginOptions, Environment, Properties, Event, Logger
+from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 
 class TestSegment(unittest.TestCase):
@@ -19,7 +19,7 @@ class TestSegment(unittest.TestCase):
 
         self.assertEqual(p.id(), 'segment')
         try:
-            p.load(PluginOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
+            p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
             now = datetime(year=2020, month=8, day=27, hour=16, minute=41, second=25)
 

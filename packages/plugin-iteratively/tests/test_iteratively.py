@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from itly.plugin_iteratively import IterativelyPlugin, IterativelyOptions
 from itly.plugin_iteratively._iteratively_client import Request
-from itly.sdk import PluginOptions, Environment, Properties, Event, ValidationResponse, Logger
+from itly.sdk import PluginLoadOptions, Environment, Properties, Event, ValidationResponse, Logger
 
 
 class TestIteratively(unittest.TestCase):
@@ -21,7 +21,7 @@ class TestIteratively(unittest.TestCase):
 
         self.assertEqual(p.id(), 'iteratively')
         try:
-            p.load(PluginOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
+            p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
             now = datetime(year=2020, month=8, day=27, hour=16, minute=41, second=25)
 
@@ -128,7 +128,7 @@ class TestIteratively(unittest.TestCase):
 
         self.assertEqual(p.id(), 'iteratively')
         try:
-            p.load(PluginOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
+            p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
             now = datetime(year=2020, month=8, day=27, hour=16, minute=41, second=25)
 
@@ -235,7 +235,7 @@ class TestIteratively(unittest.TestCase):
 
         self.assertEqual(p.id(), 'iteratively')
         try:
-            p.load(PluginOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
+            p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
             now = datetime(year=2020, month=8, day=27, hour=16, minute=41, second=25)
 

@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Callable, Optional
 
-from itly.sdk import Plugin, PluginOptions, Properties, Event, Logger
+from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 from ._segment_client import SegmentClient, Request
 
 
@@ -27,7 +27,7 @@ class SegmentPlugin(Plugin):
         return 'segment'
 
     def load(self, options):
-        # type: (PluginOptions) -> None
+        # type: (PluginLoadOptions) -> None
         self._client = SegmentClient(write_key=self._write_key, on_error=self._on_error,
                                      flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
                                      host=self._options.host, send_request=self._send_request)
