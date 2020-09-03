@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='itly.plugin-amplitude',
-    version='0.0.3',
+    version='0.0.4',
     description='Iteratively Analytics SDK - Amplitude Plugin',
     long_description='Iteratively Analytics SDK - Amplitude Plugin',
     url='https://github.com/iterativelyhq/itly-sdk-python',

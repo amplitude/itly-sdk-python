@@ -5,7 +5,7 @@ import json
 import queue
 import time
 
-import requests
+from requests import Session
 
 from itly.sdk import AsyncConsumer, AsyncConsumerMessage
 
@@ -24,6 +24,7 @@ class AmplitudeClient(object):
             "identification": Endpoint(url=identification_endpoint or "https://api.amplitude.com/identify", is_json=False),
         }
         self._send_request = send_request if send_request is not None else self._send_request_default  # type: Callable[[Request], None]
+        self._session = Session()
         self._consumer = AsyncConsumer(message_queue=self._queue, do_upload=self._upload_batch, flush_queue_size=flush_queue_size, flush_interval=flush_interval)
         atexit.register(self.shutdown)
         self._consumer.start()
@@ -68,9 +69,9 @@ class AmplitudeClient(object):
     def _send_request_default(self, request):
         # type: (Request) -> None
         if request.is_json:
-            response = requests.post(request.url, json=request.data)
+            response = self._session.post(request.url, json=request.data)
         else:
-            response = requests.post(request.url, data=request.data)
+            response = self._session.post(request.url, data=request.data)
         if response.status_code >= 300:
             self.on_error('Unexpected status code for {0}: {1}'.format(request.url, response.status_code))
 

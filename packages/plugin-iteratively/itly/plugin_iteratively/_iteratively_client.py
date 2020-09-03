@@ -4,7 +4,7 @@ import queue
 from datetime import datetime, timedelta
 from typing import Callable, List, Optional, NamedTuple, Any
 
-import requests
+from requests import Session
 
 from itly.sdk import AsyncConsumer, AsyncConsumerMessage, Event, Properties, ValidationResponse
 
@@ -27,6 +27,7 @@ class IterativelyClient(object):
         self.on_error = on_error
         self._queue = AsyncConsumer.create_queue()  # type: queue.Queue
         self._send_request = send_request if send_request is not None else self._send_request_default  # type: Callable[[Request], None]
+        self._session = Session()
         self._consumer = AsyncConsumer(self._queue, do_upload=self._upload_batch, flush_queue_size=flush_queue_size, flush_interval=flush_interval)
         atexit.register(self.shutdown)
         self._consumer.start()
@@ -78,7 +79,7 @@ class IterativelyClient(object):
     def _send_request_default(self, request):
         # type: (Request) -> None
         try:
-            response = requests.post(self.api_endpoint, json=request.data, headers={'Authorization': 'Bearer ' + self.api_key})
+            response = self._session.post(self.api_endpoint, json=request.data, headers={'Authorization': 'Bearer ' + self.api_key})
         except Exception as e:
             raise Exception("A unhandled exception occurred. ({0}).".format(e))
         if response.status_code < 300:
