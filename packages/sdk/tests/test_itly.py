@@ -186,7 +186,7 @@ class TestItly(unittest.TestCase):
         itly.identify('user-id')
 
         log_text = '\n'.join(logger.log_lines)
-        self.assertEqual(log_text, """[itly-core] load
+        self.assertEqual(log_text, """[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=identify, properties=None)
@@ -202,7 +202,7 @@ class TestItly(unittest.TestCase):
         ))
 
         log_text = '\n'.join(logger.log_lines)
-        self.assertEqual(log_text, """[itly-core] load
+        self.assertEqual(log_text, """[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=identify, properties={"required_number": 42.0})
@@ -216,7 +216,7 @@ class TestItly(unittest.TestCase):
         itly.group('user-id', 'group-id')
 
         log_text = '\n'.join(logger.log_lines)
-        self.assertEqual(log_text, """[itly-core] load
+        self.assertEqual(log_text, """[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=group, properties=None)
@@ -232,7 +232,7 @@ class TestItly(unittest.TestCase):
         ))
 
         log_text = '\n'.join(logger.log_lines)
-        self.assertEqual(log_text, """[itly-core] load
+        self.assertEqual(log_text, """[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=group, properties={"required_boolean": true})
@@ -277,7 +277,7 @@ class TestItly(unittest.TestCase):
         itly.shutdown()
 
         log_text = '\n'.join(logger.log_lines)
-        self.assertEqual(log_text, '''[itly-core] load
+        self.assertEqual(log_text, '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties={"requiredString": "A required string", "optionalEnum": "Value 1"})
 [plugin-custom] validate(event=identify, properties={"user_prop": 1})
@@ -295,7 +295,7 @@ class TestItly(unittest.TestCase):
 [plugin-custom] validate(event=EventMaxIntForTest, properties={"int_max_10": 20})
 [plugin-custom] track(user_id=test-user-id, event=EventMaxIntForTest, properties={"requiredString": "A required string", "optionalEnum": "Value 1", "int_max_10": 20})
 [plugin-custom] flush()
-[itly-core] shutdown
+[itly-core] shutdown()
 [plugin-custom] shutdown()''')
 
     def test_events_disabled(self):
@@ -343,33 +343,33 @@ class TestItly(unittest.TestCase):
     def test_development_failed_validation_on_validation_error(self):
         # type: () -> None
         validation_results = [
-            (None, "Validation Error: invalid event!!!", '''[itly-core] load
+            (None, "Validation Error: invalid event!!!", '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] on_validation_error(event=event, validation='invalid event!!!')'''),
-            (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=False), None, '''[itly-core] load
+            (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=False), None, '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] on_validation_error(event=event, validation='invalid event!!!')'''),
-            (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=True), "Validation Error: invalid event!!!", '''[itly-core] load
+            (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=True), "Validation Error: invalid event!!!", '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] on_validation_error(event=event, validation='invalid event!!!')'''),
-            (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=False), None, '''[itly-core] load
+            (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=False), None, '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] on_validation_error(event=event, validation='invalid event!!!')
 [plugin-custom] track(user_id=user-id, event=event, properties={"invalid": true})'''),
-            (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=True), "Validation Error: invalid event!!!", '''[itly-core] load
+            (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=True), "Validation Error: invalid event!!!", '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] on_validation_error(event=event, validation='invalid event!!!')'''),
-            (ValidationOptions(disabled=True, track_invalid=True, error_on_invalid=True), None, '''[itly-core] load
+            (ValidationOptions(disabled=True, track_invalid=True, error_on_invalid=True), None, '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] track(user_id=user-id, event=event, properties={"invalid": true})'''),
@@ -379,33 +379,33 @@ class TestItly(unittest.TestCase):
     def test_production_failed_validation_on_validation_error(self):
         # type: () -> None
         validation_results = [
-            (None, None, '''[itly-core] load
+            (None, None, '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] on_validation_error(event=event, validation='invalid event!!!')'''),
-            (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=False), None, '''[itly-core] load
+            (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=False), None, '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] on_validation_error(event=event, validation='invalid event!!!')'''),
-            (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=True), "Validation Error: invalid event!!!", '''[itly-core] load
+            (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=True), "Validation Error: invalid event!!!", '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] on_validation_error(event=event, validation='invalid event!!!')'''),
-            (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=False), None, '''[itly-core] load
+            (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=False), None, '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] on_validation_error(event=event, validation='invalid event!!!')
 [plugin-custom] track(user_id=user-id, event=event, properties={"invalid": true})'''),
-            (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=True), "Validation Error: invalid event!!!", '''[itly-core] load
+            (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=True), "Validation Error: invalid event!!!", '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] on_validation_error(event=event, validation='invalid event!!!')'''),
-            (ValidationOptions(disabled=True, track_invalid=True, error_on_invalid=True), None, '''[itly-core] load
+            (ValidationOptions(disabled=True, track_invalid=True, error_on_invalid=True), None, '''[itly-core] load()
 [plugin-custom] load()
 [plugin-custom] validate(event=context, properties=None)
 [plugin-custom] track(user_id=user-id, event=event, properties={"invalid": true})'''),

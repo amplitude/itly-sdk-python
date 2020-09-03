@@ -165,7 +165,7 @@ class Itly(object):
 
         assert self._validationOptions is not None
         if self._validationOptions.error_on_invalid:
-            raise Exception('Validation Error: {0}'.format(failed_validations[0].message))
+            raise ValueError('Validation Error: {0}'.format(failed_validations[0].message))
 
         return False
 
