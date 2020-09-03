@@ -5,6 +5,8 @@ from typing import Optional, Callable, List, Tuple, NamedTuple, Any
 
 AsyncConsumerMessage = NamedTuple("AsyncConsumerMessage", [("message_type", str), ("data", Any)])
 
+_dummy_event = Event()
+
 
 class AsyncConsumer(Thread):
     @staticmethod
@@ -64,7 +66,7 @@ class AsyncConsumer(Thread):
             try:
                 timeout = (self._flush_interval_ms - (now - start)).total_seconds()
                 item = self._queue.get(block=True, timeout=timeout)
-                if isinstance(item.data, Event):
+                if isinstance(item.data, type(_dummy_event)):
                     return items, item.data
                 if len(items) > 0 and items[-1].message_type != item.message_type:
                     self._pending_message = item

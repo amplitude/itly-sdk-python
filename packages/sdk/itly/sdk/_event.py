@@ -3,7 +3,7 @@ from typing import Optional
 from ._properties import Properties
 
 
-class Event:
+class Event(object):
     def __init__(self, name, properties=None, event_id=None, version=None):
         # type: (str, Optional[Properties], Optional[str], Optional[str]) -> None
         self.name = name  # type: str

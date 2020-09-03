@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='itly.sdk',
-    version='0.0.19',
+    version='0.0.25',
     description='Iteratively Analytics SDK',
     long_description='Iteratively Analytics SDK',
     url='https://github.com/iterativelyhq/itly-sdk-python',
