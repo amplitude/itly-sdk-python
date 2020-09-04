@@ -7,15 +7,14 @@ from ._mixpanel_consumer import MixpanelConsumer, Request
 
 
 class MixpanelClient(Mixpanel):
-    def __init__(self, api_key, on_error, flush_queue_size, flush_interval, api_host, send_request):
-        # type: (str, Callable[[str], None], int, timedelta, Optional[str], Optional[Callable[[Request], None]]) -> None
+    def __init__(self, api_key: str, on_error: Callable[[str], None], flush_queue_size: int, flush_interval: timedelta,
+                 api_host: Optional[str], send_request: Optional[Callable[[Request], None]]) -> None:
         consumer = MixpanelConsumer(api_key=api_key, on_error=on_error, api_host=api_host,
                                     flush_queue_size=flush_queue_size, flush_interval=flush_interval,
                                     send_request=send_request)
         super(MixpanelClient, self).__init__(token=api_key, consumer=consumer)
 
-    def alias(self, alias_id, original, meta=None):
-        # type: (str, str, Optional[Dict]) -> None
+    def alias(self, alias_id: str, original: str, meta: Optional[Dict] = None) -> None:
         event = {
             'event': '$create_alias',
             'properties': {
@@ -28,10 +27,8 @@ class MixpanelClient(Mixpanel):
             event.update(meta)
         self._consumer.send('alias', json_dumps(event, cls=self._serializer))
 
-    def flush(self):
-        # type: () -> None
+    def flush(self) -> None:
         self._consumer.flush()
 
-    def shutdown(self):
-        # type: () -> None
+    def shutdown(self) -> None:
         self._consumer.shutdown()

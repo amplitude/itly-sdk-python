@@ -7,73 +7,58 @@ from itly.sdk import Itly, Options, Environment, Event, Properties, Logger, Plug
 
 
 class CustomLogger(Logger):
-    def __init__(self):
-        # type: () -> None
-        self.log_lines = []  # type: List[str]
+    def __init__(self) -> None:
+        self.log_lines: List[str] = []
 
-    def debug(self, message):
-        # type: (str) -> None
+    def debug(self, message: str) -> None:
         self.log_lines.append(message)
 
-    def info(self, message):
-        # type: (str) -> None
+    def info(self, message: str) -> None:
         self.log_lines.append(message)
 
-    def warn(self, message):
-        # type: (str) -> None
+    def warn(self, message: str) -> None:
         self.log_lines.append(message)
 
-    def error(self, message):
-        # type: (str) -> None
+    def error(self, message: str) -> None:
         self.log_lines.append(message)
 
 
 class CustomPlugin(Plugin):
-    def id(self):
+    def id(self) -> str:
         return 'custom'
 
-    def load(self, options):
-        # type: (PluginLoadOptions) -> None
+    def load(self, options: PluginLoadOptions) -> None:
         pass
 
-    def alias(self, user_id, previous_id, timestamp=None):
-        # type: (str, str, Optional[datetime]) -> None
+    def alias(self, user_id: str, previous_id: str, timestamp: Optional[datetime] = None) -> None:
         pass
 
-    def identify(self, user_id, properties, timestamp=None):
-        # type: (str, Optional[Properties], Optional[datetime]) -> None
+    def identify(self, user_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
         pass
 
-    def group(self, user_id, group_id, properties, timestamp=None):
-        # type: (str, str, Optional[Properties], Optional[datetime]) -> None
+    def group(self, user_id: str, group_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
         pass
 
-    def page(self, user_id, category, name, properties, timestamp=None):
-        # type: (str, Optional[str], Optional[str], Optional[Properties], Optional[datetime]) -> None
+    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
         pass
 
-    def track(self, user_id, event, timestamp=None):
-        # type: (str, Event, Optional[datetime]) -> None
+    def track(self, user_id: str, event: Event, timestamp: Optional[datetime] = None) -> None:
         pass
 
-    def flush(self):
-        # type: () -> None
+    def flush(self) -> None:
         pass
 
-    def shutdown(self):
-        # type: () -> None
+    def shutdown(self) -> None:
         pass
 
     # Validation methods
 
-    def validate(self, event):
-        # type: (Event) -> ValidationResponse
+    def validate(self, event: Event) -> ValidationResponse:
         if event.properties is not None and 'invalid' in event.properties:
             return self._create_invalid_response('invalid event!!!')
         return self._create_valid_response()
 
-    def on_validation_error(self, validation, event, timestamp=None):
-        # type: (ValidationResponse, Event, Optional[datetime]) -> None
+    def on_validation_error(self, validation: ValidationResponse, event: Event, timestamp: Optional[datetime] = None) -> None:
         pass
 
 
@@ -88,13 +73,11 @@ class TestOptionalEnum(enum.Enum):
 
 
 class TestItly(unittest.TestCase):
-    def test_load_default_options_succeeds(self):
-        # type: () -> None
+    def test_load_default_options_succeeds(self) -> None:
         itly = Itly()
         itly.load(Options())
 
-    def test_double_load_throws_exception(self):
-        # type: () -> None
+    def test_double_load_throws_exception(self) -> None:
         itly = Itly()
         itly.load(Options())
         with self.assertRaises(Exception) as ctx:
@@ -102,64 +85,56 @@ class TestItly(unittest.TestCase):
 
         self.assertEqual(str(ctx.exception), 'Itly is already initialized. itly.load() should only be called once.')
 
-    def test_alias_before_load_throws_error(self):
-        # type: () -> None
+    def test_alias_before_load_throws_error(self) -> None:
         itly = Itly()
         with self.assertRaises(Exception) as ctx:
             itly.alias('user-id', 'previous-user-id')
 
         self.assertEqual(str(ctx.exception), 'Itly is not yet initialized. Have you called `itly.load()` on app start?')
 
-    def test_group_before_load_throws_error(self):
-        # type: () -> None
+    def test_group_before_load_throws_error(self) -> None:
         itly = Itly()
         with self.assertRaises(Exception) as ctx:
             itly.group('user-id', 'group-id')
 
         self.assertEqual(str(ctx.exception), 'Itly is not yet initialized. Have you called `itly.load()` on app start?')
 
-    def test_identify_before_load_throws_error(self):
-        # type: () -> None
+    def test_identify_before_load_throws_error(self) -> None:
         itly = Itly()
         with self.assertRaises(Exception) as ctx:
             itly.identify('user-id')
 
         self.assertEqual(str(ctx.exception), 'Itly is not yet initialized. Have you called `itly.load()` on app start?')
 
-    def test_page_before_load_throws_error(self):
-        # type: () -> None
+    def test_page_before_load_throws_error(self) -> None:
         itly = Itly()
         with self.assertRaises(Exception) as ctx:
             itly.page('user-id', 'category', 'name')
 
         self.assertEqual(str(ctx.exception), 'Itly is not yet initialized. Have you called `itly.load()` on app start?')
 
-    def test_track_before_load_throws_error(self):
-        # type: () -> None
+    def test_track_before_load_throws_error(self) -> None:
         itly = Itly()
         with self.assertRaises(Exception) as ctx:
             itly.track('user-id', Event("event"))
 
         self.assertEqual(str(ctx.exception), 'Itly is not yet initialized. Have you called `itly.load()` on app start?')
 
-    def test_flush_before_load_throws_error(self):
-        # type: () -> None
+    def test_flush_before_load_throws_error(self) -> None:
         itly = Itly()
         with self.assertRaises(Exception) as ctx:
             itly.flush()
 
         self.assertEqual(str(ctx.exception), 'Itly is not yet initialized. Have you called `itly.load()` on app start?')
 
-    def test_shutdown_before_load_throws_error(self):
-        # type: () -> None
+    def test_shutdown_before_load_throws_error(self) -> None:
         itly = Itly()
         with self.assertRaises(Exception) as ctx:
             itly.shutdown()
 
         self.assertEqual(str(ctx.exception), 'Itly is not yet initialized. Have you called `itly.load()` on app start?')
 
-    def test_double_shutdown_throws_exception(self):
-        # type: () -> None
+    def test_double_shutdown_throws_exception(self) -> None:
         itly = Itly()
         itly.load(Options())
         itly.shutdown()
@@ -168,8 +143,7 @@ class TestItly(unittest.TestCase):
 
         self.assertEqual(str(ctx.exception), 'Itly is shutdown. No more requests are possible.')
 
-    def test_track_after_shutdown_throws_error(self):
-        # type: () -> None
+    def test_track_after_shutdown_throws_error(self) -> None:
         itly = Itly()
         itly.load(Options())
         itly.shutdown()
@@ -178,8 +152,7 @@ class TestItly(unittest.TestCase):
 
         self.assertEqual(str(ctx.exception), 'Itly is shutdown. No more requests are possible.')
 
-    def test_identify_without_properties_succeeds(self):
-        # type: () -> None
+    def test_identify_without_properties_succeeds(self) -> None:
         itly = Itly()
         logger = CustomLogger()
         itly.load(Options(logger=logger, plugins=[CustomPlugin()]))
@@ -192,8 +165,7 @@ class TestItly(unittest.TestCase):
 [plugin-custom] validate(event=identify, properties=None)
 [plugin-custom] identify(user_id=user-id, properties=None)""")
 
-    def test_identify_with_properties_succeeds(self):
-        # type: () -> None
+    def test_identify_with_properties_succeeds(self) -> None:
         itly = Itly()
         logger = CustomLogger()
         itly.load(Options(logger=logger, plugins=[CustomPlugin()]))
@@ -208,8 +180,7 @@ class TestItly(unittest.TestCase):
 [plugin-custom] validate(event=identify, properties={"required_number": 42.0})
 [plugin-custom] identify(user_id=user-id, properties={"required_number": 42.0})""")
 
-    def test_group_without_properties_succeeds(self):
-        # type: () -> None
+    def test_group_without_properties_succeeds(self) -> None:
         itly = Itly()
         logger = CustomLogger()
         itly.load(Options(logger=logger, plugins=[CustomPlugin()]))
@@ -222,8 +193,7 @@ class TestItly(unittest.TestCase):
 [plugin-custom] validate(event=group, properties=None)
 [plugin-custom] group(user_id=user-id, group_id=group-id, properties=None)""")
 
-    def test_group_with_properties_succeeds(self):
-        # type: () -> None
+    def test_group_with_properties_succeeds(self) -> None:
         itly = Itly()
         logger = CustomLogger()
         itly.load(Options(logger=logger, plugins=[CustomPlugin()]))
@@ -238,8 +208,7 @@ class TestItly(unittest.TestCase):
 [plugin-custom] validate(event=group, properties={"required_boolean": true})
 [plugin-custom] group(user_id=user-id, group_id=group-id, properties={"required_boolean": true})""")
 
-    def test_events_succeeds(self):
-        # type: () -> None
+    def test_events_succeeds(self) -> None:
         user_id = 'test-user-id'
 
         itly = Itly()
@@ -298,8 +267,7 @@ class TestItly(unittest.TestCase):
 [itly-core] shutdown()
 [plugin-custom] shutdown()''')
 
-    def test_events_disabled(self):
-        # type: () -> None
+    def test_events_disabled(self) -> None:
         user_id = 'test-user-id'
 
         itly = Itly()
@@ -340,8 +308,7 @@ class TestItly(unittest.TestCase):
         log_text = '\n'.join(logger.log_lines)
         self.assertEqual(log_text, '''[itly-core] disabled = True''')
 
-    def test_development_failed_validation_on_validation_error(self):
-        # type: () -> None
+    def test_development_failed_validation_on_validation_error(self) -> None:
         validation_results = [
             (None, "Validation Error: invalid event!!!", '''[itly-core] load()
 [plugin-custom] load()
@@ -376,8 +343,7 @@ class TestItly(unittest.TestCase):
         ]
         self._check_validation_results(Environment.DEVELOPMENT, validation_results)
 
-    def test_production_failed_validation_on_validation_error(self):
-        # type: () -> None
+    def test_production_failed_validation_on_validation_error(self) -> None:
         validation_results = [
             (None, None, '''[itly-core] load()
 [plugin-custom] load()
@@ -412,8 +378,7 @@ class TestItly(unittest.TestCase):
         ]
         self._check_validation_results(Environment.PRODUCTION, validation_results)
 
-    def _check_validation_results(self, environment, validation_results):
-        # type: (Environment, List[Tuple[ValidationOptions, Optional[str], str]]) -> None
+    def _check_validation_results(self, environment: Environment, validation_results: List[Tuple[ValidationOptions, Optional[str], str]]) -> None:
         for validation_options, error_text, expected_log in validation_results:
             itly = Itly()
             logger = CustomLogger()

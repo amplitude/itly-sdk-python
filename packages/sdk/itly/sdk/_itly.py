@@ -16,25 +16,23 @@ DEFAULT_PROD_VALIDATION_OPTIONS = ValidationOptions(disabled=False, track_invali
 LOG_PREFIX = '[itly-core] '
 
 
-class Itly(object):
-    def __init__(self):
-        # type: () -> None
-        self._options = None  # type: Optional[Options]
-        self._plugins = []  # type: List[Plugin]
-        self._validationOptions = None  # type: Optional[ValidationOptions]
-        self._logger = Logger.NONE  # type: Logger
-        self._is_shutdown = False  # type: bool
+class Itly:
+    def __init__(self) -> None:
+        self._options: Optional[Options] = None
+        self._plugins: List[Plugin] = []
+        self._validationOptions: Optional[ValidationOptions] = None
+        self._logger: Logger = Logger.NONE
+        self._is_shutdown: bool = False
 
-    def load(self, options):
-        # type: (Options) -> None
+    def load(self, options: Options) -> None:
         if self._options is not None:
             raise Exception('Itly is already initialized. itly.load() should only be called once.')
 
-        self._options = copy.copy(options)
+        self._options = options
         if self._options.validation is None:
-            self._options.validation = copy.copy(DEFAULT_PROD_VALIDATION_OPTIONS
-                                                 if self._options.environment == Environment.PRODUCTION
-                                                 else DEFAULT_DEV_VALIDATION_OPTIONS)
+            self._options = self._options._replace(
+                validation=DEFAULT_PROD_VALIDATION_OPTIONS if self._options.environment == Environment.PRODUCTION else DEFAULT_DEV_VALIDATION_OPTIONS
+            )
 
         self._logger = LoggerPrefixSafeDecorator(self._options.logger, LOG_PREFIX)
 
@@ -59,16 +57,14 @@ class Itly(object):
         )
         self._validate(context_event)
 
-    def alias(self, user_id, previous_id):
-        # type: (str, str) -> None
+    def alias(self, user_id: str, previous_id: str) -> None:
         if self._disabled():
             return
 
         for plugin in self._plugins:
             plugin.alias(user_id=user_id, previous_id=previous_id)
 
-    def identify(self, user_id, identify_properties=None):
-        # type: (str, Optional[Properties]) -> None
+    def identify(self, user_id: str, identify_properties: Optional[Properties] = None) -> None:
         if self._disabled():
             return
 
@@ -81,8 +77,7 @@ class Itly(object):
             for plugin in self._plugins:
                 plugin.identify(user_id=user_id, properties=identify_properties)
 
-    def group(self, user_id, group_id, group_properties=None):
-        # type: (str, str, Optional[Properties]) -> None
+    def group(self, user_id: str, group_id: str, group_properties: Optional[Properties] = None) -> None:
         if self._disabled():
             return
 
@@ -95,8 +90,7 @@ class Itly(object):
             for plugin in self._plugins:
                 plugin.group(user_id=user_id, group_id=group_id, properties=group_properties)
 
-    def page(self, user_id, category, name, page_properties=None):
-        # type: (str, str, str, Optional[Properties]) -> None
+    def page(self, user_id: str, category: Optional[str], name: Optional[str], page_properties: Optional[Properties] = None) -> None:
         if self._disabled():
             return
 
@@ -109,8 +103,7 @@ class Itly(object):
             for plugin in self._plugins:
                 plugin.page(user_id=user_id, category=category, name=name, properties=page_properties)
 
-    def track(self, user_id, event):
-        # type: (str, Event) -> None
+    def track(self, user_id: str, event: Event) -> None:
         if self._disabled():
             return
         if not self._should_be_tracked(event):
@@ -118,7 +111,7 @@ class Itly(object):
 
         assert self._options is not None
 
-        merged_event = event  # type: Event
+        merged_event: Event = event
         if self._options.context is not None:
             merged_event = copy.copy(event)
             merged_event.properties = Properties.concat([self._options.context, event.properties])
@@ -126,16 +119,14 @@ class Itly(object):
         for plugin in self._plugins:
             plugin.track(user_id=user_id, event=merged_event)
 
-    def flush(self):
-        # type: () -> None
+    def flush(self) -> None:
         if self._disabled():
             return
 
         for plugin in self._plugins:
             plugin.flush()
 
-    def shutdown(self):
-        # type: () -> None
+    def shutdown(self) -> None:
         if self._disabled():
             return
 
@@ -145,9 +136,8 @@ class Itly(object):
         for plugin in self._plugins:
             plugin.shutdown()
 
-    def _validate(self, event):
-        # type: (Event) -> bool
-        failed_validations = []  # type: List[ValidationResponse]
+    def _validate(self, event: Event) -> bool:
+        failed_validations: List[ValidationResponse] = []
 
         # Loop over plugins and stop if valid === false
         for plugin in self._plugins:
@@ -169,8 +159,7 @@ class Itly(object):
 
         return False
 
-    def _disabled(self):
-        # type: () -> bool
+    def _disabled(self) -> bool:
         if self._is_shutdown:
             raise Exception('Itly is shutdown. No more requests are possible.')
         if self._options is None:
@@ -178,8 +167,7 @@ class Itly(object):
 
         return self._options.disabled
 
-    def _should_be_tracked(self, event):
-        # type: (Event) -> bool
+    def _should_be_tracked(self, event: Event) -> bool:
         assert self._validationOptions is not None
 
         if self._validationOptions.disabled:

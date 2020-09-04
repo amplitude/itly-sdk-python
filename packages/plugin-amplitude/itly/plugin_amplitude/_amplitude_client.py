@@ -9,28 +9,35 @@ from requests import Session
 
 from itly.sdk import AsyncConsumer, AsyncConsumerMessage
 
-Endpoint = NamedTuple("Endpoint", [("url", str), ("is_json", bool)])
-Request = NamedTuple("Request", [("url", str), ("is_json", bool), ("data", Any)])
+
+class Endpoint(NamedTuple):
+    url: str
+    is_json: bool
 
 
-class AmplitudeClient(object):
-    def __init__(self, api_key, on_error, flush_queue_size, flush_interval, events_endpoint, identification_endpoint, send_request):
-        # type: (str, Callable[[str], None], int, timedelta, Optional[str], Optional[str], Optional[Callable[[Request], None]]) -> None
+class Request(NamedTuple):
+    url: str
+    is_json: bool
+    data: Any
+
+
+class AmplitudeClient:
+    def __init__(self, api_key: str, on_error: Callable[[str], None], flush_queue_size: int, flush_interval: timedelta,
+                 events_endpoint: Optional[str], identification_endpoint: Optional[str], send_request: Optional[Callable[[Request], None]]) -> None:
         self.api_key = api_key
         self.on_error = on_error
-        self._queue = AsyncConsumer.create_queue()  # type: queue.Queue
+        self._queue: queue.Queue = AsyncConsumer.create_queue()
         self._endpoints = {
             "events": Endpoint(url=events_endpoint or "https://api.amplitude.com/2/httpapi", is_json=True),
             "identification": Endpoint(url=identification_endpoint or "https://api.amplitude.com/identify", is_json=False),
         }
-        self._send_request = send_request if send_request is not None else self._send_request_default  # type: Callable[[Request], None]
+        self._send_request: Callable[[Request], None] = send_request if send_request is not None else self._send_request_default
         self._session = Session()
         self._consumer = AsyncConsumer(message_queue=self._queue, do_upload=self._upload_batch, flush_queue_size=flush_queue_size, flush_interval=flush_interval)
         atexit.register(self.shutdown)
         self._consumer.start()
 
-    def track(self, user_id, event_name, properties, timestamp):
-        # type: (str, str, Dict, datetime) -> None
+    def track(self, user_id: str, event_name: str, properties: Dict[str, Any], timestamp: datetime) -> None:
         data = {
             "user_id": user_id,
             "event_type": event_name,
@@ -39,16 +46,14 @@ class AmplitudeClient(object):
         }
         self._enqueue(AsyncConsumerMessage("events", data))
 
-    def identify(self, user_id, properties):
-        # type: (str, Dict) -> None
+    def identify(self, user_id: str, properties: Dict[str, Any]) -> None:
         data = {
             "user_id": user_id,
             "user_properties": properties if properties is not None else {}
         }
         self._enqueue(AsyncConsumerMessage("identification", data))
 
-    def _upload_batch(self, batch):
-        # type: (List[AsyncConsumerMessage]) -> None
+    def _upload_batch(self, batch: List[AsyncConsumerMessage]) -> None:
         message_type = batch[0].message_type
         endpoint_url, is_json = self._endpoints[message_type]
         try:
@@ -66,8 +71,7 @@ class AmplitudeClient(object):
         except Exception as e:
             self.on_error(str(e))
 
-    def _send_request_default(self, request):
-        # type: (Request) -> None
+    def _send_request_default(self, request: Request) -> None:
         if request.is_json:
             response = self._session.post(request.url, json=request.data)
         else:
@@ -75,17 +79,14 @@ class AmplitudeClient(object):
         if response.status_code >= 300:
             self.on_error('Unexpected status code for {0}: {1}'.format(request.url, response.status_code))
 
-    def shutdown(self):
-        # type: () -> None
+    def shutdown(self) -> None:
         self._consumer.shutdown()
 
-    def _enqueue(self, message):
-        # type: (AsyncConsumerMessage) -> None
+    def _enqueue(self, message: AsyncConsumerMessage) -> None:
         try:
             self._queue.put(message)
         except queue.Full:
             self.on_error("async queue is full")
 
-    def flush(self):
-        # type: () -> None
+    def flush(self) -> None:
         self._consumer.flush()

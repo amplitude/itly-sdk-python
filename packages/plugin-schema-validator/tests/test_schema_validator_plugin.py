@@ -27,8 +27,7 @@ class Context(Event):
         VALUE_1 = 'Value 1'
         VALUE_2 = 'Value 2'
 
-    def __init__(self, required_string, optional_enum=None):
-        # type: (str, Optional[Context.OptionalEnum]) -> None
+    def __init__(self, required_string: str, optional_enum: "Context.OptionalEnum" = None) -> None:
         properties = {
             "requiredString": required_string
         }
@@ -41,8 +40,7 @@ class Context(Event):
 
 
 class Group(Event):
-    def __init__(self, required_boolean, optional_string=None):
-        # type: (bool, Optional[str]) -> None
+    def __init__(self, required_boolean: bool, optional_string: Optional[str] = None) -> None:
         properties = {
             "requiredBoolean": required_boolean
         }
@@ -55,8 +53,7 @@ class Group(Event):
 
 
 class Identify(Event):
-    def __init__(self, required_number, optional_array=None):
-        # type: (float, Optional[List[str]]) -> None
+    def __init__(self, required_number: float, optional_array: Optional[List[str]] = None) -> None:
         properties = {
             "requiredNumber": required_number
         }
@@ -73,8 +70,8 @@ class EventWithAllProperties(Event):
         ENUM_1 = "Enum1"
         ENUM_2 = "Enum2"
 
-    def __init__(self, required_array, required_boolean, required_enum, required_integer, required_number, required_string, optional_string=None):
-        # type: (List[str], bool, EventWithAllProperties.RequiredEnum, int, float, str, Optional[str]) -> None
+    def __init__(self, required_array: List[str], required_boolean: bool, required_enum: "EventWithAllProperties.RequiredEnum",
+                 required_integer: int, required_number: float, required_string: str, optional_string: Optional[str] = None) -> None:
         properties = {
             "requiredArray": required_array,
             "requiredBoolean": required_boolean,
@@ -93,8 +90,7 @@ class EventWithAllProperties(Event):
 
 
 class EventWithConstTypes(Event):
-    def __init__(self):
-        # type: () -> None
+    def __init__(self) -> None:
         properties = {
             "Boolean Const": True,
             "Integer Const": 10,
@@ -110,8 +106,7 @@ class EventWithConstTypes(Event):
 
 
 class EventMaxIntForTest(Event):
-    def __init__(self, int_max_10):
-        # type: (int) -> None
+    def __init__(self, int_max_10: int) -> None:
         properties = {
             "intMax10": int_max_10
         }

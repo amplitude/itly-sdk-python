@@ -1,49 +1,42 @@
 import time
 from datetime import datetime, timedelta
-from typing import Optional, Callable
+from typing import Optional, Callable, NamedTuple
 
 from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 from ._mixpanel_client import MixpanelClient
 from ._mixpanel_consumer import Request
 
 
-class MixpanelOptions(object):
-    def __init__(self, api_host=None, flush_queue_size=10, flush_interval_ms=1000):
-        # type: (Optional[str], int, int) -> None
-        self.api_host = api_host  # type: Optional[str]
-        self.flush_queue_size = flush_queue_size  # type: int
-        self.flush_interval_ms = flush_interval_ms  # type: int
+class MixpanelOptions(NamedTuple):
+    api_host: Optional[str] = None
+    flush_queue_size: int = 10
+    flush_interval_ms: int = 1000
 
 
 class MixpanelPlugin(Plugin):
-    def __init__(self, api_key, options):
-        # type: (str, MixpanelOptions) -> None
-        self._api_key = api_key  # type: str
-        self._options = options  # type: MixpanelOptions
-        self._client = None  # type: Optional[MixpanelClient]
-        self._logger = Logger.NONE  # type: Logger
-        self._send_request = None  # type: Optional[Callable[[Request], None]]
+    def __init__(self, api_key: str, options: MixpanelOptions) -> None:
+        self._api_key: str = api_key
+        self._options: MixpanelOptions = options
+        self._client: Optional[MixpanelClient] = None
+        self._logger: Logger = Logger.NONE
+        self._send_request: Optional[Callable[[Request], None]] = None
 
-    def id(self):
-        # type: () -> str
+    def id(self) -> str:
         return 'mixpanel'
 
-    def load(self, options):
-        # type: (PluginLoadOptions) -> None
+    def load(self, options: PluginLoadOptions) -> None:
         self._client = MixpanelClient(api_key=self._api_key, on_error=self._on_error,
                                       flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
                                       api_host=self._options.api_host, send_request=self._send_request)
         self._logger = options.logger
 
-    def alias(self, user_id, previous_id, timestamp=None):
-        # type: (str, str, Optional[datetime]) -> None
+    def alias(self, user_id: str, previous_id: str, timestamp: Optional[datetime] = None) -> None:
         assert self._client is not None
         self._client.alias(
             original=user_id,
             alias_id=previous_id)
 
-    def identify(self, user_id, properties, timestamp=None):
-        # type: (str, Optional[Properties], Optional[datetime]) -> None
+    def identify(self, user_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
         assert self._client is not None
         if timestamp is None:
             timestamp = datetime.utcnow()
@@ -53,8 +46,7 @@ class MixpanelPlugin(Plugin):
             '$set': properties.to_json() if properties is not None else {},
         })
 
-    def track(self, user_id, event, timestamp=None):
-        # type: (str, Event, Optional[datetime]) -> None
+    def track(self, user_id: str, event: Event, timestamp: Optional[datetime] = None) -> None:
         assert self._client is not None
 
         if timestamp is None:
@@ -67,17 +59,14 @@ class MixpanelPlugin(Plugin):
             event_name=event.name,
             properties=json_properties)
 
-    def flush(self):
-        # type: () -> None
+    def flush(self) -> None:
         assert self._client is not None
         self._client.flush()
 
-    def shutdown(self):
-        # type: () -> None
+    def shutdown(self) -> None:
         assert self._client is not None
         self._client.shutdown()
 
-    def _on_error(self, err):
-        # type: (str) -> None
+    def _on_error(self, err: str) -> None:
         message = "Error. {0}".format(err)
         self._logger.error(message)

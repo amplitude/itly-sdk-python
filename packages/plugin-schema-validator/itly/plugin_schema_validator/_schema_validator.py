@@ -7,24 +7,20 @@ from itly.sdk import Plugin, Event, ValidationResponse, PluginLoadOptions
 
 
 class SchemaValidatorPlugin(Plugin):
-    def __init__(self, schemas):
-        # type: (Dict[str, str]) -> None
-        self._schemas = schemas  # type: Dict[str, str]
-        self._validators = {}  # type: Dict[str, jsonschema.Draft7Validator]
+    def __init__(self, schemas: Dict[str, str]):
+        self._schemas: Dict[str, str] = schemas
+        self._validators: Dict[str, jsonschema.Draft7Validator] = {}
 
-    def id(self):
-        # type: () -> str
+    def id(self) -> str:
         return 'schema-validator'
 
-    def load(self, options):
-        # type: (PluginLoadOptions) -> None
+    def load(self, options: PluginLoadOptions) -> None:
         for schema_key, raw_schema in self._schemas.items():
             schema = json.loads(raw_schema)
             jsonschema.Draft7Validator.check_schema(schema)
             self._validators[schema_key] = jsonschema.Draft7Validator(schema)
 
-    def validate(self, event):
-        # type: (Event) -> ValidationResponse
+    def validate(self, event: Event) -> ValidationResponse:
         schema_key = self._get_schema_key(event)
         # Check that we have a schema for this event
         if schema_key not in self._schemas:
@@ -45,6 +41,5 @@ class SchemaValidatorPlugin(Plugin):
         return self._create_valid_response()
 
     @staticmethod
-    def _get_schema_key(event):
-        # type: (Event) -> str
+    def _get_schema_key(event: Event) -> str:
         return event.name

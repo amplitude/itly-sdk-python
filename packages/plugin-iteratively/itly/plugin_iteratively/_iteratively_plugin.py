@@ -1,35 +1,33 @@
 from datetime import timedelta, datetime
-from typing import Optional, Callable
+from typing import Optional, Callable, NamedTuple
 
-from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Environment, ValidationResponse
+from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Environment, ValidationResponse, Logger
 from ._iteratively_client import IterativelyClient, TrackType, Request
 
 
-class IterativelyOptions(object):
-    def __init__(self, url=None, environment=Environment.DEVELOPMENT, omit_values=False, flush_queue_size=10, flush_interval_ms=1000, disabled=None):
-        # type: (Optional[str], Environment, bool, int, int, Optional[bool]) -> None
-        self.url = url  # type: Optional[str]
-        self.environment = environment  # type: Environment
-        self.omit_values = omit_values  # type: bool
-        self.flush_queue_size = flush_queue_size  # type: int
-        self.flush_interval_ms = flush_interval_ms  # type: int
-        self.disabled = disabled if disabled is not None else environment == Environment.PRODUCTION  # type: bool
+class IterativelyOptions(NamedTuple):
+    url: Optional[str] = None
+    environment: Environment = Environment.DEVELOPMENT
+    omit_values: bool = False
+    flush_queue_size: int = 10
+    flush_interval_ms: int = 1000
+    disabled: Optional[bool] = None
 
 
 class IterativelyPlugin(Plugin):
-    def __init__(self, api_key, options):
-        # type: (str, IterativelyOptions) -> None
-        self._api_key = api_key
-        self._options = options
-        self._client = None  # type: Optional[IterativelyClient]
-        self._send_request = None  # type: Optional[Callable[[Request], None]]
+    def __init__(self, api_key: str, options: IterativelyOptions) -> None:
+        self._api_key: str = api_key
+        self._options: IterativelyOptions = options._replace(
+            disabled=options.disabled if options.disabled is not None else options.environment == Environment.PRODUCTION
+        )
+        self._client: Optional[IterativelyClient] = None
+        self._logger: Logger = Logger.NONE
+        self._send_request: Optional[Callable[[Request], None]] = None
 
-    def id(self):
-        # type: () -> str
+    def id(self) -> str:
         return 'iteratively'
 
-    def load(self, options):
-        # type: (PluginLoadOptions) -> None
+    def load(self, options: PluginLoadOptions) -> None:
         if self._options.disabled:
             options.logger.info("disabled")
             return
@@ -38,9 +36,9 @@ class IterativelyPlugin(Plugin):
         self._client = IterativelyClient(api_endpoint=self._options.url, api_key=self._api_key,
                                          flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
                                          omit_values=self._options.omit_values, on_error=self._on_error, send_request=self._send_request)
+        self._logger = options.logger
 
-    def identify(self, user_id, properties, timestamp=None):
-        # type: (str, Optional[Properties], Optional[datetime]) -> None
+    def identify(self, user_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
         if self._options.disabled:
             return
 
@@ -49,8 +47,7 @@ class IterativelyPlugin(Plugin):
                            properties=properties,
                            timestamp=timestamp)
 
-    def group(self, user_id, group_id, properties, timestamp=None):
-        # type: (str, str, Optional[Properties], Optional[datetime]) -> None
+    def group(self, user_id: str, group_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
         if self._options.disabled:
             return
 
@@ -59,8 +56,7 @@ class IterativelyPlugin(Plugin):
                            properties=properties,
                            timestamp=timestamp)
 
-    def page(self, user_id, category, name, properties, timestamp=None):
-        # type: (str, Optional[str], Optional[str], Optional[Properties], Optional[datetime]) -> None
+    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
         if self._options.disabled:
             return
 
@@ -69,8 +65,7 @@ class IterativelyPlugin(Plugin):
                            properties=properties,
                            timestamp=timestamp)
 
-    def track(self, user_id, event, timestamp=None):
-        # type: (str, Event, Optional[datetime]) -> None
+    def track(self, user_id: str, event: Event, timestamp: Optional[datetime] = None) -> None:
         if self._options.disabled:
             return
 
@@ -80,24 +75,21 @@ class IterativelyPlugin(Plugin):
                            properties=event.properties,
                            timestamp=timestamp)
 
-    def flush(self):
-        # type: () -> None
+    def flush(self) -> None:
         if self._options.disabled:
             return
 
         assert self._client is not None
         self._client.flush()
 
-    def shutdown(self):
-        # type: () -> None
+    def shutdown(self) -> None:
         if self._options.disabled:
             return
 
         assert self._client is not None
         self._client.shutdown()
 
-    def on_validation_error(self, validation, event, timestamp=None):
-        # type: (ValidationResponse, Event, Optional[datetime]) -> None
+    def on_validation_error(self, validation: ValidationResponse, event: Event, timestamp: Optional[datetime] = None) -> None:
         if self._options.disabled:
             return
 
@@ -114,7 +106,6 @@ class IterativelyPlugin(Plugin):
                                validation=validation,
                                timestamp=timestamp)
 
-    def _on_error(self, err):
-        # type: (str) -> None
+    def _on_error(self, err: str) -> None:
         message = "Error. {0}".format(err)
         self._logger.error(message)
