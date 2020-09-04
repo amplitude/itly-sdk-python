@@ -32,7 +32,7 @@ class Context(Event):
             "requiredString": required_string
         }
         if optional_enum is not None:
-            properties['optionalEnum'] = optional_enum.value
+            properties['optionalEnum'] = optional_enum
         super(Context, self).__init__(
             "context",
             Properties(**properties),
@@ -76,7 +76,7 @@ class EventWithAllProperties(Event):
             "requiredArray": required_array,
             "requiredBoolean": required_boolean,
             "requiredConst": "some-const-value",
-            "requiredEnum": required_enum.value,
+            "requiredEnum": required_enum,
             "requiredInteger": required_integer,
             "requiredNumber": required_number,
             "requiredString": required_string
