@@ -42,7 +42,7 @@ class Itly:
 
         self._validationOptions = self._options.validation
 
-        self._logger.debug('load()')
+        self._logger.info('load()')
 
         for plugin in self._options.plugins:
             plugin_logger = LoggerPrefixSafeDecorator(self._options.logger, '[plugin-{0}] '.format(plugin.id()))
@@ -61,6 +61,7 @@ class Itly:
         if self._disabled():
             return
 
+        self._logger.info('alias(user_id={0}, previous_id={1})'.format(user_id, previous_id))
         for plugin in self._plugins:
             plugin.alias(user_id=user_id, previous_id=previous_id)
 
@@ -68,11 +69,12 @@ class Itly:
         if self._disabled():
             return
 
+        self._logger.info('identify(user_id={0}, properties={1})'.format(user_id, identify_properties))
+
         identify_event = Event(
             name='identify',
             properties=identify_properties,
         )
-
         if self._should_be_tracked(identify_event):
             for plugin in self._plugins:
                 plugin.identify(user_id=user_id, properties=identify_properties)
@@ -81,11 +83,12 @@ class Itly:
         if self._disabled():
             return
 
+        self._logger.info('group(user_id={0}, group_id={1}, properties={2})'.format(user_id, group_id, group_properties))
+
         group_event = Event(
             name='group',
             properties=group_properties,
         )
-
         if self._should_be_tracked(group_event):
             for plugin in self._plugins:
                 plugin.group(user_id=user_id, group_id=group_id, properties=group_properties)
@@ -94,11 +97,12 @@ class Itly:
         if self._disabled():
             return
 
+        self._logger.info('page(user_id={0}, category={1}, name={2}, properties={3})'.format(user_id, category, name, page_properties))
+
         page_event = Event(
             name='page',
             properties=page_properties,
         )
-
         if self._should_be_tracked(page_event):
             for plugin in self._plugins:
                 plugin.page(user_id=user_id, category=category, name=name, properties=page_properties)
@@ -106,15 +110,18 @@ class Itly:
     def track(self, user_id: str, event: Event) -> None:
         if self._disabled():
             return
-        if not self._should_be_tracked(event):
-            return
-
-        assert self._options is not None
 
         merged_event: Event = event
         if self._options.context is not None:
             merged_event = copy.copy(event)
             merged_event.properties = Properties.concat([self._options.context, event.properties])
+
+        self._logger.info('track(user_id={0}, event={1}, properties={2})'.format(user_id, merged_event.name, merged_event.properties))
+
+        if not self._should_be_tracked(event):
+            return
+
+        assert self._options is not None
 
         for plugin in self._plugins:
             plugin.track(user_id=user_id, event=merged_event)
@@ -123,6 +130,7 @@ class Itly:
         if self._disabled():
             return
 
+        self._logger.info('flush()')
         for plugin in self._plugins:
             plugin.flush()
 
@@ -130,7 +138,7 @@ class Itly:
         if self._disabled():
             return
 
-        self._logger.debug('shutdown()')
+        self._logger.info('shutdown()')
 
         self._is_shutdown = True
         for plugin in self._plugins:
@@ -139,7 +147,6 @@ class Itly:
     def _validate(self, event: Event) -> bool:
         failed_validations: List[ValidationResponse] = []
 
-        # Loop over plugins and stop if valid === false
         for plugin in self._plugins:
             validation = plugin.validate(event)
             if not validation.valid:

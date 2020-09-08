@@ -70,7 +70,7 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.load(options)
         except Exception as e:
-            self._logger.error('Error in load(). {0}.'.format(e))
+            self._logger.error('Error in load(). {0}'.format(e))
 
     def alias(self, user_id: str, previous_id: str, timestamp: Optional[datetime] = None) -> None:
         if self._plugin.__class__.alias != Plugin.alias:
@@ -78,7 +78,7 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.alias(user_id, previous_id, timestamp)
         except Exception as e:
-            self._logger.error('Error in alias(). {0}.'.format(e))
+            self._logger.error('Error in alias(). {0}'.format(e))
 
     def identify(self, user_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
         if self._plugin.__class__.identify != Plugin.identify:
@@ -86,7 +86,7 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.identify(user_id, properties, timestamp)
         except Exception as e:
-            self._logger.error('Error in identify(). {0}.'.format(e))
+            self._logger.error('Error in identify(). {0}'.format(e))
 
     def group(self, user_id: str, group_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
         if self._plugin.__class__.group != Plugin.group:
@@ -94,7 +94,7 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.group(user_id, group_id, properties, timestamp)
         except Exception as e:
-            self._logger.error('Error in group(). {0}.'.format(e))
+            self._logger.error('Error in group(). {0}'.format(e))
 
     def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
         if self._plugin.__class__.page != Plugin.page:
@@ -102,7 +102,7 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.page(user_id, category, name, properties, timestamp)
         except Exception as e:
-            self._logger.error('Error in page(). {0}.'.format(e))
+            self._logger.error('Error in page(). {0}'.format(e))
 
     def track(self, user_id: str, event: Event, timestamp: Optional[datetime] = None) -> None:
         if self._plugin.__class__.track != Plugin.track:
@@ -110,7 +110,7 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.track(user_id, event, timestamp)
         except Exception as e:
-            self._logger.error('Error in track(). {0}.'.format(e))
+            self._logger.error('Error in track(). {0}'.format(e))
 
     def flush(self) -> None:
         if self._plugin.__class__.flush != Plugin.flush:
@@ -118,7 +118,7 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.flush()
         except Exception as e:
-            self._logger.error('Error in flush(). {0}.'.format(e))
+            self._logger.error('Error in flush(). {0}'.format(e))
 
     def shutdown(self) -> None:
         if self._plugin.__class__.shutdown != Plugin.shutdown:
@@ -126,7 +126,7 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.shutdown()
         except Exception as e:
-            self._logger.error('Error in shutdown(). {0}.'.format(e))
+            self._logger.error('Error in shutdown(). {0}'.format(e))
 
     # Validation methods
 
@@ -136,7 +136,7 @@ class PluginSafeDecorator(Plugin):
         try:
             return self._plugin.validate(event)
         except Exception as e:
-            self._logger.error('Error in validate(). {0}.'.format(e))
+            self._logger.error('Error in validate(). {0}'.format(e))
             return self._create_invalid_response(message=str(e))
 
     def on_validation_error(self, validation: ValidationResponse, event: Event, timestamp: Optional[datetime] = None) -> None:
@@ -145,4 +145,4 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.on_validation_error(validation, event, timestamp)
         except Exception as e:
-            self._logger.error('Error in on_validation_error(). {0}.'.format(e))
+            self._logger.error('Error in on_validation_error(). {0}'.format(e))

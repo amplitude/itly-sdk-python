@@ -21,7 +21,7 @@ class SchemaValidatorPlugin(Plugin):
             self._validators[schema_key] = jsonschema.Draft7Validator(schema)
 
     def validate(self, event: Event) -> ValidationResponse:
-        schema_key = self._get_schema_key(event)
+        schema_key = event.name
         # Check that we have a schema for this event
         if schema_key not in self._schemas:
             raise ValueError("Event '{0}' not found in tracking plan.".format(event.name))
@@ -39,7 +39,3 @@ class SchemaValidatorPlugin(Plugin):
             )
 
         return self._create_valid_response()
-
-    @staticmethod
-    def _get_schema_key(event: Event) -> str:
-        return event.name

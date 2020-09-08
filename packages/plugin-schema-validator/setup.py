@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='itly.plugin-schema-validator',
-    version='0.0.10',
+    version='0.0.11',
     description='Iteratively Analytics SDK - Schema Validator Plugin',
     long_description='Iteratively Analytics SDK - Schema Validator Plugin',
     url='https://github.com/iterativelyhq/itly-sdk-python',
