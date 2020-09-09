@@ -12,7 +12,7 @@ class MixpanelClient(Mixpanel):
         consumer = MixpanelConsumer(api_key=api_key, on_error=on_error, api_host=api_host,
                                     flush_queue_size=flush_queue_size, flush_interval=flush_interval,
                                     send_request=send_request)
-        super(MixpanelClient, self).__init__(token=api_key, consumer=consumer)
+        super().__init__(token=api_key, consumer=consumer)
 
     def alias(self, alias_id: str, original: str, meta: Optional[Dict] = None) -> None:
         event = {

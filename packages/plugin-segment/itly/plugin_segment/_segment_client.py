@@ -16,7 +16,7 @@ class Request(NamedTuple):
 class SegmentClient(analytics.Client):
     def __init__(self, write_key: str, on_error: Callable[[str], None], flush_queue_size: int, flush_interval: timedelta,
                  host: Optional[str], send_request: Optional[Callable[[Request], None]]) -> None:
-        super(SegmentClient, self).__init__(write_key=write_key, host=host, send=False, on_error=lambda e, _: on_error(e))
+        super().__init__(write_key=write_key, host=host, send=False, on_error=lambda e, _: on_error(e))
         self._host = host
         self.queue: queue.Queue = AsyncConsumer.create_queue()
         self._send_request: Callable[[Request], None] = send_request if send_request is not None else self._send_request_default
@@ -40,7 +40,7 @@ class SegmentClient(analytics.Client):
         self.consumer.shutdown()
 
     def _enqueue(self, msg: Any) -> None:
-        _, msg = super(SegmentClient, self)._enqueue(msg)
+        _, msg = super()._enqueue(msg)
         try:
             self.queue.put(AsyncConsumerMessage(message_type='', data=msg))
         except queue.Full:

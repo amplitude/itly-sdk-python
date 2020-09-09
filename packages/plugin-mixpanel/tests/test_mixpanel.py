@@ -58,7 +58,7 @@ class TestMixpanel(unittest.TestCase):
                 Request('people', '[{"$token":"My-Key","$distinct_id":"user-1","$set":{"item1":"value1","item2":2}}]'),
                 Request('alias', '[{"event":"$create_alias","properties":{"distinct_id":"user-1","alias":"prev-user-1","token":"My-Key"}}]'),
                 Request('events',
-                        '[{"event":"event-1","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value1","item2":1}},{"event":"event-2","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value2","item2":2}}]'),
+                        '[{"event":"event-1","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value1","item2":1}},{"event":"event-2","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value2","item2":2}}]'),  # nopep8
             ])
 
             p.flush()
@@ -70,7 +70,7 @@ class TestMixpanel(unittest.TestCase):
                 Request('people', '[{"$token":"My-Key","$distinct_id":"user-1","$set":{"item1":"value1","item2":2}}]'),
                 Request('alias', '[{"event":"$create_alias","properties":{"distinct_id":"user-1","alias":"prev-user-1","token":"My-Key"}}]'),
                 Request('events',
-                        '[{"event":"event-1","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value1","item2":1}},{"event":"event-2","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value2","item2":2}}]'),
+                        '[{"event":"event-1","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value1","item2":1}},{"event":"event-2","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value2","item2":2}}]'),  # nopep8
             ])
 
             p.track("user-2", Event('event-3', Properties(item1='value3', item2=3)))
@@ -81,7 +81,7 @@ class TestMixpanel(unittest.TestCase):
                 Request('people', '[{"$token":"My-Key","$distinct_id":"user-1","$set":{"item1":"value1","item2":2}}]'),
                 Request('alias', '[{"event":"$create_alias","properties":{"distinct_id":"user-1","alias":"prev-user-1","token":"My-Key"}}]'),
                 Request('events',
-                        '[{"event":"event-1","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value1","item2":1}},{"event":"event-2","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value2","item2":2}}]'),
+                        '[{"event":"event-1","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value1","item2":1}},{"event":"event-2","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value2","item2":2}}]'),  # nopep8
                 Request('events', '[{"event":"event-3","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value3","item2":3}}]'),
             ])
 
@@ -96,10 +96,10 @@ class TestMixpanel(unittest.TestCase):
                 Request('people', '[{"$token":"My-Key","$distinct_id":"user-1","$set":{"item1":"value1","item2":2}}]'),
                 Request('alias', '[{"event":"$create_alias","properties":{"distinct_id":"user-1","alias":"prev-user-1","token":"My-Key"}}]'),
                 Request('events',
-                        '[{"event":"event-1","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value1","item2":1}},{"event":"event-2","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value2","item2":2}}]'),
+                        '[{"event":"event-1","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value1","item2":1}},{"event":"event-2","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value2","item2":2}}]'),  # nopep8
                 Request('events', '[{"event":"event-3","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value3","item2":3}}]'),
                 Request('events',
-                        '[{"event":"event-4","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value4","item2":4}},{"event":"event-5","properties":{"token":"My-Key","distinct_id":"user-1","mp_lib":"python","$lib_version":"4.6.0","item1":"value5","item2":5}}]'),
+                        '[{"event":"event-4","properties":{"token":"My-Key","distinct_id":"user-2","mp_lib":"python","$lib_version":"4.6.0","item1":"value4","item2":4}},{"event":"event-5","properties":{"token":"My-Key","distinct_id":"user-1","mp_lib":"python","$lib_version":"4.6.0","item1":"value5","item2":5}}]'),  # nopep8
             ])
 
     @staticmethod

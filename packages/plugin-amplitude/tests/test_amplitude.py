@@ -30,22 +30,32 @@ class TestAmplitude(unittest.TestCase):
             time.sleep(0.1)
             self._clean_requests(requests)
             self.assertEqual(requests, [
-                Request('https://api.amplitude.com/identify', False, {'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'}),
+                Request('https://api.amplitude.com/identify', False, {
+                    'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'
+                }),
             ])
 
             p.track("user-2", Event('event-2', Properties(item1='value2', item2=2)))
             time.sleep(0.1)
             self._clean_requests(requests)
             self.assertEqual(requests, [
-                Request('https://api.amplitude.com/identify', False, {'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'}),
+                Request('https://api.amplitude.com/identify', False, {
+                    'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'
+                }),
             ])
 
             p.flush()
             time.sleep(0.1)
             self._clean_requests(requests)
             self.assertEqual(requests, [
-                Request('https://api.amplitude.com/identify', False, {'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'}),
-                Request('https://api.amplitude.com/2/httpapi', True, {'events': [{'user_id': 'user-2', 'event_type': 'event-1', 'event_properties': {'item1': 'value1', 'item2': 1}}, {'user_id': 'user-2', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}}], 'api_key': 'My-Key'}),
+                Request('https://api.amplitude.com/identify', False, {
+                    'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'
+                }),
+                Request('https://api.amplitude.com/2/httpapi', True, {
+                    'events': [
+                        {'user_id': 'user-2', 'event_type': 'event-1', 'event_properties': {'item1': 'value1', 'item2': 1}},
+                        {'user_id': 'user-2', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}}], 'api_key': 'My-Key'
+                }),
             ])
 
             p.flush()
@@ -54,8 +64,15 @@ class TestAmplitude(unittest.TestCase):
             time.sleep(0.1)
             self._clean_requests(requests)
             self.assertEqual(requests, [
-                Request('https://api.amplitude.com/identify', False, {'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'}),
-                Request('https://api.amplitude.com/2/httpapi', True, {'events': [{'user_id': 'user-2', 'event_type': 'event-1', 'event_properties': {'item1': 'value1', 'item2': 1}}, {'user_id': 'user-2', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}}], 'api_key': 'My-Key'}),
+                Request('https://api.amplitude.com/identify', False, {
+                    'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'
+                }),
+                Request('https://api.amplitude.com/2/httpapi', True, {
+                    'events': [
+                        {'user_id': 'user-2', 'event_type': 'event-1', 'event_properties': {'item1': 'value1', 'item2': 1}},
+                        {'user_id': 'user-2', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}}
+                    ],
+                    'api_key': 'My-Key'}),
             ])
 
             p.track("user-2", Event('event-3', Properties(item1='value3', item2=3)))
@@ -63,9 +80,20 @@ class TestAmplitude(unittest.TestCase):
             time.sleep(1.1)
             self._clean_requests(requests)
             self.assertEqual(requests, [
-                Request('https://api.amplitude.com/identify', False, {'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'}),
-                Request('https://api.amplitude.com/2/httpapi', True, {'events': [{'user_id': 'user-2', 'event_type': 'event-1', 'event_properties': {'item1': 'value1', 'item2': 1}}, {'user_id': 'user-2', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}}], 'api_key': 'My-Key'}),
-                Request('https://api.amplitude.com/2/httpapi', True, {'events': [{'user_id': 'user-2', 'event_type': 'event-3', 'event_properties': {'item1': 'value3', 'item2': 3}}], 'api_key': 'My-Key'}),
+                Request('https://api.amplitude.com/identify', False, {
+                    'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'
+                }),
+                Request('https://api.amplitude.com/2/httpapi', True, {
+                    'events': [
+                        {'user_id': 'user-2', 'event_type': 'event-1', 'event_properties': {'item1': 'value1', 'item2': 1}},
+                        {'user_id': 'user-2', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}}
+                    ],
+                    'api_key': 'My-Key'}),
+                Request('https://api.amplitude.com/2/httpapi', True, {
+                    'events': [
+                        {'user_id': 'user-2', 'event_type': 'event-3', 'event_properties': {'item1': 'value3', 'item2': 3}}
+                    ],
+                    'api_key': 'My-Key'}),
             ])
 
             p.track("user-2", Event('event-4', Properties(item1='value4', item2=4)))
@@ -76,10 +104,25 @@ class TestAmplitude(unittest.TestCase):
             time.sleep(0.1)
             self._clean_requests(requests)
             self.assertEqual(requests, [
-                Request('https://api.amplitude.com/identify', False, {'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'}),
-                Request('https://api.amplitude.com/2/httpapi', True, {'events': [{'user_id': 'user-2', 'event_type': 'event-1', 'event_properties': {'item1': 'value1', 'item2': 1}}, {'user_id': 'user-2', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}}], 'api_key': 'My-Key'}),
-                Request('https://api.amplitude.com/2/httpapi', True, {'events': [{'user_id': 'user-2', 'event_type': 'event-3', 'event_properties': {'item1': 'value3', 'item2': 3}}], 'api_key': 'My-Key'}),
-                Request('https://api.amplitude.com/2/httpapi', True, {'events': [{'user_id': 'user-2', 'event_type': 'event-4', 'event_properties': {'item1': 'value4', 'item2': 4}}, {'user_id': 'user-1', 'event_type': 'event-5', 'event_properties': {'item1': 'value5', 'item2': 5}}], 'api_key': 'My-Key'}),
+                Request('https://api.amplitude.com/identify', False, {
+                    'identification': '[{"user_id": "user-1", "user_properties": {"item1": "value1", "item2": 2}}]', 'api_key': 'My-Key'}),
+                Request('https://api.amplitude.com/2/httpapi', True, {
+                    'events': [
+                        {'user_id': 'user-2', 'event_type': 'event-1', 'event_properties': {'item1': 'value1', 'item2': 1}},
+                        {'user_id': 'user-2', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}}
+                    ],
+                    'api_key': 'My-Key'}),
+                Request('https://api.amplitude.com/2/httpapi', True, {
+                    'events': [
+                        {'user_id': 'user-2', 'event_type': 'event-3', 'event_properties': {'item1': 'value3', 'item2': 3}}
+                    ],
+                    'api_key': 'My-Key'}),
+                Request('https://api.amplitude.com/2/httpapi', True, {
+                    'events': [
+                        {'user_id': 'user-2', 'event_type': 'event-4', 'event_properties': {'item1': 'value4', 'item2': 4}},
+                        {'user_id': 'user-1', 'event_type': 'event-5', 'event_properties': {'item1': 'value5', 'item2': 5}}
+                    ],
+                    'api_key': 'My-Key'}),
             ])
 
     @staticmethod

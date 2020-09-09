@@ -277,7 +277,7 @@ class TestItly(unittest.TestCase):
 [itly-core] flush()
 [plugin-custom] flush()
 [itly-core] shutdown()
-[plugin-custom] shutdown()''')
+[plugin-custom] shutdown()''')  # nopep8
 
     def test_events_disabled(self) -> None:
         user_id = 'test-user-id'
