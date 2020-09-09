@@ -1,5 +1,4 @@
-import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Optional, Callable, NamedTuple
 
 from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
@@ -30,34 +29,25 @@ class MixpanelPlugin(Plugin):
                                       api_host=self._options.api_host, send_request=self._send_request)
         self._logger = options.logger
 
-    def alias(self, user_id: str, previous_id: str, timestamp: Optional[datetime] = None) -> None:
+    def alias(self, user_id: str, previous_id: str) -> None:
         assert self._client is not None
         self._client.alias(
             original=user_id,
             alias_id=previous_id)
 
-    def identify(self, user_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
+    def identify(self, user_id: str, properties: Optional[Properties]) -> None:
         assert self._client is not None
-        if timestamp is None:
-            timestamp = datetime.utcnow()
         self._client.people_update({
             '$distinct_id': user_id,
-            '$time': int(time.mktime(timestamp.timetuple())),
             '$set': properties.to_json() if properties is not None else {},
         })
 
-    def track(self, user_id: str, event: Event, timestamp: Optional[datetime] = None) -> None:
+    def track(self, user_id: str, event: Event) -> None:
         assert self._client is not None
-
-        if timestamp is None:
-            timestamp = datetime.utcnow()
-        json_properties = {"time": int(time.mktime(timestamp.timetuple()))}
-        if event.properties is not None:
-            json_properties.update(event.properties.to_json())
         self._client.track(
             distinct_id=user_id,
             event_name=event.name,
-            properties=json_properties)
+            properties=event.properties.to_json() if event.properties is not None else None)
 
     def flush(self) -> None:
         assert self._client is not None

@@ -35,12 +35,11 @@ class IterativelyClient:
         self._consumer.start()
 
     def track(self, track_type: TrackType, event: Optional[Event] = None, properties: Optional[Properties] = None,
-              validation: Optional[ValidationResponse] = None, timestamp: Optional[datetime] = None) -> None:
-        if timestamp is None:
-            timestamp = datetime.utcnow()
+              validation: Optional[ValidationResponse] = None) -> None:
+        date_sent = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + "Z"
         model = {
             "type": track_type.value,
-            "dateSent": timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + "Z",
+            "dateSent": date_sent,
             "properties": {},
             "valid": True,
             "validation": {

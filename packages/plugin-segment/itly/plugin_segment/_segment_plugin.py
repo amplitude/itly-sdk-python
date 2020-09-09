@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Optional, NamedTuple, Callable
 
 from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
@@ -28,39 +28,34 @@ class SegmentPlugin(Plugin):
                                      host=self._options.host, send_request=self._send_request)
         self._logger = options.logger
 
-    def alias(self, user_id: str, previous_id: str, timestamp: Optional[datetime] = None) -> None:
+    def alias(self, user_id: str, previous_id: str) -> None:
         assert self._client is not None
         self._client.alias(user_id=user_id,
-                           previous_id=previous_id,
-                           timestamp=timestamp)
+                           previous_id=previous_id)
 
-    def identify(self, user_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
+    def identify(self, user_id: str, properties: Optional[Properties]) -> None:
         assert self._client is not None
         self._client.identify(user_id=user_id,
-                              traits=properties.to_json() if properties is not None else None,
-                              timestamp=timestamp)
+                              traits=properties.to_json() if properties is not None else None)
 
-    def group(self, user_id: str, group_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
+    def group(self, user_id: str, group_id: str, properties: Optional[Properties]) -> None:
         assert self._client is not None
         self._client.group(user_id=user_id,
                            group_id=group_id,
-                           traits=properties.to_json() if properties is not None else None,
-                           timestamp=timestamp)
+                           traits=properties.to_json() if properties is not None else None)
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
+    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
         assert self._client is not None
         self._client.page(user_id=user_id,
                           category=category,
                           name=name,
-                          properties=properties.to_json() if properties is not None else None,
-                          timestamp=timestamp)
+                          properties=properties.to_json() if properties is not None else None)
 
-    def track(self, user_id: str, event: Event, timestamp: Optional[datetime] = None) -> None:
+    def track(self, user_id: str, event: Event) -> None:
         assert self._client is not None
         self._client.track(user_id=user_id,
                            event=event.name,
-                           properties=event.properties.to_json() if event.properties is not None else None,
-                           timestamp=timestamp)
+                           properties=event.properties.to_json() if event.properties is not None else None)
 
     def flush(self) -> None:
         assert self._client is not None

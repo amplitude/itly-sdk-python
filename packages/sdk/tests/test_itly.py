@@ -1,6 +1,5 @@
 import enum
 import unittest
-from datetime import datetime
 from typing import List, Optional, Tuple
 
 from itly.sdk import Itly, Options, Environment, Event, Properties, Logger, Plugin, PluginLoadOptions, ValidationResponse, ValidationOptions
@@ -30,19 +29,19 @@ class CustomPlugin(Plugin):
     def load(self, options: PluginLoadOptions) -> None:
         pass
 
-    def alias(self, user_id: str, previous_id: str, timestamp: Optional[datetime] = None) -> None:
+    def alias(self, user_id: str, previous_id: str) -> None:
         pass
 
-    def identify(self, user_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
+    def identify(self, user_id: str, properties: Optional[Properties]) -> None:
         pass
 
-    def group(self, user_id: str, group_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
+    def group(self, user_id: str, group_id: str, properties: Optional[Properties]) -> None:
         pass
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
+    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
         pass
 
-    def track(self, user_id: str, event: Event, timestamp: Optional[datetime] = None) -> None:
+    def track(self, user_id: str, event: Event) -> None:
         pass
 
     def flush(self) -> None:
@@ -58,7 +57,7 @@ class CustomPlugin(Plugin):
             return self._create_invalid_response('invalid event!!!')
         return self._create_valid_response()
 
-    def on_validation_error(self, validation: ValidationResponse, event: Event, timestamp: Optional[datetime] = None) -> None:
+    def on_validation_error(self, validation: ValidationResponse, event: Event) -> None:
         pass
 
 

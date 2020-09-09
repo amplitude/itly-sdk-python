@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
 from typing import Optional, Callable, NamedTuple
 
 from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Environment, ValidationResponse, Logger
@@ -38,42 +38,38 @@ class IterativelyPlugin(Plugin):
                                          omit_values=self._options.omit_values, on_error=self._on_error, send_request=self._send_request)
         self._logger = options.logger
 
-    def identify(self, user_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
+    def identify(self, user_id: str, properties: Optional[Properties]) -> None:
         if self._options.disabled:
             return
 
         assert self._client is not None
         self._client.track(track_type=TrackType.IDENTIFY,
-                           properties=properties,
-                           timestamp=timestamp)
+                           properties=properties)
 
-    def group(self, user_id: str, group_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
+    def group(self, user_id: str, group_id: str, properties: Optional[Properties]) -> None:
         if self._options.disabled:
             return
 
         assert self._client is not None
         self._client.track(track_type=TrackType.GROUP,
-                           properties=properties,
-                           timestamp=timestamp)
+                           properties=properties)
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
+    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
         if self._options.disabled:
             return
 
         assert self._client is not None
         self._client.track(track_type=TrackType.PAGE,
-                           properties=properties,
-                           timestamp=timestamp)
+                           properties=properties)
 
-    def track(self, user_id: str, event: Event, timestamp: Optional[datetime] = None) -> None:
+    def track(self, user_id: str, event: Event) -> None:
         if self._options.disabled:
             return
 
         assert self._client is not None
         self._client.track(track_type=TrackType.TRACK,
                            event=event,
-                           properties=event.properties,
-                           timestamp=timestamp)
+                           properties=event.properties)
 
     def flush(self) -> None:
         if self._options.disabled:
@@ -89,7 +85,7 @@ class IterativelyPlugin(Plugin):
         assert self._client is not None
         self._client.shutdown()
 
-    def on_validation_error(self, validation: ValidationResponse, event: Event, timestamp: Optional[datetime] = None) -> None:
+    def on_validation_error(self, validation: ValidationResponse, event: Event) -> None:
         if self._options.disabled:
             return
 
@@ -97,14 +93,12 @@ class IterativelyPlugin(Plugin):
         if event.name in (TrackType.GROUP.value, TrackType.IDENTIFY.value, TrackType.PAGE.value):
             self._client.track(TrackType[event.name],
                                properties=event.properties,
-                               validation=validation,
-                               timestamp=timestamp)
+                               validation=validation)
         else:
             self._client.track(TrackType.TRACK,
                                event=event,
                                properties=event.properties,
-                               validation=validation,
-                               timestamp=timestamp)
+                               validation=validation)
 
     def _on_error(self, err: str) -> None:
         message = "Error. {0}".format(err)

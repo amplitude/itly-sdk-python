@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
 from typing import Optional, Callable, NamedTuple
 
 from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
@@ -30,17 +30,16 @@ class AmplitudePlugin(Plugin):
                                        send_request=self._send_request)
         self._logger = options.logger
 
-    def identify(self, user_id: str, properties: Optional[Properties], timestamp: Optional[datetime] = None) -> None:
+    def identify(self, user_id: str, properties: Optional[Properties]) -> None:
         assert self._client is not None
         self._client.identify(user_id=user_id,
                               properties=properties.to_json() if properties is not None else None)
 
-    def track(self, user_id: str, event: Event, timestamp: Optional[datetime] = None) -> None:
+    def track(self, user_id: str, event: Event) -> None:
         assert self._client is not None
         self._client.track(user_id=user_id,
                            event_name=event.name,
-                           properties=event.properties.to_json() if event.properties is not None else None,
-                           timestamp=timestamp if timestamp is not None else datetime.utcnow())
+                           properties=event.properties.to_json() if event.properties is not None else None)
 
     def flush(self) -> None:
         assert self._client is not None

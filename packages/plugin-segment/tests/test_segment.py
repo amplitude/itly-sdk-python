@@ -1,6 +1,5 @@
 import time
 import unittest
-from datetime import datetime, timedelta
 
 from itly.plugin_segment import SegmentPlugin, SegmentOptions
 from itly.plugin_segment._segment_client import Request
@@ -21,101 +20,108 @@ class TestSegment(unittest.TestCase):
         try:
             p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
-            now = datetime(year=2020, month=8, day=27, hour=16, minute=41, second=25)
-
-            p.identify("user-1", Properties(item1='value1', item2=2), timestamp=now)
+            p.identify("user-1", Properties(item1='value1', item2=2))
 
             time.sleep(0.1)
             self.assertEqual(requests, [])
-            p.alias("user-1", "prev-user-1", timestamp=now)
+            p.alias("user-1", "prev-user-1")
 
             time.sleep(0.1)
             self.assertEqual(requests, [])
 
-            p.track("user-2", Event('event-1', Properties(item1='value1', item2=1)), timestamp=now)
+            p.track("user-2", Event('event-1', Properties(item1='value1', item2=1)))
             time.sleep(0.1)
 
             self._clean_requests(requests)
             self.assertEqual(requests, [
                 Request(data=[
-                    {'integrations': {}, 'anonymousId': None, 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
+                    {'integrations': {}, 'anonymousId': None, 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
                      'userId': 'user-1', 'traits': {'item1': 'value1', 'item2': 2}},
-                    {'integrations': {}, 'previousId': 'prev-user-1', 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
+                    {'integrations': {}, 'previousId': 'prev-user-1', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
                      'userId': 'user-1', 'type': 'alias', 'anonymousId': None},
-                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 'timestamp': '2020-08-27T16:41:25+00:00',
-                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}]),
+                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 
+                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}
+                ]),
             ])
 
-            p.group("user-2", "group-2", Properties(item1='value2', item2=2), timestamp=now + timedelta(seconds=3))
+            p.group("user-2", "group-2", Properties(item1='value2', item2=2))
             time.sleep(0.1)
 
             self._clean_requests(requests)
             self.assertEqual(requests, [
                 Request(data=[
-                    {'integrations': {}, 'anonymousId': None, 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
+                    {'integrations': {}, 'anonymousId': None, 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
                      'userId': 'user-1', 'traits': {'item1': 'value1', 'item2': 2}},
-                    {'integrations': {}, 'previousId': 'prev-user-1', 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
+                    {'integrations': {}, 'previousId': 'prev-user-1', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
                      'userId': 'user-1', 'type': 'alias', 'anonymousId': None},
-                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 'timestamp': '2020-08-27T16:41:25+00:00',
-                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}]),
-            ])
-
-            p.flush()
-            time.sleep(0.1)
-
-            self._clean_requests(requests)
-            self.assertEqual(requests, [
-                Request(data=[
-                    {'integrations': {}, 'anonymousId': None, 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
-                     'userId': 'user-1', 'traits': {'item1': 'value1', 'item2': 2}},
-                    {'integrations': {}, 'previousId': 'prev-user-1', 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
-                     'userId': 'user-1', 'type': 'alias', 'anonymousId': None},
-                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 'timestamp': '2020-08-27T16:41:25+00:00',
-                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}]),
-                Request(data=[
-                    {'integrations': {}, 'anonymousId': None, 'timestamp': '2020-08-27T16:41:28+00:00', 'groupId': 'group-2', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
-                     'userId': 'user-2', 'traits': {'item1': 'value2', 'item2': 2}, 'type': 'group'}]),
+                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 
+                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}
+                ]),
             ])
 
             p.flush()
+            time.sleep(0.1)
+
+            self._clean_requests(requests)
+            self.assertEqual(requests, [
+                Request(data=[
+                    {'integrations': {}, 'anonymousId': None, 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
+                     'userId': 'user-1', 'traits': {'item1': 'value1', 'item2': 2}},
+                    {'integrations': {}, 'previousId': 'prev-user-1', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
+                     'userId': 'user-1', 'type': 'alias', 'anonymousId': None},
+                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 
+                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}
+                ]),
+                Request(data=[
+                    {'integrations': {}, 'anonymousId': None, 'groupId': 'group-2', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
+                     'userId': 'user-2', 'traits': {'item1': 'value2', 'item2': 2}, 'type': 'group'}
+                ]),
+            ])
+
+            p.flush()
             p.flush()
 
             time.sleep(0.1)
             self._clean_requests(requests)
             self.assertEqual(requests, [
                 Request(data=[
-                    {'integrations': {}, 'anonymousId': None, 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
+                    {'integrations': {}, 'anonymousId': None, 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
                      'userId': 'user-1', 'traits': {'item1': 'value1', 'item2': 2}},
-                    {'integrations': {}, 'previousId': 'prev-user-1', 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
+                    {'integrations': {}, 'previousId': 'prev-user-1', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
                      'userId': 'user-1', 'type': 'alias', 'anonymousId': None},
-                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 'timestamp': '2020-08-27T16:41:25+00:00',
-                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}]),
+                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 
+                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}
+                ]),
                 Request(data=[
-                    {'integrations': {}, 'anonymousId': None, 'timestamp': '2020-08-27T16:41:28+00:00', 'groupId': 'group-2', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
-                     'userId': 'user-2', 'traits': {'item1': 'value2', 'item2': 2}, 'type': 'group'}]),
+                    {'integrations': {}, 'anonymousId': None, 'groupId': 'group-2', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
+                     'userId': 'user-2', 'traits': {'item1': 'value2', 'item2': 2}, 'type': 'group'}
+                ]),
             ])
 
-            p.page("user-2", "category-2", "page-3", Properties(item1='value3', item2=3), timestamp=now + timedelta(seconds=7))
+            p.page("user-2", "category-2", "page-3", Properties(item1='value3', item2=3))
 
             time.sleep(1.1)
             self._clean_requests(requests)
             self.assertEqual(requests, [
                 Request(data=[
-                    {'integrations': {}, 'anonymousId': None, 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
+                    {'integrations': {}, 'anonymousId': None, 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
                      'userId': 'user-1', 'traits': {'item1': 'value1', 'item2': 2}},
-                    {'integrations': {}, 'previousId': 'prev-user-1', 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
+                    {'integrations': {}, 'previousId': 'prev-user-1', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
                      'userId': 'user-1', 'type': 'alias', 'anonymousId': None},
-                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 'timestamp': '2020-08-27T16:41:25+00:00',
-                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}]),
+                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 
+                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}
+                ]),
                 Request(data=[
-                    {'integrations': {}, 'anonymousId': None, 'timestamp': '2020-08-27T16:41:28+00:00', 'groupId': 'group-2', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
-                     'userId': 'user-2', 'traits': {'item1': 'value2', 'item2': 2}, 'type': 'group'}]),
-                Request(data=[{'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value3', 'item2': 3}, 'timestamp': '2020-08-27T16:41:32+00:00', 'category': 'category-2',
-                               'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'page', 'name': 'page-3'}]),
+                    {'integrations': {}, 'anonymousId': None, 'groupId': 'group-2', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
+                     'userId': 'user-2', 'traits': {'item1': 'value2', 'item2': 2}, 'type': 'group'}
+                ]),
+                Request(data=[{'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value3', 'item2': 3}, 'category': 'category-2',
+                               'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'page', 'name': 'page-3'}
+                              ]),
             ])
 
-            p.track("user-2", Event('event-4', Properties(item1='value4', item2=4)), timestamp=now + timedelta(seconds=10))
-            p.track("user-1", Event('event-5', Properties(item1='value5', item2=5)), timestamp=now + timedelta(seconds=12))
+            p.track("user-2", Event('event-4', Properties(item1='value4', item2=4)))
+            p.track("user-1", Event('event-5', Properties(item1='value5', item2=5)))
         finally:
             p.shutdown()
 
@@ -123,21 +129,24 @@ class TestSegment(unittest.TestCase):
             self._clean_requests(requests)
             self.assertEqual(requests, [
                 Request(data=[
-                    {'integrations': {}, 'anonymousId': None, 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
+                    {'integrations': {}, 'anonymousId': None, 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'type': 'identify',
                      'userId': 'user-1', 'traits': {'item1': 'value1', 'item2': 2}},
-                    {'integrations': {}, 'previousId': 'prev-user-1', 'timestamp': '2020-08-27T16:41:25+00:00', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
+                    {'integrations': {}, 'previousId': 'prev-user-1', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
                      'userId': 'user-1', 'type': 'alias', 'anonymousId': None},
-                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 'timestamp': '2020-08-27T16:41:25+00:00',
-                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}]),
+                    {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value1', 'item2': 1}, 
+                     'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-1'}
+                ]),
                 Request(data=[
-                    {'integrations': {}, 'anonymousId': None, 'timestamp': '2020-08-27T16:41:28+00:00', 'groupId': 'group-2', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
+                    {'integrations': {}, 'anonymousId': None, 'groupId': 'group-2', 'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
                      'userId': 'user-2', 'traits': {'item1': 'value2', 'item2': 2}, 'type': 'group'}]),
-                Request(data=[{'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value3', 'item2': 3}, 'timestamp': '2020-08-27T16:41:32+00:00', 'category': 'category-2',
-                               'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'page', 'name': 'page-3'}]),
-                Request(data=[{'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value4', 'item2': 4}, 'timestamp': '2020-08-27T16:41:35+00:00',
+                Request(data=[{'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value3', 'item2': 3}, 'category': 'category-2',
+                               'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'page', 'name': 'page-3'}
+                              ]),
+                Request(data=[{'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value4', 'item2': 4}, 
                                'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-2', 'type': 'track', 'event': 'event-4'},
-                              {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value5', 'item2': 5}, 'timestamp': '2020-08-27T16:41:37+00:00',
-                               'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-1', 'type': 'track', 'event': 'event-5'}]),
+                              {'integrations': {}, 'anonymousId': None, 'properties': {'item1': 'value5', 'item2': 5}, 
+                               'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}}, 'userId': 'user-1', 'type': 'track', 'event': 'event-5'}
+                              ]),
             ])
 
     @staticmethod
@@ -146,3 +155,5 @@ class TestSegment(unittest.TestCase):
             for item in request.data:
                 if 'messageId' in item:
                     del item['messageId']
+                if 'timestamp' in item:
+                    del item['timestamp']

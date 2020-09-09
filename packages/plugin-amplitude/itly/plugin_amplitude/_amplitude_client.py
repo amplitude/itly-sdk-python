@@ -1,9 +1,9 @@
 import atexit
-from datetime import timedelta, datetime
-from typing import Dict, Callable, List, Optional, NamedTuple, Any
 import json
 import queue
 import time
+from datetime import timedelta
+from typing import Dict, Callable, List, Optional, NamedTuple, Any
 
 from requests import Session
 
@@ -37,11 +37,11 @@ class AmplitudeClient:
         atexit.register(self.shutdown)
         self._consumer.start()
 
-    def track(self, user_id: str, event_name: str, properties: Dict[str, Any], timestamp: datetime) -> None:
+    def track(self, user_id: str, event_name: str, properties: Dict[str, Any]) -> None:
         data = {
             "user_id": user_id,
             "event_type": event_name,
-            "time": int(time.mktime(timestamp.timetuple()) * 1000),
+            "time": int(time.time() * 1000),
             "event_properties": properties if properties is not None else {}
         }
         self._enqueue(AsyncConsumerMessage("events", data))
