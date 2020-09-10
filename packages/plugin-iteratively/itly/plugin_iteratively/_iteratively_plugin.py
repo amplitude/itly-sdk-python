@@ -90,8 +90,7 @@ class IterativelyPlugin(Plugin):
         self._client.shutdown()
 
     def _on_error(self, err: str) -> None:
-        message = "Error. {0}".format(err)
-        self._logger.error(message)
+        self._logger.error(f"Error. {err}")
 
     @staticmethod
     def _first_failed_validation(validation_results: List[ValidationResponse]) -> Optional[ValidationResponse]:

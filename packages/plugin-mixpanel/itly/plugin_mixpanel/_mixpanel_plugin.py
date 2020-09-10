@@ -58,5 +58,4 @@ class MixpanelPlugin(Plugin):
         self._client.shutdown()
 
     def _on_error(self, err: str) -> None:
-        message = "Error. {0}".format(err)
-        self._logger.error(message)
+        self._logger.error(f"Error. {err}")

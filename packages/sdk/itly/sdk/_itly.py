@@ -39,7 +39,7 @@ class Itly:
         )
 
         for plugin in self._options.plugins:
-            plugin_logger = LoggerPrefixSafeDecorator(self._options.logger, '[plugin-{0}] '.format(plugin.id()))
+            plugin_logger = LoggerPrefixSafeDecorator(self._options.logger, f'[plugin-{plugin.id()}] ')
             plugin = PluginSafeDecorator(plugin, plugin_logger)
             self._plugins.append(plugin)
             plugin_options = PluginLoadOptions(environment=self._options.environment, logger=plugin_logger)
@@ -49,7 +49,7 @@ class Itly:
         if self._disabled():
             return
 
-        self._logger.info('alias(user_id={0}, previous_id={1})'.format(user_id, previous_id))
+        self._logger.info(f'alias(user_id={user_id}, previous_id={previous_id})')
         self._run_on_all_plugins(lambda plugin: plugin.alias(user_id=user_id, previous_id=previous_id))
         self._run_on_all_plugins(lambda plugin: plugin.post_alias(user_id=user_id, previous_id=previous_id))
 
@@ -57,7 +57,7 @@ class Itly:
         if self._disabled():
             return
 
-        self._logger.info('identify(user_id={0}, properties={1})'.format(user_id, identify_properties))
+        self._logger.info(f'identify(user_id={user_id}, properties={identify_properties})')
         self._validate_and_run_on_all_plugins(
             Event(name='identify', properties=identify_properties),
             False,
@@ -69,7 +69,7 @@ class Itly:
         if self._disabled():
             return
 
-        self._logger.info('group(user_id={0}, group_id={1}, properties={2})'.format(user_id, group_id, group_properties))
+        self._logger.info(f'group(user_id={user_id}, group_id={group_id}, properties={group_properties})')
         self._validate_and_run_on_all_plugins(
             Event(name='group', properties=group_properties),
             False,
@@ -81,7 +81,7 @@ class Itly:
         if self._disabled():
             return
 
-        self._logger.info('page(user_id={0}, category={1}, name={2}, properties={3})'.format(user_id, category, name, page_properties))
+        self._logger.info(f'page(user_id={user_id}, category={category}, name={name}, properties={page_properties})')
         self._validate_and_run_on_all_plugins(
             Event(name='page', properties=page_properties),
             False,
@@ -93,7 +93,7 @@ class Itly:
         if self._disabled():
             return
 
-        self._logger.info('track(user_id={0}, event={1}, properties={2})'.format(user_id, event.name, event.properties))
+        self._logger.info(f'track(user_id={user_id}, event={event.name}, properties={event.properties})')
         self._validate_and_run_on_all_plugins(
             event,
             True,

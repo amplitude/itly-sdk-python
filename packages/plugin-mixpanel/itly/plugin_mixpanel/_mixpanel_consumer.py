@@ -34,7 +34,7 @@ class MixpanelConsumer:
 
     def _upload_batch(self, batch: List[AsyncConsumerMessage]) -> None:
         endpoint = batch[0].message_type
-        batch_json = '[{0}]'.format(','.join(message.data for message in batch))
+        batch_json = f"[{','.join(message.data for message in batch)}]"
         try:
             self._send_request(Request(endpoint=endpoint, data=batch_json))
         except Exception as e:

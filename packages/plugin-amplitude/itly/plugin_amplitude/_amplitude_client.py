@@ -77,7 +77,7 @@ class AmplitudeClient:
         else:
             response = self._session.post(request.url, data=request.data)
         if response.status_code >= 300:
-            self.on_error('Unexpected status code for {0}: {1}'.format(request.url, response.status_code))
+            self.on_error(f'Unexpected status code for {request.url}: {response.status_code}')
 
     def shutdown(self) -> None:
         self._consumer.shutdown()

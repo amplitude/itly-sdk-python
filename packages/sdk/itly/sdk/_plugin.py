@@ -85,103 +85,100 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.load(options)
         except Exception as e:
-            self._logger.error('Error in load(). {0}'.format(e))
+            self._logger.error(f'Error in load(). {e}')
 
     # Validation methods
 
     def validate(self, event: Event) -> ValidationResponse:
         if self._plugin.__class__.validate != Plugin.validate:
-            self._logger.info('validate(event={0}, properties={1})'.format(event.name, event.properties))
+            self._logger.info(f'validate(event={event.name}, properties={event.properties})')
         try:
             return self._plugin.validate(event)
         except Exception as e:
-            self._logger.error('Error in validate(). {0}'.format(e))
+            self._logger.error(f'Error in validate(). {e}')
             return self._create_invalid_response(message=str(e))
 
     # Tracking methods
 
     def alias(self, user_id: str, previous_id: str) -> None:
         if self._plugin.__class__.alias != Plugin.alias:
-            self._logger.info('alias(user_id={0}, previous_id={1})'.format(user_id, previous_id))
+            self._logger.info(f'alias(user_id={user_id}, previous_id={previous_id})')
         try:
             self._plugin.alias(user_id, previous_id)
         except Exception as e:
-            self._logger.error('Error in alias(). {0}'.format(e))
+            self._logger.error(f'Error in alias(). {e}')
 
     def post_alias(self, user_id: str, previous_id: str) -> None:
         if self._plugin.__class__.post_alias != Plugin.post_alias:
-            self._logger.info('post_alias(user_id={0}, previous_id={1})'.format(user_id, previous_id))
+            self._logger.info(f'post_alias(user_id={user_id}, previous_id={previous_id})')
         try:
             self._plugin.post_alias(user_id, previous_id)
         except Exception as e:
-            self._logger.error('Error in post_alias(). {0}'.format(e))
+            self._logger.error(f'Error in post_alias(). {e}')
 
     def identify(self, user_id: str, properties: Optional[Properties]) -> None:
         if self._plugin.__class__.identify != Plugin.identify:
-            self._logger.info('identify(user_id={0}, properties={1})'.format(user_id, properties))
+            self._logger.info(f'identify(user_id={user_id}, properties={properties})')
         try:
             self._plugin.identify(user_id, properties)
         except Exception as e:
-            self._logger.error('Error in identify(). {0}'.format(e))
+            self._logger.error(f'Error in identify(). {e}')
 
     def post_identify(self, user_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_identify != Plugin.post_identify:
-            self._logger.info('post_identify(user_id={0}, properties={1}, validation_results={2})'.format(user_id, properties, validation_results))
+            self._logger.info(f'post_identify(user_id={user_id}, properties={properties}, validation_results={validation_results})')
         try:
             self._plugin.post_identify(user_id, properties, validation_results)
         except Exception as e:
-            self._logger.error('Error in post_identify(). {0}'.format(e))
+            self._logger.error(f'Error in post_identify(). {e}')
 
     def group(self, user_id: str, group_id: str, properties: Optional[Properties]) -> None:
         if self._plugin.__class__.group != Plugin.group:
-            self._logger.info('group(user_id={0}, group_id={1}, properties={2})'.format(user_id, group_id, properties))
+            self._logger.info(f'group(user_id={user_id}, group_id={group_id}, properties={properties})')
         try:
             self._plugin.group(user_id, group_id, properties)
         except Exception as e:
-            self._logger.error('Error in group(). {0}'.format(e))
+            self._logger.error(f'Error in group(). {e}')
 
     def post_group(self, user_id: str, group_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_group != Plugin.post_group:
-            self._logger.info('post_group(user_id={0}, group_id={1}, properties={2}, validation_results={3})'.format(
-                user_id, group_id, properties, validation_results))
+            self._logger.info(f'post_group(user_id={user_id}, group_id={group_id}, properties={properties}, validation_results={validation_results})')
         try:
             self._plugin.post_group(user_id, group_id, properties, validation_results)
         except Exception as e:
-            self._logger.error('Error in post_group(). {0}'.format(e))
+            self._logger.error(f'Error in post_group(). {e}')
 
     def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
         if self._plugin.__class__.page != Plugin.page:
-            self._logger.info('page(user_id={0}, category={1}, name={2}, properties={3})'.format(user_id, category, name, properties))
+            self._logger.info(f'page(user_id={user_id}, category={category}, name={name}, properties={properties})')
         try:
             self._plugin.page(user_id, category, name, properties)
         except Exception as e:
-            self._logger.error('Error in page(). {0}'.format(e))
+            self._logger.error(f'Error in page(). {e}')
 
     def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_page != Plugin.post_page:
-            self._logger.info('post_page(user_id={0}, category={1}, name={2}, properties={3}, validation_results={4})'.format(
-                user_id, category, name, properties, validation_results))
+            self._logger.info(f'post_page(user_id={user_id}, category={category}, name={name}, properties={properties}, validation_results={validation_results})')
         try:
             self._plugin.post_page(user_id, category, name, properties, validation_results)
         except Exception as e:
-            self._logger.error('Error in post_page(). {0}'.format(e))
+            self._logger.error(f'Error in post_page(). {e}')
 
     def track(self, user_id: str, event: Event) -> None:
         if self._plugin.__class__.track != Plugin.track:
-            self._logger.info('track(user_id={0}, event={1}, properties={2})'.format(user_id, event.name, event.properties))
+            self._logger.info(f'track(user_id={user_id}, event={event.name}, properties={event.properties})')
         try:
             self._plugin.track(user_id, event)
         except Exception as e:
-            self._logger.error('Error in track(). {0}'.format(e))
+            self._logger.error(f'Error in track(). {e}')
 
     def post_track(self, user_id: str, event: Event, validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_track != Plugin.post_track:
-            self._logger.info('post_track(user_id={0}, event={1}, properties={2}, validation_results={3})'.format(
-                user_id, event.name, event.properties, validation_results))
+            self._logger.info(f'post_track(user_id={user_id}, event={event.name}, properties={event.properties}, validation_results={validation_results})')
         try:
             self._plugin.post_track(user_id, event, validation_results)
         except Exception as e:
-            self._logger.error('Error in post_track(). {0}'.format(e))
+            self._logger.error(f'Error in post_track(). {e}')
 
     def flush(self) -> None:
         if self._plugin.__class__.flush != Plugin.flush:
@@ -189,7 +186,7 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.flush()
         except Exception as e:
-            self._logger.error('Error in flush(). {0}'.format(e))
+            self._logger.error(f'Error in flush(). {e}')
 
     def shutdown(self) -> None:
         if self._plugin.__class__.shutdown != Plugin.shutdown:
@@ -197,4 +194,4 @@ class PluginSafeDecorator(Plugin):
         try:
             self._plugin.shutdown()
         except Exception as e:
-            self._logger.error('Error in shutdown(). {0}'.format(e))
+            self._logger.error(f'Error in shutdown(). {e}')

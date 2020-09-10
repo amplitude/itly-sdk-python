@@ -80,14 +80,14 @@ class IterativelyClient:
         try:
             response = self._session.post(self.api_endpoint, json=request.data, headers={'Authorization': 'Bearer ' + self.api_key})
         except Exception as e:
-            raise Exception("A unhandled exception occurred. ({0}).".format(e))
+            raise Exception(f"A unhandled exception occurred. ({e}).")
         if response.status_code < 300:
             return
         if 500 <= response.status_code <= 599:
-            raise Exception("Upload received error response from server ({0}).".format(response.status_code))
+            raise Exception(f"Upload received error response from server ({response.status_code}).")
         if response.status_code == 429:
-            raise Exception("Upload rejected due to rate limiting ({0}).".format(response.status_code))
-        raise Exception("Upload failed due to unhandled HTTP error ({0}).".format(response.status_code))
+            raise Exception(f"Upload rejected due to rate limiting ({response.status_code}).")
+        raise Exception(f"Upload failed due to unhandled HTTP error ({response.status_code}).")
 
     def shutdown(self) -> None:
         self._consumer.shutdown()

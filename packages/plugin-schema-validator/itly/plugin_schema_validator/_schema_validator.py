@@ -24,18 +24,18 @@ class SchemaValidatorPlugin(Plugin):
         schema_key = event.name
         # Check that we have a schema for this event
         if schema_key not in self._schemas:
-            raise ValueError("Event '{0}' not found in tracking plan.".format(event.name))
+            raise ValueError(f"Event '{event.name}' not found in tracking plan.")
 
         event_properties = event.properties.to_json() if event.properties is not None else {}
         try:
             self._validators[schema_key].validate(instance=event_properties)
         except jsonschema.ValidationError as ex:
             return self._create_invalid_response(
-                message="Passed in {0} properties did not validate against your tracking plan. {1}".format(event.name, ex)
+                message=f"Passed in {event.name} properties did not validate against your tracking plan. {ex}"
             )
         except Exception as ex:
             return self._create_invalid_response(
-                message="Passed in {0} properties did not validate against your tracking plan. An unknown error occurred during validation. {1}".format(event.name, ex)
+                message=f"Passed in {event.name} properties did not validate against your tracking plan. An unknown error occurred during validation. {ex}"
             )
 
         return self._create_valid_response()
