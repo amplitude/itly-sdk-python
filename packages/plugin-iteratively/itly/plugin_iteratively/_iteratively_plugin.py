@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Optional, Callable, NamedTuple
+from typing import Optional, Callable, NamedTuple, List
 
 from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Environment, ValidationResponse, Logger
 from ._iteratively_client import IterativelyClient, TrackType, Request
@@ -38,38 +38,42 @@ class IterativelyPlugin(Plugin):
                                          omit_values=self._options.omit_values, on_error=self._on_error, send_request=self._send_request)
         self._logger = options.logger
 
-    def identify(self, user_id: str, properties: Optional[Properties]) -> None:
+    def post_identify(self, user_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         if self._options.disabled:
             return
 
         assert self._client is not None
         self._client.track(track_type=TrackType.IDENTIFY,
-                           properties=properties)
+                           properties=properties,
+                           validation=self._first_failed_validation(validation_results))
 
-    def group(self, user_id: str, group_id: str, properties: Optional[Properties]) -> None:
+    def post_group(self, user_id: str, group_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         if self._options.disabled:
             return
 
         assert self._client is not None
         self._client.track(track_type=TrackType.GROUP,
-                           properties=properties)
+                           properties=properties,
+                           validation=self._first_failed_validation(validation_results))
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
+    def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         if self._options.disabled:
             return
 
         assert self._client is not None
         self._client.track(track_type=TrackType.PAGE,
-                           properties=properties)
+                           properties=properties,
+                           validation=self._first_failed_validation(validation_results))
 
-    def track(self, user_id: str, event: Event) -> None:
+    def post_track(self, user_id: str, event: Event, validation_results: List[ValidationResponse]) -> None:
         if self._options.disabled:
             return
 
         assert self._client is not None
         self._client.track(track_type=TrackType.TRACK,
                            event=event,
-                           properties=event.properties)
+                           properties=event.properties,
+                           validation=self._first_failed_validation(validation_results))
 
     def flush(self) -> None:
         if self._options.disabled:
@@ -85,21 +89,13 @@ class IterativelyPlugin(Plugin):
         assert self._client is not None
         self._client.shutdown()
 
-    def on_validation_error(self, validation: ValidationResponse, event: Event) -> None:
-        if self._options.disabled:
-            return
-
-        assert self._client is not None
-        if event.name in (TrackType.GROUP.value, TrackType.IDENTIFY.value, TrackType.PAGE.value):
-            self._client.track(TrackType[event.name],
-                               properties=event.properties,
-                               validation=validation)
-        else:
-            self._client.track(TrackType.TRACK,
-                               event=event,
-                               properties=event.properties,
-                               validation=validation)
-
     def _on_error(self, err: str) -> None:
         message = "Error. {0}".format(err)
         self._logger.error(message)
+
+    @staticmethod
+    def _first_failed_validation(validation_results: List[ValidationResponse]) -> Optional[ValidationResponse]:
+        for result in validation_results:
+            if not result.valid:
+                return result
+        return None

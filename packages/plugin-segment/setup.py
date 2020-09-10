@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='itly.plugin-segment',
-    version='0.0.4',
+    version='0.0.5',
     description='Iteratively Analytics SDK - Segment Plugin',
     long_description='Iteratively Analytics SDK - Segment Plugin',
     url='https://github.com/iterativelyhq/itly-sdk-python',

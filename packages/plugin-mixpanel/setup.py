@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='itly.plugin-mixpanel',
-    version='0.0.5',
+    version='0.0.6',
     description='Iteratively Analytics SDK - Mixpanel Plugin',
     long_description='Iteratively Analytics SDK - Mixpanel Plugin',
     url='https://github.com/iterativelyhq/itly-sdk-python',

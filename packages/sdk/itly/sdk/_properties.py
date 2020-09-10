@@ -24,7 +24,10 @@ class Properties:
         return item in self._properties
 
     @staticmethod
-    def concat(properties: List[Optional["Properties"]]) -> "Properties":
+    def concat(properties: List[Optional["Properties"]]) -> Optional["Properties"]:
+        if all(p is None for p in properties):
+            return None
+
         result: Dict[str, Any] = {}
         for p in properties:
             if p is not None:
