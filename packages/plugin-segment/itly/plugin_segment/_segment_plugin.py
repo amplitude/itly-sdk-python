@@ -10,7 +10,7 @@ class SegmentOptions(NamedTuple):
 
 
 class SegmentPlugin(Plugin):
-    def __init__(self, write_key: str, options: Optional[SegmentOptions]) -> None:
+    def __init__(self, write_key: str, options: Optional[SegmentOptions] = None) -> None:
         self._write_key: str = write_key
         self._options: SegmentOptions = options if options is not None else SegmentOptions()
         self._client: Optional[analytics.Client] = None

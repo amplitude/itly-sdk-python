@@ -1,9 +1,10 @@
 from datetime import timedelta
-from typing import Optional, Callable, NamedTuple
+from typing import Optional, NamedTuple
+
+from mixpanel import Mixpanel
+from mixpanel_async import AsyncBufferedConsumer
 
 from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
-from ._mixpanel_client import MixpanelClient
-from ._mixpanel_consumer import Request
 
 
 class MixpanelOptions(NamedTuple):
@@ -13,20 +14,27 @@ class MixpanelOptions(NamedTuple):
 
 
 class MixpanelPlugin(Plugin):
-    def __init__(self, api_key: str, options: MixpanelOptions) -> None:
+    def __init__(self, api_key: str, options: Optional[MixpanelOptions] = None) -> None:
         self._api_key: str = api_key
-        self._options: MixpanelOptions = options
-        self._client: Optional[MixpanelClient] = None
+        self._options: MixpanelOptions = options if options is not None else MixpanelOptions()
+        self._client: Optional[Mixpanel] = None
+        self._consumer: Optional[AsyncBufferedConsumer] = None
         self._logger: Logger = Logger.NONE
-        self._send_request: Optional[Callable[[Request], None]] = None
 
     def id(self) -> str:
         return 'mixpanel'
 
     def load(self, options: PluginLoadOptions) -> None:
-        self._client = MixpanelClient(api_key=self._api_key, on_error=self._on_error,
-                                      flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
-                                      api_host=self._options.api_host, send_request=self._send_request)
+        self._consumer = AsyncBufferedConsumer(
+            flush_after=timedelta(milliseconds=self._options.flush_interval_ms),
+            max_size=self._options.flush_queue_size,
+            events_url=None if self._options.api_host is None else f'{self._options.api_host}/track',
+            people_url=None if self._options.api_host is None else f'{self._options.api_host}/engage',
+        )
+        self._client = Mixpanel(
+            token=self._api_key,
+            consumer=self._consumer,
+        )
         self._logger = options.logger
 
     def alias(self, user_id: str, previous_id: str) -> None:
@@ -50,12 +58,12 @@ class MixpanelPlugin(Plugin):
             properties=event.properties.to_json() if event.properties is not None else None)
 
     def flush(self) -> None:
-        assert self._client is not None
-        self._client.flush()
+        assert self._consumer is not None
+        self._consumer.flush()
 
     def shutdown(self) -> None:
-        assert self._client is not None
-        self._client.shutdown()
+        assert self._consumer is not None
+        self._consumer.flush(async_=False)
 
     def _on_error(self, err: str) -> None:
         self._logger.error(f"Error. {err}")
