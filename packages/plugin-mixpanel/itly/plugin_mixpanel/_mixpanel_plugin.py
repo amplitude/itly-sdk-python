@@ -1,8 +1,6 @@
-from datetime import timedelta
 from typing import Optional, NamedTuple
 
-from mixpanel import Mixpanel
-from mixpanel_async import AsyncBufferedConsumer
+from mixpanel import Mixpanel, BufferedConsumer
 
 from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 
@@ -10,7 +8,6 @@ from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 class MixpanelOptions(NamedTuple):
     api_host: Optional[str] = None
     flush_queue_size: int = 10
-    flush_interval_ms: int = 1000
 
 
 class MixpanelPlugin(Plugin):
@@ -18,15 +15,14 @@ class MixpanelPlugin(Plugin):
         self._api_key: str = api_key
         self._options: MixpanelOptions = options if options is not None else MixpanelOptions()
         self._client: Optional[Mixpanel] = None
-        self._consumer: Optional[AsyncBufferedConsumer] = None
+        self._consumer: Optional[BufferedConsumer] = None
         self._logger: Logger = Logger.NONE
 
     def id(self) -> str:
         return 'mixpanel'
 
     def load(self, options: PluginLoadOptions) -> None:
-        self._consumer = AsyncBufferedConsumer(
-            flush_after=timedelta(milliseconds=self._options.flush_interval_ms),
+        self._consumer = BufferedConsumer(
             max_size=self._options.flush_queue_size,
             events_url=None if self._options.api_host is None else f'{self._options.api_host}/track',
             people_url=None if self._options.api_host is None else f'{self._options.api_host}/engage',
@@ -63,7 +59,7 @@ class MixpanelPlugin(Plugin):
 
     def shutdown(self) -> None:
         assert self._consumer is not None
-        self._consumer.flush(async_=False)
+        self._consumer.flush()
 
     def _on_error(self, err: str) -> None:
         self._logger.error(f"Error. {err}")
