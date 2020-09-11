@@ -1,31 +1,26 @@
-from datetime import timedelta
-from typing import Optional, NamedTuple, Callable
+from typing import Optional, NamedTuple, Any
+
+import analytics
 
 from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
-from ._segment_client import SegmentClient, Request
 
 
 class SegmentOptions(NamedTuple):
-    flush_queue_size: int = 10
-    flush_interval_ms: int = 1000
     host: Optional[str] = None
 
 
 class SegmentPlugin(Plugin):
-    def __init__(self, write_key: str, options: SegmentOptions) -> None:
+    def __init__(self, write_key: str, options: Optional[SegmentOptions]) -> None:
         self._write_key: str = write_key
-        self._options: SegmentOptions = options
-        self._client: Optional[SegmentClient] = None
+        self._options: SegmentOptions = options if options is not None else SegmentOptions()
+        self._client: Optional[analytics.Client] = None
         self._logger: Logger = Logger.NONE
-        self._send_request: Optional[Callable[[Request], None]] = None
 
     def id(self) -> str:
         return 'segment'
 
     def load(self, options: PluginLoadOptions) -> None:
-        self._client = SegmentClient(write_key=self._write_key, on_error=self._on_error,
-                                     flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
-                                     host=self._options.host, send_request=self._send_request)
+        self._client = analytics.Client(write_key=self._write_key, on_error=self._on_error, host=self._options.host)
         self._logger = options.logger
 
     def alias(self, user_id: str, previous_id: str) -> None:
@@ -63,7 +58,7 @@ class SegmentPlugin(Plugin):
 
     def shutdown(self) -> None:
         assert self._client is not None
-        self._client.shutdown()
+        self._client.join()
 
-    def _on_error(self, err: str) -> None:
-        self._logger.error(f"Error. {err}")
+    def _on_error(self, e: Exception, _: Any) -> None:
+        self._logger.error(f"Error. {e}")

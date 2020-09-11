@@ -6,7 +6,7 @@ Iteratively Analytics SDK for Python
 ### Install pytest
 
 ```
-pip install pytest
+pip install pytest pytest-httpserver
 ```
 
 ### Run tests
