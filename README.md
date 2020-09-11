@@ -51,3 +51,18 @@ pytest
 ### Publish packages to real PyPi
 
 `make publish-all`
+
+## Use SDK/plugins locally
+
+!!! Virtual environment should be used.
+
+```
+pip install requests mixpanel jsonschema analytics-python
+
+pip install YOUR-PATH/itly-sdk-python/packages/sdk
+pip install YOUR-PATH/itly-sdk-python/packages/plugin-amplitude
+pip install YOUR-PATH/itly-sdk-python/packages/plugin-iteratively
+pip install YOUR-PATH/itly-sdk-python/packages/plugin-mixpanel
+pip install YOUR-PATH/itly-sdk-python/packages/plugin-schema-validator
+pip install YOUR-PATH/itly-sdk-python/packages/plugin-segment
+```
