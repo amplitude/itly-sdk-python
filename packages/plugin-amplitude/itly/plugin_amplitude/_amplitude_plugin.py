@@ -13,9 +13,9 @@ class AmplitudeOptions(NamedTuple):
 
 
 class AmplitudePlugin(Plugin):
-    def __init__(self, api_key: str, options: AmplitudeOptions) -> None:
+    def __init__(self, api_key: str, options: Optional[AmplitudeOptions] = None) -> None:
         self._api_key: str = api_key
-        self._options: AmplitudeOptions = options
+        self._options: AmplitudeOptions = options if options is not None else AmplitudeOptions()
         self._client: Optional[AmplitudeClient] = None
         self._logger: Logger = Logger.NONE
         self._send_request: Optional[Callable[[Request], None]] = None
