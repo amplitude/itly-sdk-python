@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "itly.sdk"
+version = "0.1.4"
+description = "Iteratively Analytics SDK"
+authors = ["Iteratively"]
+license = "MIT"
+packages = [
+    { include = "itly" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.0.1"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
