@@ -66,10 +66,10 @@ class CustomPlugin(Plugin):
     def shutdown(self) -> None:
         pass
 
-    def validate(self, event: Event) -> ValidationResponse:
+    def validate(self, event: Event) -> Optional[ValidationResponse]:
         if event.properties is not None and 'invalid' in event.properties:
             return self._create_invalid_response('invalid event!!!')
-        return self._create_valid_response()
+        return None
 
 
 class RequiredEnum(enum.Enum):

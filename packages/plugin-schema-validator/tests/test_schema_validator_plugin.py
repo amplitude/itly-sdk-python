@@ -124,7 +124,7 @@ def test_validate_context_with_properties_valid():
         required_string="Required context string",
         optional_enum=Context.OptionalEnum.VALUE_1
     ))
-    assert validation.valid is True
+    assert validation is None
 
 
 def test_validate_group_with_properties_valid():
@@ -134,7 +134,7 @@ def test_validate_group_with_properties_valid():
         required_boolean=False,
         optional_string="I'm optional!"
     ))
-    assert validation.valid is True
+    assert validation is None
 
 
 def test_validate_identify_with_properties_valid():
@@ -144,7 +144,7 @@ def test_validate_identify_with_properties_valid():
         required_number=2.0,
         optional_array=['optional']
     ))
-    assert validation.valid is True
+    assert validation is None
 
 
 def test_validate_event_with_all_properties_valid():
@@ -158,14 +158,14 @@ def test_validate_event_with_all_properties_valid():
         required_number=2.0,
         required_string="don't forget this. it's required.",
     ))
-    assert validation.valid is True
+    assert validation is None
 
 
 def test_validate_event_with_const_types_valid():
     plugin = SchemaValidatorPlugin(DEFAULT_SCHEMAS)
     plugin.load(PluginLoadOptions(environment=Environment.PRODUCTION, logger=Logger.NONE))
     validation = plugin.validate(EventWithConstTypes())
-    assert validation.valid is True
+    assert validation is None
 
 
 def test_validate_invalid_event_not_valid():

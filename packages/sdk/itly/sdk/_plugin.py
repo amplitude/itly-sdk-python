@@ -20,8 +20,8 @@ class Plugin(ABC):
 
     # Validation methods
 
-    def validate(self, event: Event) -> ValidationResponse:
-        return ValidationResponse(valid=True, plugin_id='', message='')
+    def validate(self, event: Event) -> Optional[ValidationResponse]:
+        return None
 
     # Tracking methods
 
@@ -89,7 +89,7 @@ class PluginSafeDecorator(Plugin):
 
     # Validation methods
 
-    def validate(self, event: Event) -> ValidationResponse:
+    def validate(self, event: Event) -> Optional[ValidationResponse]:
         if self._plugin.__class__.validate != Plugin.validate:
             self._logger.info(f'validate(event={event.name}, properties={event.properties})')
         try:

@@ -122,7 +122,8 @@ class Itly:
         if not self._options.validation.disabled:
             for plugin in self._plugins:
                 validation_result = plugin.validate(event)
-                if not validation_result.valid:
+                # Only add invalid validation responses
+                if validation_result is not None and not validation_result.valid:
                     validation_results.append(validation_result)
 
         return validation_results

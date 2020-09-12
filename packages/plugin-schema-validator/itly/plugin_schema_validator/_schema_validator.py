@@ -1,5 +1,5 @@
 import json
-from typing import Dict
+from typing import Dict, Optional
 
 import jsonschema
 
@@ -20,7 +20,7 @@ class SchemaValidatorPlugin(Plugin):
             jsonschema.Draft7Validator.check_schema(schema)
             self._validators[schema_key] = jsonschema.Draft7Validator(schema)
 
-    def validate(self, event: Event) -> ValidationResponse:
+    def validate(self, event: Event) -> Optional[ValidationResponse]:
         schema_key = event.name
         # Check that we have a schema for this event
         if schema_key not in self._schemas:
@@ -38,4 +38,4 @@ class SchemaValidatorPlugin(Plugin):
                 message=f"Passed in {event.name} properties did not validate against your tracking plan. An unknown error occurred during validation. {ex}"
             )
 
-        return self._create_valid_response()
+        return None
