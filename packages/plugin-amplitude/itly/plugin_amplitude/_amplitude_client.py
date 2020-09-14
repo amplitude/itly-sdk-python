@@ -7,7 +7,7 @@ from typing import Dict, Callable, List, Optional, NamedTuple, Any
 
 from requests import Session
 
-from itly.sdk import AsyncConsumer, AsyncConsumerMessage
+from itly.sdk.consumers import AsyncConsumer, AsyncConsumerMessage
 
 
 class Endpoint(NamedTuple):

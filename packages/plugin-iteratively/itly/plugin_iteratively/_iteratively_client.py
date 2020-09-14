@@ -6,7 +6,8 @@ from typing import Callable, List, Optional, NamedTuple, Any
 
 from requests import Session
 
-from itly.sdk import AsyncConsumer, AsyncConsumerMessage, Event, Properties, ValidationResponse
+from itly.sdk import Event, Properties, ValidationResponse
+from itly.sdk.consumers import AsyncConsumer, AsyncConsumerMessage
 
 
 class Request(NamedTuple):

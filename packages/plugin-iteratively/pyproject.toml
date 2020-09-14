@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "itly.plugin-iteratively"
-version = "0.1.1"
+version = "0.1.2"
 description = "Iteratively Analytics SDK - Iteratively Plugin"
 authors = ["Iteratively"]
 license = "MIT"

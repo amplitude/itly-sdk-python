@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "itly.plugin-amplitude"
-version = "0.1.1"
+version = "0.1.2"
 description = "Iteratively Analytics SDK - Amplitude Plugin"
 authors = ["Iteratively"]
 license = "MIT"

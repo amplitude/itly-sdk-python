@@ -7,6 +7,5 @@ from ._properties import Properties
 from ._event import Event
 from ._logger import Logger
 from ._plugin import Plugin
-from ._async_consumer import AsyncConsumer, AsyncConsumerMessage
 
 from ._itly import Itly
