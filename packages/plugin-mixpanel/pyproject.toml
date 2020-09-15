@@ -1,7 +1,8 @@
 [tool.poetry]
 name = "itly.plugin-mixpanel"
-version = "0.1.1"
+version = "0.1.2"
 description = "Iteratively Analytics SDK - Mixpanel Plugin"
+readme="README.md"
 authors = ["Iteratively"]
 license = "MIT"
 packages = [
