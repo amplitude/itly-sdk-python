@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 
 class Properties:
     def __init__(self, **kwargs: Any):
-        self._properties = dict(**kwargs)
+        self._properties = {key: value for (key, value) in kwargs.items() if value is not None}
 
     def to_json(self) -> Dict[str, Any]:
         return {

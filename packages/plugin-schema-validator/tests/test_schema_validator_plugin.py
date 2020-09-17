@@ -29,40 +29,34 @@ class Context(Event):
         VALUE_2 = 'Value 2'
 
     def __init__(self, required_string: str, optional_enum: "Context.OptionalEnum" = None) -> None:
-        properties = {
-            "requiredString": required_string
-        }
-        if optional_enum is not None:
-            properties['optionalEnum'] = optional_enum
         super().__init__(
             "context",
-            Properties(**properties),
+            Properties(**{
+                "requiredString": required_string,
+                "optionalEnum": optional_enum,
+            }),
         )
 
 
 class Group(Event):
     def __init__(self, required_boolean: bool, optional_string: Optional[str] = None) -> None:
-        properties = {
-            "requiredBoolean": required_boolean
-        }
-        if optional_string is not None:
-            properties['optionalString'] = optional_string
         super().__init__(
             "group",
-            Properties(**properties),
+            Properties(**{
+                "requiredBoolean": required_boolean,
+                "optionalString": optional_string,
+            }),
         )
 
 
 class Identify(Event):
     def __init__(self, required_number: float, optional_array: Optional[List[str]] = None) -> None:
-        properties = {
-            "requiredNumber": required_number
-        }
-        if optional_array is not None:
-            properties['optionalArray'] = optional_array
         super().__init__(
             "identify",
-            Properties(**properties),
+            Properties(**{
+                "requiredNumber": required_number,
+                "optionalArray": optional_array,
+            }),
         )
 
 
@@ -73,47 +67,43 @@ class EventWithAllProperties(Event):
 
     def __init__(self, required_array: List[str], required_boolean: bool, required_enum: "EventWithAllProperties.RequiredEnum",
                  required_integer: int, required_number: float, required_string: str, optional_string: Optional[str] = None) -> None:
-        properties = {
-            "requiredArray": required_array,
-            "requiredBoolean": required_boolean,
-            "requiredConst": "some-const-value",
-            "requiredEnum": required_enum,
-            "requiredInteger": required_integer,
-            "requiredNumber": required_number,
-            "requiredString": required_string
-        }
-        if optional_string is not None:
-            properties['optionalString'] = optional_string
         super().__init__(
             "Event With All Properties",
-            Properties(**properties),
+            Properties(**{
+                "requiredArray": required_array,
+                "requiredBoolean": required_boolean,
+                "requiredConst": "some-const-value",
+                "requiredEnum": required_enum,
+                "requiredInteger": required_integer,
+                "requiredNumber": required_number,
+                "requiredString": required_string,
+                "optionalString": optional_string,
+            }),
         )
 
 
 class EventWithConstTypes(Event):
     def __init__(self) -> None:
-        properties = {
-            "Boolean Const": True,
-            "Integer Const": 10,
-            "Number Const": 2.2,
-            "String Const": "String-Constant",
-            "String Const WIth Quotes": "\"String \"Const With\" Quotes\"",
-            "String Int Const": 0
-        }
         super().__init__(
             "Event With Const Types",
-            Properties(**properties),
+            Properties(**{
+                "Boolean Const": True,
+                "Integer Const": 10,
+                "Number Const": 2.2,
+                "String Const": "String-Constant",
+                "String Const WIth Quotes": "\"String \"Const With\" Quotes\"",
+                "String Int Const": 0,
+            }),
         )
 
 
 class EventMaxIntForTest(Event):
     def __init__(self, int_max_10: int) -> None:
-        properties = {
-            "intMax10": int_max_10
-        }
         super().__init__(
             "EventMaxIntForTest",
-            Properties(**properties),
+            Properties(**{
+                "intMax10": int_max_10,
+            }),
         )
 
 
