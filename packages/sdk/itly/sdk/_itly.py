@@ -1,4 +1,3 @@
-import copy
 from typing import Optional, List, Callable
 
 from ._event import Event
@@ -33,7 +32,7 @@ class Itly:
 
         self._logger.info('load()')
 
-        self._context: Event = Event(
+        self._context = Event(
             name='context',
             properties=options.context,
         )
@@ -119,6 +118,7 @@ class Itly:
     def _validate(self, event: Event) -> List[ValidationResponse]:
         validation_results: List[ValidationResponse] = []
 
+        assert self._options is not None
         if not self._options.validation.disabled:
             for plugin in self._plugins:
                 validation_result = plugin.validate(event)
@@ -141,9 +141,14 @@ class Itly:
 
         combined_event: Event = event
         if include_context:
-            combined_event = copy.copy(event)
-            combined_event.properties = Properties.concat([self._context.properties, event.properties])
+            combined_event = Event(
+                name=event.name,
+                properties=Properties.concat([self._context.properties, event.properties]),
+                event_id=event.id,
+                version=event.version,
+            )
 
+        assert self._options is not None
         if (is_context_valid and is_event_valid) or self._options.validation.track_invalid:
             self._run_on_all_plugins(lambda plugin: action(plugin, combined_event))
 
@@ -153,7 +158,7 @@ class Itly:
         if (not is_context_valid or not is_event_valid) and self._options.validation.error_on_invalid:
             raise ValueError(combined_failed_validation_responses[0].message)
 
-    def _run_on_all_plugins(self, action: Callable[[Plugin], None]):
+    def _run_on_all_plugins(self, action: Callable[[Plugin], None]) -> None:
         for plugin in self._plugins:
             action(plugin)
 
