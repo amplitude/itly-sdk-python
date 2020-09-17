@@ -1,17 +1,16 @@
 import atexit
 import enum
 import queue
+import time
 from datetime import datetime, timedelta
-from typing import Callable, List, Optional, NamedTuple, Any
+from typing import Callable, List, Optional, Any
 
+import requests
 from requests import Session
 
 from itly.sdk import Event, Properties, ValidationResponse
-from itly.sdk.internal import AsyncConsumer, AsyncConsumerMessage
-
-
-class Request(NamedTuple):
-    data: Any
+from itly.sdk.internal import AsyncConsumer, AsyncConsumerMessage, backoff
+from ._retry_options import IterativelyRetryOptions
 
 
 class TrackType(enum.Enum):
@@ -22,14 +21,14 @@ class TrackType(enum.Enum):
 
 
 class IterativelyClient:
-    def __init__(self, api_endpoint: str, api_key: str, flush_queue_size: int, flush_interval: timedelta, omit_values: bool,
-                 on_error: Callable[[str], None], send_request: Optional[Callable[[Request], None]]) -> None:
-        self.api_endpoint = api_endpoint
-        self.api_key = api_key
+    def __init__(self, api_endpoint: str, api_key: str, flush_queue_size: int, flush_interval: timedelta, omit_values: bool, retry_options: IterativelyRetryOptions,
+                 on_error: Callable[[str], None]) -> None:
+        self._api_endpoint = api_endpoint
+        self._api_key = api_key
         self._omit_values = omit_values
-        self.on_error = on_error
+        self._retry_options = retry_options
+        self._on_error = on_error
         self._queue: queue.Queue = AsyncConsumer.create_queue()
-        self._send_request: Callable[[Request], None] = send_request if send_request is not None else self._send_request_default
         self._session = Session()
         self._consumer = AsyncConsumer(self._queue, do_upload=self._upload_batch, flush_queue_size=flush_queue_size, flush_interval=flush_interval)
         atexit.register(self.shutdown)
@@ -73,21 +72,41 @@ class IterativelyClient:
             'objects': [message.data for message in batch],
         }
         try:
-            self._send_request(Request(data=data))
+            self._send_request(data)
         except Exception as e:
-            self.on_error(str(e))
+            self._on_error(str(e))
 
-    def _send_request_default(self, request: Request) -> None:
+    def _send_request(self, data: Any) -> None:
+        need_retry = self._post_request(data)
+        if not need_retry:
+            return
+        for delay in backoff(start=self._retry_options.delay_initial.total_seconds(),
+                             stop=self._retry_options.delay_maximum.total_seconds(),
+                             count=self._retry_options.max_retries-1,
+                             factor=2.0,
+                             jitter=1.0):
+            time.sleep(delay)
+            need_retry = self._post_request(data)
+            if not need_retry:
+                return
+        raise Exception("Failed to upload events. Maximum attempts exceeded.")
+
+    def _post_request(self, data: Any) -> bool:
         try:
-            response = self._session.post(self.api_endpoint, json=request.data, headers={'Authorization': 'Bearer ' + self.api_key})
+            response = self._session.post(self._api_endpoint, json=data, headers={'Authorization': 'Bearer ' + self._api_key})
+        except requests.ConnectionError:
+            return True
+        except requests.Timeout:
+            return True
         except Exception as e:
             raise Exception(f"A unhandled exception occurred. ({e}).")
-        if response.status_code < 300:
-            return
-        if 500 <= response.status_code <= 599:
-            raise Exception(f"Upload received error response from server ({response.status_code}).")
+
+        if 200 <= response.status_code < 300:
+            return False
+        if 500 <= response.status_code < 600:
+            return True
         if response.status_code == 429:
-            raise Exception(f"Upload rejected due to rate limiting ({response.status_code}).")
+            return True
         raise Exception(f"Upload failed due to unhandled HTTP error ({response.status_code}).")
 
     def shutdown(self) -> None:
@@ -97,7 +116,7 @@ class IterativelyClient:
         try:
             self._queue.put(message)
         except queue.Full:
-            self.on_error("async queue is full")
+            self._on_error("async queue is full")
 
     def flush(self) -> None:
         self._consumer.flush()

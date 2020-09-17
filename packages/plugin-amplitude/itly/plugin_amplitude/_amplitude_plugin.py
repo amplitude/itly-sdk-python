@@ -1,13 +1,13 @@
 from datetime import timedelta
-from typing import Optional, Callable, NamedTuple
+from typing import Optional, NamedTuple
 
 from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
-from ._amplitude_client import AmplitudeClient, Request
+from ._amplitude_client import AmplitudeClient
 
 
 class AmplitudeOptions(NamedTuple):
     flush_queue_size: int = 10
-    flush_interval_ms: int = 1000
+    flush_interval: timedelta = timedelta(seconds=1)
     events_endpoint: Optional[str] = None
     identification_endpoint: Optional[str] = None
 
@@ -18,16 +18,14 @@ class AmplitudePlugin(Plugin):
         self._options: AmplitudeOptions = options if options is not None else AmplitudeOptions()
         self._client: Optional[AmplitudeClient] = None
         self._logger: Logger = Logger.NONE
-        self._send_request: Optional[Callable[[Request], None]] = None
 
     def id(self) -> str:
         return 'amplitude'
 
     def load(self, options: PluginLoadOptions) -> None:
         self._client = AmplitudeClient(api_key=self._api_key, on_error=self._on_error,
-                                       flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
-                                       events_endpoint=self._options.events_endpoint, identification_endpoint=self._options.identification_endpoint,
-                                       send_request=self._send_request)
+                                       flush_queue_size=self._options.flush_queue_size, flush_interval=self._options.flush_interval,
+                                       events_endpoint=self._options.events_endpoint, identification_endpoint=self._options.identification_endpoint)
         self._logger = options.logger
 
     def identify(self, user_id: str, properties: Optional[Properties]) -> None:

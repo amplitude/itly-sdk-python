@@ -21,7 +21,7 @@ class AsyncConsumer(Thread):
         self._daemon = True
         self._do_upload = do_upload
         self._upload_size = flush_queue_size
-        self._flush_interval_ms = flush_interval
+        self._flush_interval = flush_interval
         self._queue = message_queue
         self._pending_message: Optional[AsyncConsumerMessage] = None
         self._running = True
@@ -57,9 +57,9 @@ class AsyncConsumer(Thread):
         self._pending_message = None
 
         now = datetime.now()
-        while len(items) < self._upload_size and now - start < self._flush_interval_ms:
+        while len(items) < self._upload_size and now - start < self._flush_interval:
             try:
-                timeout = (self._flush_interval_ms - (now - start)).total_seconds()
+                timeout = (self._flush_interval - (now - start)).total_seconds()
                 item = self._queue.get(block=True, timeout=timeout)
                 if isinstance(item.data, Event):
                     return items, item.data

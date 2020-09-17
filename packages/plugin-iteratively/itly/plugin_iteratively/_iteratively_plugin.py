@@ -1,8 +1,9 @@
 from datetime import timedelta
-from typing import Optional, Callable, NamedTuple, List
+from typing import Optional, NamedTuple, List
 
 from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Environment, ValidationResponse, Logger
-from ._iteratively_client import IterativelyClient, TrackType, Request
+from ._iteratively_client import IterativelyClient, TrackType
+from ._retry_options import IterativelyRetryOptions
 
 
 class IterativelyOptions(NamedTuple):
@@ -10,8 +11,9 @@ class IterativelyOptions(NamedTuple):
     environment: Environment = Environment.DEVELOPMENT
     omit_values: bool = False
     flush_queue_size: int = 10
-    flush_interval_ms: int = 1000
+    flush_interval: timedelta = timedelta(seconds=1)
     disabled: Optional[bool] = None
+    retry_options: IterativelyRetryOptions = IterativelyRetryOptions()
 
 
 class IterativelyPlugin(Plugin):
@@ -22,7 +24,6 @@ class IterativelyPlugin(Plugin):
         )
         self._client: Optional[IterativelyClient] = None
         self._logger: Logger = Logger.NONE
-        self._send_request: Optional[Callable[[Request], None]] = None
 
     def id(self) -> str:
         return 'iteratively'
@@ -34,8 +35,9 @@ class IterativelyPlugin(Plugin):
 
         assert self._options.url is not None
         self._client = IterativelyClient(api_endpoint=self._options.url, api_key=self._api_key,
-                                         flush_queue_size=self._options.flush_queue_size, flush_interval=timedelta(milliseconds=self._options.flush_interval_ms),
-                                         omit_values=self._options.omit_values, on_error=self._on_error, send_request=self._send_request)
+                                         flush_queue_size=self._options.flush_queue_size, flush_interval=self._options.flush_interval,
+                                         retry_options=self._options.retry_options,
+                                         omit_values=self._options.omit_values, on_error=self._on_error)
         self._logger = options.logger
 
     def post_identify(self, user_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:

@@ -23,7 +23,7 @@ class Request(NamedTuple):
 
 class AmplitudeClient:
     def __init__(self, api_key: str, on_error: Callable[[str], None], flush_queue_size: int, flush_interval: timedelta,
-                 events_endpoint: Optional[str], identification_endpoint: Optional[str], send_request: Optional[Callable[[Request], None]]) -> None:
+                 events_endpoint: Optional[str], identification_endpoint: Optional[str]) -> None:
         self.api_key = api_key
         self.on_error = on_error
         self._queue: queue.Queue = AsyncConsumer.create_queue()
@@ -31,7 +31,6 @@ class AmplitudeClient:
             "events": Endpoint(url=events_endpoint or "https://api.amplitude.com/2/httpapi", is_json=True),
             "identification": Endpoint(url=identification_endpoint or "https://api.amplitude.com/identify", is_json=False),
         }
-        self._send_request: Callable[[Request], None] = send_request if send_request is not None else self._send_request_default
         self._session = Session()
         self._consumer = AsyncConsumer(message_queue=self._queue, do_upload=self._upload_batch, flush_queue_size=flush_queue_size, flush_interval=flush_interval)
         atexit.register(self.shutdown)
@@ -71,7 +70,7 @@ class AmplitudeClient:
         except Exception as e:
             self.on_error(str(e))
 
-    def _send_request_default(self, request: Request) -> None:
+    def _send_request(self, request: Request) -> None:
         if request.is_json:
             response = self._session.post(request.url, json=request.data)
         else:

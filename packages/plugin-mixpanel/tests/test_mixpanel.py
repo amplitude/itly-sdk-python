@@ -1,13 +1,17 @@
 import base64
 import json
 import re
+import time
 import urllib.parse
+from typing import Any, List
+
+from pytest_httpserver import HTTPServer
 
 from itly.plugin_mixpanel import MixpanelPlugin, MixpanelOptions
 from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 
-def test_mixpanel(httpserver):
+def test_mixpanel(httpserver: HTTPServer):
     httpserver.expect_request(re.compile('/(track|engage)')).respond_with_json({'status': 1})
 
     options = MixpanelOptions(
@@ -27,11 +31,9 @@ def test_mixpanel(httpserver):
     p.track("user-1", Event('event-5', Properties(item1='value5', item2=5)))
     p.shutdown()
 
-    requests = []
-    for item in httpserver.collected_data:
-        data = re.search(b'data=([^&]+)&', item)
-        batch = json.loads(base64.b64decode(urllib.parse.unquote(data.group(1).decode('ascii'))))
-        requests += [_clean_request(r) for r in batch]
+    time.sleep(0.1)
+    requests = _get_cleaned_requests(httpserver)
+    httpserver.stop()
 
     assert requests == [
         {'event': 'event-1',
@@ -75,7 +77,16 @@ def test_mixpanel(httpserver):
     ]
 
 
-def _clean_request(request):
+def _get_cleaned_requests(httpserver: Any) -> List[Any]:
+    requests = []
+    for item in httpserver.collected_data:
+        data = re.search(b'data=([^&]+)&', item)
+        batch = json.loads(base64.b64decode(urllib.parse.unquote(data.group(1).decode('ascii'))))
+        requests += [_clean_request(r) for r in batch]
+    return requests
+
+
+def _clean_request(request: Any) -> Any:
     if '$time' in request:
         del request['$time']
     if 'properties' in request and 'time' in request['properties']:

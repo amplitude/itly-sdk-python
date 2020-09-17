@@ -1,10 +1,14 @@
 import json
+import time
+from typing import Any, List
+
+from pytest_httpserver import HTTPServer
 
 from itly.plugin_segment import SegmentPlugin, SegmentOptions
 from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 
-def test_segment(httpserver):
+def test_segment(httpserver: HTTPServer):
     httpserver.expect_request('/v1/batch').respond_with_data()
 
     options = SegmentOptions(
@@ -27,9 +31,10 @@ def test_segment(httpserver):
 
     p.flush()
     p.shutdown()
+    time.sleep(0.1)
+    httpserver.stop()
 
-    batches = [json.loads(data)['batch'] for data in httpserver.collected_data]
-    requests = [_clean_request(r) for batch in batches for r in batch]
+    requests = _get_cleaned_requests(httpserver)
     assert requests == [
         {'anonymousId': None,
          'context': {'library': {'name': 'analytics-python', 'version': '1.2.9'}},
@@ -82,7 +87,12 @@ def test_segment(httpserver):
     ]
 
 
-def _clean_request(request):
+def _get_cleaned_requests(httpserver: Any) -> List[Any]:
+    batches = [json.loads(data)['batch'] for data in httpserver.collected_data]
+    return [_clean_request(r) for batch in batches for r in batch]
+
+
+def _clean_request(request: Any) -> Any:
     del request['messageId']
     del request['timestamp']
     return request

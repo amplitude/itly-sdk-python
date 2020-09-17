@@ -3,7 +3,7 @@ import sys
 import pytest
 from pytest_httpserver import HTTPServer
 from pytest_httpserver.httpserver import RequestMatcher
-from pytest_httpserver.pytest_plugin import Plugin, PluginHTTPServer
+from pytest_httpserver.pytest_plugin import PluginHTTPServer
 from werkzeug.wrappers import Request
 
 sys.path.extend([
@@ -40,11 +40,6 @@ class _PluginHTTPServer(PluginHTTPServer):
 
 @pytest.fixture
 def httpserver():
-    if Plugin.SERVER:
-        Plugin.SERVER.clear()
-        yield Plugin.SERVER
-        return
-
     host = HTTPServer.DEFAULT_LISTEN_HOST
     port = HTTPServer.DEFAULT_LISTEN_PORT
 
