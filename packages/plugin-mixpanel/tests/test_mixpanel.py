@@ -1,4 +1,3 @@
-import base64
 import json
 import re
 import time
@@ -37,14 +36,14 @@ def test_mixpanel(httpserver: HTTPServer):
 
     assert requests == [
         {'event': 'event-1',
-         'properties': {'$lib_version': '4.6.0',
+         'properties': {'$lib_version': '4.7.0',
                         'distinct_id': 'user-2',
                         'item1': 'value1',
                         'item2': 1,
                         'mp_lib': 'python',
                         'token': 'My-Key'}},
         {'event': 'event-2',
-         'properties': {'$lib_version': '4.6.0',
+         'properties': {'$lib_version': '4.7.0',
                         'distinct_id': 'user-2',
                         'item1': 'value2',
                         'item2': 2,
@@ -54,21 +53,21 @@ def test_mixpanel(httpserver: HTTPServer):
          '$set': {'item1': 'value1', 'item2': 2},
          '$token': 'My-Key'},
         {'event': 'event-3',
-         'properties': {'$lib_version': '4.6.0',
+         'properties': {'$lib_version': '4.7.0',
                         'distinct_id': 'user-2',
                         'item1': 'value3',
                         'item2': 3,
                         'mp_lib': 'python',
                         'token': 'My-Key'}},
         {'event': 'event-4',
-         'properties': {'$lib_version': '4.6.0',
+         'properties': {'$lib_version': '4.7.0',
                         'distinct_id': 'user-2',
                         'item1': 'value4',
                         'item2': 4,
                         'mp_lib': 'python',
                         'token': 'My-Key'}},
         {'event': 'event-5',
-         'properties': {'$lib_version': '4.6.0',
+         'properties': {'$lib_version': '4.7.0',
                         'distinct_id': 'user-1',
                         'item1': 'value5',
                         'item2': 5,
@@ -81,7 +80,7 @@ def _get_cleaned_requests(httpserver: Any) -> List[Any]:
     requests = []
     for item in httpserver.collected_data:
         data = re.search(b'data=([^&]+)&', item)
-        batch = json.loads(base64.b64decode(urllib.parse.unquote(data.group(1).decode('ascii'))))
+        batch = json.loads(urllib.parse.unquote(data.group(1).decode('ascii')))
         requests += [_clean_request(r) for r in batch]
     return requests
 
@@ -89,6 +88,9 @@ def _get_cleaned_requests(httpserver: Any) -> List[Any]:
 def _clean_request(request: Any) -> Any:
     if '$time' in request:
         del request['$time']
-    if 'properties' in request and 'time' in request['properties']:
-        del request['properties']['time']
+    if 'properties' in request:
+        if 'time' in request['properties']:
+            del request['properties']['time']
+        if '$insert_id' in request['properties']:
+            del request['properties']['$insert_id']
     return request
