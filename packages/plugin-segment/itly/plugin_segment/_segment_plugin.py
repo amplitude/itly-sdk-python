@@ -1,8 +1,8 @@
-from typing import Optional, NamedTuple, Any, Dict
+from typing import Optional, NamedTuple, Any
 
 import analytics
 
-from itly.sdk import Plugin, PluginLoadOptions, Event, Logger
+from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 
 
 class SegmentOptions(NamedTuple):
@@ -28,29 +28,29 @@ class SegmentPlugin(Plugin):
         self._client.alias(user_id=user_id,
                            previous_id=previous_id)
 
-    def identify(self, user_id: str, properties: Optional[Dict[str, Any]]) -> None:
+    def identify(self, user_id: str, properties: Optional[Properties]) -> None:
         assert self._client is not None
         self._client.identify(user_id=user_id,
-                              traits=properties.copy() if properties is not None else None)
+                              traits=properties.to_json() if properties is not None else None)
 
-    def group(self, user_id: str, group_id: str, properties: Optional[Dict[str, Any]]) -> None:
+    def group(self, user_id: str, group_id: str, properties: Optional[Properties]) -> None:
         assert self._client is not None
         self._client.group(user_id=user_id,
                            group_id=group_id,
-                           traits=properties.copy() if properties is not None else None)
+                           traits=properties.to_json() if properties is not None else None)
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Dict[str, Any]]) -> None:
+    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
         assert self._client is not None
         self._client.page(user_id=user_id,
                           category=category,
                           name=name,
-                          properties=properties.copy() if properties is not None else None)
+                          properties=properties.to_json() if properties is not None else None)
 
     def track(self, user_id: str, event: Event) -> None:
         assert self._client is not None
         self._client.track(user_id=user_id,
                            event=event.name,
-                           properties=event.properties.copy() if event.properties is not None else None)
+                           properties=event.properties.to_json() if event.properties is not None else None)
 
     def flush(self) -> None:
         assert self._client is not None

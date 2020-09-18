@@ -8,7 +8,7 @@ import urllib.parse
 from pytest_httpserver import HTTPServer
 
 from itly.plugin_amplitude import AmplitudePlugin, AmplitudeOptions
-from itly.sdk import PluginLoadOptions, Environment, Event, Logger
+from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 
 def test_amplitude(httpserver: HTTPServer):
@@ -26,7 +26,7 @@ def test_amplitude(httpserver: HTTPServer):
     try:
         p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
-        p.identify("user-1", dict(item1='value1', item2=2))
+        p.identify("user-1", Properties(item1='value1', item2=2))
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
         assert requests == []

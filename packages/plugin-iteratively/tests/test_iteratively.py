@@ -7,7 +7,7 @@ from typing import List, Any
 from pytest_httpserver import HTTPServer
 
 from itly.plugin_iteratively import IterativelyPlugin, IterativelyOptions, IterativelyRetryOptions
-from itly.sdk import PluginLoadOptions, Environment, Event, Logger, ValidationResponse
+from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger, ValidationResponse
 
 
 class CustomLogger(Logger):
@@ -42,7 +42,7 @@ def test_iteratively(httpserver: HTTPServer):
     try:
         p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
-        p.post_identify("user-1", dict(item1='value1', item2=2),
+        p.post_identify("user-1", Properties(item1='value1', item2=2),
                         [
                             ValidationResponse(valid=True, plugin_id='custom', message=''),
                             ValidationResponse(valid=False, plugin_id='custom', message='invalid!!!'),
@@ -51,7 +51,7 @@ def test_iteratively(httpserver: HTTPServer):
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
         assert requests == []
-        p.post_identify("user-2", dict(item1='value3', item2=4), [])
+        p.post_identify("user-2", Properties(item1='value3', item2=4), [])
 
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
@@ -73,7 +73,7 @@ def test_iteratively(httpserver: HTTPServer):
             ]},
         ]
 
-        p.post_group("user-2", "group-2", dict(item1='value2', item2=2), [])
+        p.post_group("user-2", "group-2", Properties(item1='value2', item2=2), [])
 
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
@@ -116,7 +116,7 @@ def test_iteratively(httpserver: HTTPServer):
             ]},
         ]
 
-        p.post_page("user-2", "category-2", "page-3", dict(item1='value3', item2=3),
+        p.post_page("user-2", "category-2", "page-3", Properties(item1='value3', item2=3),
                     [
                         ValidationResponse(valid=False, plugin_id='custom', message='invalid!!!'),
                         ValidationResponse(valid=True, plugin_id='custom', message=''),
@@ -138,7 +138,7 @@ def test_iteratively(httpserver: HTTPServer):
             ]},
         ]
 
-        p.post_track("user-1", Event('event-5', dict(item1='value5', item2=5), id='id-5', version='version-5'), [])
+        p.post_track("user-1", Event('event-5', dict(item1='value5', item2=5), id_='id-5', version='version-5'), [])
     finally:
         p.shutdown()
 
@@ -179,12 +179,12 @@ def test_iteratively_omit_values(httpserver: HTTPServer):
     try:
         p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
-        p.post_identify("user-1", dict(item1='value1', item2=2), [])
+        p.post_identify("user-1", Properties(item1='value1', item2=2), [])
 
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
         assert requests == []
-        p.post_identify("user-2", dict(item1='value3', item2=4),
+        p.post_identify("user-2", Properties(item1='value3', item2=4),
                         [
                             ValidationResponse(valid=True, plugin_id='custom', message=''),
                             ValidationResponse(valid=False, plugin_id='custom', message='invalid!!!'),
@@ -206,7 +206,7 @@ def test_iteratively_omit_values(httpserver: HTTPServer):
             ]},
         ]
 
-        p.post_group("user-2", "group-2", dict(item1='value2', item2=2),
+        p.post_group("user-2", "group-2", Properties(item1='value2', item2=2),
                      [
                          ValidationResponse(valid=False, plugin_id='custom', message='not valid!!!'),
                          ValidationResponse(valid=False, plugin_id='custom', message='invalid!!!'),
@@ -253,7 +253,7 @@ def test_iteratively_omit_values(httpserver: HTTPServer):
             ]},
         ]
 
-        p.post_page("user-2", "category-2", "page-3", dict(item1='value3', item2=3), [])
+        p.post_page("user-2", "category-2", "page-3", Properties(item1='value3', item2=3), [])
 
         time.sleep(1.1)
         requests = _get_cleaned_requests(httpserver)
@@ -271,7 +271,7 @@ def test_iteratively_omit_values(httpserver: HTTPServer):
             ]},
         ]
 
-        p.post_track("user-1", Event('event-5', dict(item1='value5', item2=5), id='id-5', version='version-5'),
+        p.post_track("user-1", Event('event-5', dict(item1='value5', item2=5), id_='id-5', version='version-5'),
                      [
                          ValidationResponse(valid=True, plugin_id='custom', message=''),
                          ValidationResponse(valid=False, plugin_id='custom', message='invalid!!!'),
@@ -316,12 +316,12 @@ def test_iteratively_disabled(httpserver: HTTPServer):
     try:
         p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
-        p.post_identify("user-1", dict(item1='value1', item2=2), [])
+        p.post_identify("user-1", Properties(item1='value1', item2=2), [])
 
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
         assert requests == []
-        p.post_identify("user-2", dict(item1='value3', item2=4), [])
+        p.post_identify("user-2", Properties(item1='value3', item2=4), [])
 
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
@@ -337,7 +337,7 @@ def test_iteratively_disabled(httpserver: HTTPServer):
         requests = _get_cleaned_requests(httpserver)
         assert requests == []
 
-        p.post_group("user-2", "group-2", dict(item1='value2', item2=2), [])
+        p.post_group("user-2", "group-2", Properties(item1='value2', item2=2), [])
 
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
@@ -356,13 +356,13 @@ def test_iteratively_disabled(httpserver: HTTPServer):
         requests = _get_cleaned_requests(httpserver)
         assert requests == []
 
-        p.post_page("user-2", "category-2", "page-3", dict(item1='value3', item2=3), [])
+        p.post_page("user-2", "category-2", "page-3", Properties(item1='value3', item2=3), [])
 
         time.sleep(1.1)
         requests = _get_cleaned_requests(httpserver)
         assert requests == []
 
-        p.post_track("user-1", Event('event-5', dict(item1='value5', item2=5), id='id-5', version='version-5'), [])
+        p.post_track("user-1", Event('event-5', dict(item1='value5', item2=5), id_='id-5', version='version-5'), [])
     finally:
         p.shutdown()
 

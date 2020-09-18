@@ -7,7 +7,7 @@ from typing import Any, List
 from pytest_httpserver import HTTPServer
 
 from itly.plugin_mixpanel import MixpanelPlugin, MixpanelOptions
-from itly.sdk import PluginLoadOptions, Environment, Event, Logger
+from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 
 def test_mixpanel(httpserver: HTTPServer):
@@ -20,7 +20,7 @@ def test_mixpanel(httpserver: HTTPServer):
 
     assert p.id() == 'mixpanel'
     p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
-    p.identify("user-1", dict(item1='value1', item2=2))
+    p.identify("user-1", Properties(item1='value1', item2=2))
     p.alias("user-1", "prev-user-1")
     p.track("user-2", Event('event-1', dict(item1='value1', item2=1)))
     p.track("user-2", Event('event-2', dict(item1='value2', item2=2)))

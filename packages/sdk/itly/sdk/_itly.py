@@ -5,6 +5,7 @@ from ._logger import Logger, LoggerPrefixSafeDecorator
 from ._options import Options
 from ._plugin import Plugin, PluginSafeDecorator
 from ._plugin_options import PluginLoadOptions
+from ._properties import Properties
 from ._validation_response import ValidationResponse
 
 LOG_PREFIX = '[itly-core] '
@@ -51,11 +52,11 @@ class Itly:
         self._run_on_all_plugins(lambda plugin: plugin.alias(user_id=user_id, previous_id=previous_id))
         self._run_on_all_plugins(lambda plugin: plugin.post_alias(user_id=user_id, previous_id=previous_id))
 
-    def identify(self, user_id: str, **identify_properties: Any) -> None:
+    def identify(self, user_id: str, identify_properties: Optional[Dict[str, Any]] = None) -> None:
         if self._disabled():
             return
 
-        identify_event = Event('identify', identify_properties or None)
+        identify_event = Event('identify', identify_properties)
         self._logger.info(f'identify(user_id={user_id}, properties={identify_event.properties})')
         self._validate_and_run_on_all_plugins(
             identify_event,
@@ -64,11 +65,11 @@ class Itly:
             lambda plugin, event, validation_results: plugin.post_identify(user_id, event.properties, validation_results),
         )
 
-    def group(self, user_id: str, group_id: str, **group_properties: Any) -> None:
+    def group(self, user_id: str, group_id: str, group_properties: Optional[Dict[str, Any]] = None) -> None:
         if self._disabled():
             return
 
-        group_event = Event('group', group_properties or None)
+        group_event = Event('group', group_properties)
         self._logger.info(f'group(user_id={user_id}, group_id={group_id}, properties={group_event.properties})')
         self._validate_and_run_on_all_plugins(
             group_event,
@@ -77,11 +78,11 @@ class Itly:
             lambda plugin, event, validation_results: plugin.post_group(user_id, group_id, event.properties, validation_results),
         )
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], **page_properties: Any) -> None:
+    def page(self, user_id: str, category: Optional[str], name: Optional[str], page_properties: Optional[Dict[str, Any]] = None) -> None:
         if self._disabled():
             return
 
-        page_event = Event('page', page_properties or None)
+        page_event = Event('page', page_properties)
         self._logger.info(f'page(user_id={user_id}, category={category}, name={name}, properties={page_event.properties})')
         self._validate_and_run_on_all_plugins(
             page_event,
@@ -143,11 +144,10 @@ class Itly:
 
         combined_event: Event = event
         if include_context:
-            combined_properties = self._concat_properties([self._context.properties, event.properties])
             combined_event = Event(
                 name=event.name,
-                properties=combined_properties,
-                id=event.id,
+                properties=Properties.concat([self._context.properties, event.properties]),
+                id_=event.id,
                 version=event.version,
             )
 
@@ -172,14 +172,3 @@ class Itly:
             raise Exception('Itly is not yet initialized. Have you called `itly.load()` on app start?')
 
         return self._options.disabled
-
-    @staticmethod
-    def _concat_properties(properties: List[Optional[Dict[str, Any]]]) -> Optional[Dict[str, Any]]:
-        if all(p is None for p in properties):
-            return None
-
-        result: Dict[str, Any] = {}
-        for p in properties:
-            if p is not None:
-                result.update(p)
-        return result

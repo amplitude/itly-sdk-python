@@ -26,7 +26,7 @@ class SchemaValidatorPlugin(Plugin):
         if schema_key not in self._schemas:
             raise ValueError(f"Event '{event.name}' not found in tracking plan.")
 
-        event_properties = event.properties.copy() if event.properties is not None else {}
+        event_properties = event.properties.to_json() if event.properties is not None else {}
         try:
             self._validators[schema_key].validate(instance=event_properties)
         except jsonschema.ValidationError as ex:

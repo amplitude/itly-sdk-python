@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List, Dict, Any
+from typing import Optional, List
 
 from ._event import Event
 from ._logger import Logger
 from ._plugin_options import PluginLoadOptions
+from ._properties import Properties
 from ._validation_response import ValidationResponse
 
 
@@ -30,22 +31,22 @@ class Plugin(ABC):
     def post_alias(self, user_id: str, previous_id: str) -> None:
         pass
 
-    def identify(self, user_id: str, properties: Optional[Dict[str, Any]]) -> None:
+    def identify(self, user_id: str, properties: Optional[Properties]) -> None:
         pass
 
-    def post_identify(self, user_id: str, properties: Optional[Dict[str, Any]], validation_results: List[ValidationResponse]) -> None:
+    def post_identify(self, user_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         pass
 
-    def group(self, user_id: str, group_id: str, properties: Optional[Dict[str, Any]]) -> None:
+    def group(self, user_id: str, group_id: str, properties: Optional[Properties]) -> None:
         pass
 
-    def post_group(self, user_id: str, group_id: str, properties: Optional[Dict[str, Any]], validation_results: List[ValidationResponse]) -> None:
+    def post_group(self, user_id: str, group_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         pass
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Dict[str, Any]]) -> None:
+    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
         pass
 
-    def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Dict[str, Any]], validation_results: List[ValidationResponse]) -> None:
+    def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         pass
 
     def track(self, user_id: str, event: Event) -> None:
@@ -115,7 +116,7 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error(f'Error in post_alias(). {e}')
 
-    def identify(self, user_id: str, properties: Optional[Dict[str, Any]]) -> None:
+    def identify(self, user_id: str, properties: Optional[Properties]) -> None:
         if self._plugin.__class__.identify != Plugin.identify:
             self._logger.info(f'identify(user_id={user_id}, properties={properties})')
         try:
@@ -123,7 +124,7 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error(f'Error in identify(). {e}')
 
-    def post_identify(self, user_id: str, properties: Optional[Dict[str, Any]], validation_results: List[ValidationResponse]) -> None:
+    def post_identify(self, user_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_identify != Plugin.post_identify:
             self._logger.info(f'post_identify(user_id={user_id}, properties={properties}, validation_results={validation_results})')
         try:
@@ -131,7 +132,7 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error(f'Error in post_identify(). {e}')
 
-    def group(self, user_id: str, group_id: str, properties: Optional[Dict[str, Any]]) -> None:
+    def group(self, user_id: str, group_id: str, properties: Optional[Properties]) -> None:
         if self._plugin.__class__.group != Plugin.group:
             self._logger.info(f'group(user_id={user_id}, group_id={group_id}, properties={properties})')
         try:
@@ -139,7 +140,7 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error(f'Error in group(). {e}')
 
-    def post_group(self, user_id: str, group_id: str, properties: Optional[Dict[str, Any]], validation_results: List[ValidationResponse]) -> None:
+    def post_group(self, user_id: str, group_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_group != Plugin.post_group:
             self._logger.info(f'post_group(user_id={user_id}, group_id={group_id}, properties={properties}, validation_results={validation_results})')
         try:
@@ -147,7 +148,7 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error(f'Error in post_group(). {e}')
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Dict[str, Any]]) -> None:
+    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
         if self._plugin.__class__.page != Plugin.page:
             self._logger.info(f'page(user_id={user_id}, category={category}, name={name}, properties={properties})')
         try:
@@ -155,7 +156,7 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error(f'Error in page(). {e}')
 
-    def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Dict[str, Any]], validation_results: List[ValidationResponse]) -> None:
+    def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_page != Plugin.post_page:
             self._logger.info(f'post_page(user_id={user_id}, category={category}, name={name}, properties={properties}, validation_results={validation_results})')
         try:
