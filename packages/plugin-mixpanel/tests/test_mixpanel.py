@@ -7,7 +7,7 @@ from typing import Any, List
 from pytest_httpserver import HTTPServer
 
 from itly.plugin_mixpanel import MixpanelPlugin, MixpanelOptions
-from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
+from itly.sdk import PluginLoadOptions, Environment, Event, Logger
 
 
 def test_mixpanel(httpserver: HTTPServer):
@@ -20,14 +20,14 @@ def test_mixpanel(httpserver: HTTPServer):
 
     assert p.id() == 'mixpanel'
     p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
-    p.identify("user-1", Properties(item1='value1', item2=2))
+    p.identify("user-1", dict(item1='value1', item2=2))
     p.alias("user-1", "prev-user-1")
-    p.track("user-2", Event('event-1', Properties(item1='value1', item2=1)))
-    p.track("user-2", Event('event-2', Properties(item1='value2', item2=2)))
+    p.track("user-2", Event('event-1', dict(item1='value1', item2=1)))
+    p.track("user-2", Event('event-2', dict(item1='value2', item2=2)))
     p.flush()
-    p.track("user-2", Event('event-3', Properties(item1='value3', item2=3)))
-    p.track("user-2", Event('event-4', Properties(item1='value4', item2=4)))
-    p.track("user-1", Event('event-5', Properties(item1='value5', item2=5)))
+    p.track("user-2", Event('event-3', dict(item1='value3', item2=3)))
+    p.track("user-2", Event('event-4', dict(item1='value4', item2=4)))
+    p.track("user-1", Event('event-5', dict(item1='value5', item2=5)))
     p.shutdown()
 
     time.sleep(0.1)

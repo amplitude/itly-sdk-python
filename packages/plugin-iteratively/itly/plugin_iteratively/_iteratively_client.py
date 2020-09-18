@@ -3,12 +3,12 @@ import enum
 import queue
 import time
 from datetime import datetime, timedelta
-from typing import Callable, List, Optional, Any
+from typing import Callable, List, Optional, Any, Dict
 
 import requests
 from requests import Session
 
-from itly.sdk import Event, Properties, ValidationResponse
+from itly.sdk import Event, ValidationResponse
 from itly.sdk.internal import AsyncConsumer, AsyncConsumerMessage, backoff
 from ._retry_options import IterativelyRetryOptions
 
@@ -34,7 +34,7 @@ class IterativelyClient:
         atexit.register(self.shutdown)
         self._consumer.start()
 
-    def track(self, track_type: TrackType, event: Optional[Event] = None, properties: Optional[Properties] = None,
+    def track(self, track_type: TrackType, event: Optional[Event] = None, properties: Optional[Dict[str, Any]] = None,
               validation: Optional[ValidationResponse] = None) -> None:
         date_sent = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + "Z"
         model = {
@@ -56,9 +56,9 @@ class IterativelyClient:
 
         if properties is not None:
             if self._omit_values:
-                model['properties'] = {k: None for k in properties.to_json()}
+                model['properties'] = {k: None for k in properties}
             else:
-                model['properties'] = properties.to_json()
+                model['properties'] = properties.copy()
 
         if validation is not None:
             model['valid'] = validation.valid

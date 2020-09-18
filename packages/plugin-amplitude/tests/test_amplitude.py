@@ -8,7 +8,7 @@ import urllib.parse
 from pytest_httpserver import HTTPServer
 
 from itly.plugin_amplitude import AmplitudePlugin, AmplitudeOptions
-from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
+from itly.sdk import PluginLoadOptions, Environment, Event, Logger
 
 
 def test_amplitude(httpserver: HTTPServer):
@@ -26,12 +26,12 @@ def test_amplitude(httpserver: HTTPServer):
     try:
         p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
-        p.identify("user-1", Properties(item1='value1', item2=2))
+        p.identify("user-1", dict(item1='value1', item2=2))
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
         assert requests == []
 
-        p.track("user-2", Event('event-1', Properties(item1='value1', item2=1)))
+        p.track("user-2", Event('event-1', dict(item1='value1', item2=1)))
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
         assert requests == [
@@ -40,7 +40,7 @@ def test_amplitude(httpserver: HTTPServer):
             ],
         ]
 
-        p.track("user-2", Event('event-2', Properties(item1='value2', item2=2)))
+        p.track("user-2", Event('event-2', dict(item1='value2', item2=2)))
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
         assert requests == [
@@ -80,7 +80,7 @@ def test_amplitude(httpserver: HTTPServer):
                 'api_key': 'My-Key'},
         ]
 
-        p.track("user-2", Event('event-3', Properties(item1='value3', item2=3)))
+        p.track("user-2", Event('event-3', dict(item1='value3', item2=3)))
 
         time.sleep(1.1)
         requests = _get_cleaned_requests(httpserver)
@@ -101,8 +101,8 @@ def test_amplitude(httpserver: HTTPServer):
                 'api_key': 'My-Key'},
         ]
 
-        p.track("user-2", Event('event-4', Properties(item1='value4', item2=4)))
-        p.track("user-1", Event('event-5', Properties(item1='value5', item2=5)))
+        p.track("user-2", Event('event-4', dict(item1='value4', item2=4)))
+        p.track("user-1", Event('event-5', dict(item1='value5', item2=5)))
     finally:
         p.shutdown()
 

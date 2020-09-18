@@ -1,9 +1,8 @@
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 from ._environment import Environment
 from ._logger import Logger
 from ._plugin import Plugin
-from ._properties import Properties
 from ._validation_options import ValidationOptions
 
 
@@ -12,14 +11,14 @@ class Options:
                  environment: Environment = Environment.DEVELOPMENT,
                  disabled: bool = False,
                  plugins: Optional[List[Plugin]] = None,
-                 context: Optional[Properties] = None,
+                 context: Optional[Dict[str, Any]] = None,
                  validation: Optional[ValidationOptions] = None,
                  logger: Logger = Logger.NONE
                  ):
         self._environment: Environment = environment
         self._disabled: bool = disabled
         self._plugins: List[Plugin] = plugins if plugins is not None else []
-        self._context: Optional[Properties] = context
+        self._context: Optional[Dict[str, Any]] = context
         self._validation = validation if validation is not None else ValidationOptions(
             track_invalid=environment == Environment.PRODUCTION,
             error_on_invalid=environment != Environment.PRODUCTION,
@@ -39,7 +38,7 @@ class Options:
         return self._plugins
 
     @property
-    def context(self) -> Optional[Properties]:
+    def context(self) -> Optional[Dict[str, Any]]:
         return self._context
 
     @property

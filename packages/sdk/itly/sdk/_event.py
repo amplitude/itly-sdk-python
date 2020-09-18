@@ -1,13 +1,17 @@
-from typing import Optional
-
-from ._properties import Properties
+import enum
+from typing import Optional, Any, Dict
 
 
 class Event:
-    def __init__(self, name: str, properties: Optional[Properties] = None, event_id: Optional[str] = None, version: Optional[str] = None):
+    def __init__(self, name: str, properties: Optional[Dict[str, Any]] = None, id: Optional[str] = None, version: Optional[str] = None):
         self._name: str = name
-        self._properties: Optional[Properties] = properties
-        self._id: Optional[str] = event_id
+        self._properties: Optional[Dict[str, Any]] = None if properties is None \
+            else {
+            key: value.value if isinstance(value, enum.Enum) else value
+            for key, value in properties.items()
+            if value is not None
+        }
+        self._id: Optional[str] = id
         self._version: Optional[str] = version
 
     @property
@@ -15,7 +19,7 @@ class Event:
         return self._name
 
     @property
-    def properties(self) -> Optional[Properties]:
+    def properties(self) -> Optional[Dict[str, Any]]:
         return self._properties
 
     @property

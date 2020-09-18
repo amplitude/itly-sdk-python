@@ -4,7 +4,7 @@ from typing import Optional, List
 import pytest
 
 from itly.plugin_schema_validator import SchemaValidatorPlugin
-from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
+from itly.sdk import PluginLoadOptions, Environment, Event, Logger
 
 DEFAULT_SCHEMAS = {
     'context': '{"$id":"https://iterative.ly/company/77b37977-cb3a-42eb-bce3-09f5f7c3adb7/context","$schema":"http://json-schema.org/draft-07/schema#","title":"Context","description":"","type":"object","properties":{"requiredString":{"description":"description for context requiredString","type":"string"},"optionalEnum":{"description":"description for context optionalEnum","enum":["Value 1","Value 2"]}},"additionalProperties":false,"required":["requiredString"]}',  # nopep8
@@ -31,10 +31,10 @@ class Context(Event):
     def __init__(self, required_string: str, optional_enum: "Context.OptionalEnum" = None) -> None:
         super().__init__(
             "context",
-            Properties(**{
+            {
                 "requiredString": required_string,
                 "optionalEnum": optional_enum,
-            }),
+            },
         )
 
 
@@ -42,10 +42,10 @@ class Group(Event):
     def __init__(self, required_boolean: bool, optional_string: Optional[str] = None) -> None:
         super().__init__(
             "group",
-            Properties(**{
+            {
                 "requiredBoolean": required_boolean,
                 "optionalString": optional_string,
-            }),
+            },
         )
 
 
@@ -53,10 +53,10 @@ class Identify(Event):
     def __init__(self, required_number: float, optional_array: Optional[List[str]] = None) -> None:
         super().__init__(
             "identify",
-            Properties(**{
+            {
                 "requiredNumber": required_number,
                 "optionalArray": optional_array,
-            }),
+            },
         )
 
 
@@ -69,7 +69,7 @@ class EventWithAllProperties(Event):
                  required_integer: int, required_number: float, required_string: str, optional_string: Optional[str] = None) -> None:
         super().__init__(
             "Event With All Properties",
-            Properties(**{
+            {
                 "requiredArray": required_array,
                 "requiredBoolean": required_boolean,
                 "requiredConst": "some-const-value",
@@ -78,7 +78,7 @@ class EventWithAllProperties(Event):
                 "requiredNumber": required_number,
                 "requiredString": required_string,
                 "optionalString": optional_string,
-            }),
+            },
         )
 
 
@@ -86,14 +86,14 @@ class EventWithConstTypes(Event):
     def __init__(self) -> None:
         super().__init__(
             "Event With Const Types",
-            Properties(**{
+            {
                 "Boolean Const": True,
                 "Integer Const": 10,
                 "Number Const": 2.2,
                 "String Const": "String-Constant",
                 "String Const WIth Quotes": "\"String \"Const With\" Quotes\"",
                 "String Int Const": 0,
-            }),
+            },
         )
 
 
@@ -101,9 +101,9 @@ class EventMaxIntForTest(Event):
     def __init__(self, int_max_10: int) -> None:
         super().__init__(
             "EventMaxIntForTest",
-            Properties(**{
+            {
                 "intMax10": int_max_10,
-            }),
+            },
         )
 
 

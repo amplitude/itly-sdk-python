@@ -1,7 +1,7 @@
 from datetime import timedelta
-from typing import Optional, NamedTuple, List
+from typing import Optional, NamedTuple, List, Dict, Any
 
-from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Environment, ValidationResponse, Logger
+from itly.sdk import Plugin, PluginLoadOptions, Event, Environment, ValidationResponse, Logger
 from ._iteratively_client import IterativelyClient, TrackType
 from ._retry_options import IterativelyRetryOptions
 
@@ -40,7 +40,7 @@ class IterativelyPlugin(Plugin):
                                          omit_values=self._options.omit_values, on_error=self._on_error)
         self._logger = options.logger
 
-    def post_identify(self, user_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_identify(self, user_id: str, properties: Optional[Dict[str, Any]], validation_results: List[ValidationResponse]) -> None:
         if self._options.disabled:
             return
 
@@ -49,7 +49,7 @@ class IterativelyPlugin(Plugin):
                            properties=properties,
                            validation=self._first_failed_validation(validation_results))
 
-    def post_group(self, user_id: str, group_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_group(self, user_id: str, group_id: str, properties: Optional[Dict[str, Any]], validation_results: List[ValidationResponse]) -> None:
         if self._options.disabled:
             return
 
@@ -58,7 +58,7 @@ class IterativelyPlugin(Plugin):
                            properties=properties,
                            validation=self._first_failed_validation(validation_results))
 
-    def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Dict[str, Any]], validation_results: List[ValidationResponse]) -> None:
         if self._options.disabled:
             return
 
