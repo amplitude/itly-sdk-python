@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "itly.plugin-segment"
-version = "0.1.4"
+version = "0.1.5"
 description = "Iteratively Analytics SDK - Segment Plugin"
 readme="README.md"
 authors = ["Iteratively"]

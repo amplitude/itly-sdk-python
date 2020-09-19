@@ -22,12 +22,12 @@ def test_segment(httpserver: HTTPServer):
 
     p.identify("user-1", Properties(item1='value1', item2=2))
     p.alias("user-1", "prev-user-1")
-    p.track("user-2", Event('event-1', dict(item1='value1', item2=1)))
+    p.track("user-2", Event('event-1', Properties(item1='value1', item2=1)))
     p.group("user-2", "group-2", Properties(item1='value2', item2=2))
     p.flush()
     p.page("user-2", "category-2", "page-3", Properties(item1='value3', item2=3))
-    p.track("user-2", Event('event-4', dict(item1='value4', item2=4)))
-    p.track("user-1", Event('event-5', dict(item1='value5', item2=5)))
+    p.track("user-2", Event('event-4', Properties(item1='value4', item2=4)))
+    p.track("user-1", Event('event-5', Properties(item1='value5', item2=5)))
 
     p.flush()
     p.shutdown()

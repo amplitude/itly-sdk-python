@@ -1,12 +1,12 @@
-from typing import Optional, Dict, Any
+from typing import Optional
 
 from ._properties import Properties
 
 
 class Event:
-    def __init__(self, name: str, properties: Optional[Dict[str, Any]] = None, id_: Optional[str] = None, version: Optional[str] = None):
+    def __init__(self, name: str, properties: Optional[Properties] = None, id_: Optional[str] = None, version: Optional[str] = None):
         self._name: str = name
-        self._properties: Optional[Properties] = Properties(**properties) if properties is not None else None
+        self._properties: Optional[Properties] = properties
         self._id: Optional[str] = id_
         self._version: Optional[str] = version
 

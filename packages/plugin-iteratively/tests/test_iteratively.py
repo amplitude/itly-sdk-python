@@ -57,7 +57,7 @@ def test_iteratively(httpserver: HTTPServer):
         requests = _get_cleaned_requests(httpserver)
         assert requests == []
 
-        p.post_track("user-2", Event('event-1', dict(item1='value1', item2=1)),
+        p.post_track("user-2", Event('event-1', Properties(item1='value1', item2=1)),
                      [
                          ValidationResponse(valid=False, plugin_id='custom', message='not valid!!!'),
                          ValidationResponse(valid=False, plugin_id='custom', message='invalid!!!'),
@@ -138,7 +138,7 @@ def test_iteratively(httpserver: HTTPServer):
             ]},
         ]
 
-        p.post_track("user-1", Event('event-5', dict(item1='value5', item2=5), id_='id-5', version='version-5'), [])
+        p.post_track("user-1", Event('event-5', Properties(item1='value5', item2=5), id_='id-5', version='version-5'), [])
     finally:
         p.shutdown()
 
@@ -194,7 +194,7 @@ def test_iteratively_omit_values(httpserver: HTTPServer):
         requests = _get_cleaned_requests(httpserver)
         assert requests == []
 
-        p.post_track("user-2", Event('event-1', dict(item1='value1', item2=1)), [])
+        p.post_track("user-2", Event('event-1', Properties(item1='value1', item2=1)), [])
 
         time.sleep(0.1)
         requests = _get_cleaned_requests(httpserver)
@@ -271,7 +271,7 @@ def test_iteratively_omit_values(httpserver: HTTPServer):
             ]},
         ]
 
-        p.post_track("user-1", Event('event-5', dict(item1='value5', item2=5), id_='id-5', version='version-5'),
+        p.post_track("user-1", Event('event-5', Properties(item1='value5', item2=5), id_='id-5', version='version-5'),
                      [
                          ValidationResponse(valid=True, plugin_id='custom', message=''),
                          ValidationResponse(valid=False, plugin_id='custom', message='invalid!!!'),
@@ -327,7 +327,7 @@ def test_iteratively_disabled(httpserver: HTTPServer):
         requests = _get_cleaned_requests(httpserver)
         assert requests == []
 
-        p.post_track("user-2", Event('event-1', dict(item1='value1', item2=1)),
+        p.post_track("user-2", Event('event-1', Properties(item1='value1', item2=1)),
                      [
                          ValidationResponse(valid=True, plugin_id='custom', message=''),
                          ValidationResponse(valid=False, plugin_id='custom', message='invalid!!!'),
@@ -362,7 +362,7 @@ def test_iteratively_disabled(httpserver: HTTPServer):
         requests = _get_cleaned_requests(httpserver)
         assert requests == []
 
-        p.post_track("user-1", Event('event-5', dict(item1='value5', item2=5), id_='id-5', version='version-5'), [])
+        p.post_track("user-1", Event('event-5', Properties(item1='value5', item2=5), id_='id-5', version='version-5'), [])
     finally:
         p.shutdown()
 
@@ -387,7 +387,7 @@ def test_iteratively_retry(httpserver: HTTPServer):
         httpserver.expect_oneshot_request(re.compile('/track')).respond_with_data(status=429)
         httpserver.expect_oneshot_request(re.compile('/track')).respond_with_data(status=501)
         httpserver.expect_oneshot_request(re.compile('/track')).respond_with_data()
-        p.post_track("user-2", Event('event-1', dict(item1='value1', item2=1)),
+        p.post_track("user-2", Event('event-1', Properties(item1='value1', item2=1)),
                      [
                          ValidationResponse(valid=False, plugin_id='custom', message='invalid!!!'),
                      ])
@@ -411,7 +411,7 @@ def test_iteratively_retry(httpserver: HTTPServer):
         httpserver.expect_oneshot_request(re.compile('/track')).respond_with_data(status=501)
         httpserver.expect_oneshot_request(re.compile('/track')).respond_with_data(status=504)
         httpserver.expect_oneshot_request(re.compile('/track')).respond_with_data()
-        p.post_track("user-2", Event('event-1', dict(item1='value1', item2=1)),
+        p.post_track("user-2", Event('event-1', Properties(item1='value1', item2=1)),
                      [
                          ValidationResponse(valid=False, plugin_id='custom', message='invalid!!!'),
                      ])

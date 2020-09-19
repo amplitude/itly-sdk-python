@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "itly.sdk"
-version = "0.1.15"
+version = "0.1.16"
 description = "Iteratively Analytics SDK"
 readme="README.md"
 authors = ["Iteratively"]

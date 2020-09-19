@@ -1,4 +1,4 @@
-from typing import Optional, List, Callable, Any, Dict
+from typing import Optional, List, Callable
 
 from ._event import Event
 from ._logger import Logger, LoggerPrefixSafeDecorator
@@ -52,7 +52,7 @@ class Itly:
         self._run_on_all_plugins(lambda plugin: plugin.alias(user_id=user_id, previous_id=previous_id))
         self._run_on_all_plugins(lambda plugin: plugin.post_alias(user_id=user_id, previous_id=previous_id))
 
-    def identify(self, user_id: str, identify_properties: Optional[Dict[str, Any]] = None) -> None:
+    def identify(self, user_id: str, identify_properties: Optional[Properties] = None) -> None:
         if self._disabled():
             return
 
@@ -65,7 +65,7 @@ class Itly:
             lambda plugin, event, validation_results: plugin.post_identify(user_id, event.properties, validation_results),
         )
 
-    def group(self, user_id: str, group_id: str, group_properties: Optional[Dict[str, Any]] = None) -> None:
+    def group(self, user_id: str, group_id: str, group_properties: Optional[Properties] = None) -> None:
         if self._disabled():
             return
 
@@ -78,7 +78,7 @@ class Itly:
             lambda plugin, event, validation_results: plugin.post_group(user_id, group_id, event.properties, validation_results),
         )
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], page_properties: Optional[Dict[str, Any]] = None) -> None:
+    def page(self, user_id: str, category: Optional[str], name: Optional[str], page_properties: Optional[Properties] = None) -> None:
         if self._disabled():
             return
 

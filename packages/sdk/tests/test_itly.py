@@ -175,7 +175,7 @@ def test_track_after_shutdown_throws_error() -> None:
 def test_identify_without_properties_succeeds() -> None:
     itly = Itly()
     logger = CustomLogger()
-    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=dict(context_property=1)))
+    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=Properties(context_property=1)))
     itly.identify('user-id')
 
     log_text = '\n'.join(logger.log_lines)
@@ -190,8 +190,10 @@ def test_identify_without_properties_succeeds() -> None:
 def test_identify_with_properties_succeeds() -> None:
     itly = Itly()
     logger = CustomLogger()
-    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=dict(context_property=1)))
-    itly.identify('user-id', dict(required_number=42.0))
+    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=Properties(context_property=1)))
+    itly.identify('user-id', Properties(
+        required_number=42.0,
+    ))
 
     log_text = '\n'.join(logger.log_lines)
     assert log_text == """[itly-core] load()
@@ -205,7 +207,7 @@ def test_identify_with_properties_succeeds() -> None:
 def test_group_without_properties_succeeds() -> None:
     itly = Itly()
     logger = CustomLogger()
-    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=dict(context_property=1)))
+    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=Properties(context_property=1)))
     itly.group('user-id', 'group-id')
 
     log_text = '\n'.join(logger.log_lines)
@@ -220,8 +222,10 @@ def test_group_without_properties_succeeds() -> None:
 def test_group_with_properties_succeeds() -> None:
     itly = Itly()
     logger = CustomLogger()
-    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=dict(context_property=1)))
-    itly.group('user-id', 'group-id', dict(required_boolean=True))
+    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=Properties(context_property=1)))
+    itly.group('user-id', 'group-id', Properties(
+        required_boolean=True,
+    ))
 
     log_text = '\n'.join(logger.log_lines)
     assert log_text == """[itly-core] load()
@@ -239,7 +243,7 @@ def test_events_succeeds() -> None:
     logger = CustomLogger()
     itly.load(Options(
         environment=Environment.PRODUCTION,
-        context=dict(
+        context=Properties(
             requiredString='A required string',
             optionalEnum=OptionalEnum.Value1,
         ),
@@ -247,31 +251,25 @@ def test_events_succeeds() -> None:
         logger=logger,
     ))
 
-    itly.identify('user-id', dict(user_prop=1))
+    itly.identify('user-id', Properties(user_prop=1))
     itly.alias(user_id, 'user-id')
-    itly.group(user_id, 'a-group-id', dict(group_prop='test value'))
-    itly.page(user_id, 'page category', 'page name', dict(page_prop='a page property'))
+    itly.group(user_id, 'a-group-id', Properties(group_prop='test value'))
+    itly.page(user_id, 'page category', 'page name', Properties(page_prop='a page property'))
     itly.track(user_id, Event('Event No Properties'))
-    itly.track(user_id, Event(
-        'Event With All Properties',
-        dict(
-            required_string='A required string',
-            required_number=2.0,
-            required_integer=42,
-            required_enum=RequiredEnum.Enum1,
-            required_boolean=False,
-            required_const='some-const-value',
-            required_array=['required', 'array'],
-            optional_string="I'm optional!",
-        ),
-    ))
+    itly.track(user_id, Event('Event With All Properties', Properties(
+        required_string='A required string',
+        required_number=2.0,
+        required_integer=42,
+        required_enum=RequiredEnum.Enum1,
+        required_boolean=False,
+        required_const='some-const-value',
+        required_array=['required', 'array'],
+        optional_string="I'm optional!",
+    )))
     itly.flush()
-    itly.track(user_id, Event(
-        'EventMaxIntForTest',
-        dict(
-            int_max_10=20,
-        ),
-    ))
+    itly.track(user_id, Event('EventMaxIntForTest', Properties(
+        int_max_10=20,
+    )))
     itly.flush()
     itly.shutdown()
 
@@ -323,7 +321,7 @@ def test_events_disabled() -> None:
     logger = CustomLogger()
     itly.load(Options(
         environment=Environment.PRODUCTION,
-        context=dict(
+        context=Properties(
             requiredString='A required string',
             optionalEnum=OptionalEnum.Value1,
         ),
@@ -332,31 +330,25 @@ def test_events_disabled() -> None:
         disabled=True,
     ))
 
-    itly.identify('user-id', dict(user_prop=1))
+    itly.identify('user-id', Properties(user_prop=1))
     itly.alias(user_id, 'user-id')
-    itly.group(user_id, 'a-group-id', dict(group_prop='test value'))
-    itly.page(user_id, 'page category', 'page name', dict(page_prop='a page property'))
+    itly.group(user_id, 'a-group-id', Properties(group_prop='test value'))
+    itly.page(user_id, 'page category', 'page name', Properties(page_prop='a page property'))
     itly.track(user_id, Event('Event No Properties'))
-    itly.track(user_id, Event(
-        'Event With All Properties',
-        dict(
-            required_string='A required string',
-            required_number=2.0,
-            required_integer=42,
-            required_enum=RequiredEnum.Enum1,
-            required_boolean=False,
-            required_const='some-const-value',
-            required_array=['required', 'array'],
-            optional_string="I'm optional!",
-        ),
-    ))
+    itly.track(user_id, Event('Event With All Properties', Properties(
+        required_string='A required string',
+        required_number=2.0,
+        required_integer=42,
+        required_enum=RequiredEnum.Enum1,
+        required_boolean=False,
+        required_const='some-const-value',
+        required_array=['required', 'array'],
+        optional_string="I'm optional!",
+    )))
     itly.flush()
-    itly.track(user_id, Event(
-        'EventMaxIntForTest',
-        dict(
-            int_max_10=20,
-        ),
-    ))
+    itly.track(user_id, Event('EventMaxIntForTest', Properties(
+        int_max_10=20,
+    )))
     itly.flush()
     itly.shutdown()
 
@@ -473,9 +465,9 @@ def _check_validation_results(environment: Environment, validation_results: List
         )
         if error_text is not None:
             with pytest.raises(Exception) as ctx:
-                itly.track('user-id', Event("event", dict(invalid=True)))
+                itly.track('user-id', Event("event", Properties(invalid=True)))
             assert str(ctx.value) == error_text
         else:
-            itly.track('user-id', Event("event", dict(invalid=True)))
+            itly.track('user-id', Event("event", Properties(invalid=True)))
         log_text = '\n'.join(logger.log_lines)
         assert expected_log == log_text
