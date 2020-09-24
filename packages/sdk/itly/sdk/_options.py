@@ -1,5 +1,6 @@
 from typing import Optional, List
 
+from .internal import Options as ItlyOptions
 from ._environment import Environment
 from ._logger import Logger
 from ._plugin import Plugin
@@ -7,45 +8,24 @@ from ._properties import Properties
 from ._validation_options import ValidationOptions
 
 
-class Options:
+class Options(ItlyOptions):
     def __init__(self,
+                 context: Optional[Properties] = None,
                  environment: Environment = Environment.DEVELOPMENT,
                  disabled: bool = False,
                  plugins: Optional[List[Plugin]] = None,
-                 context: Optional[Properties] = None,
                  validation: Optional[ValidationOptions] = None,
                  logger: Logger = Logger.NONE
                  ):
-        self._environment: Environment = environment
-        self._disabled: bool = disabled
-        self._plugins: List[Plugin] = plugins if plugins is not None else []
-        self._context: Optional[Properties] = context
-        self._validation = validation if validation is not None else ValidationOptions(
-            track_invalid=environment == Environment.PRODUCTION,
-            error_on_invalid=environment != Environment.PRODUCTION,
+        super().__init__(
+            environment=environment,
+            disabled=disabled,
+            plugins=plugins,
+            validation=validation,
+            logger=logger,
         )
-        self._logger: Logger = logger
-
-    @property
-    def environment(self) -> Environment:
-        return self._environment
-
-    @property
-    def disabled(self) -> bool:
-        return self._disabled
-
-    @property
-    def plugins(self) -> List[Plugin]:
-        return self._plugins
+        self._context: Optional[Properties] = context
 
     @property
     def context(self) -> Optional[Properties]:
         return self._context
-
-    @property
-    def validation(self) -> ValidationOptions:
-        return self._validation
-
-    @property
-    def logger(self) -> Logger:
-        return self._logger
