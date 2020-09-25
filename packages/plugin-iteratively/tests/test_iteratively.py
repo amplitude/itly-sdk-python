@@ -31,12 +31,11 @@ def test_iteratively(httpserver: HTTPServer):
     httpserver.expect_request(re.compile('/track')).respond_with_data()
 
     options = IterativelyOptions(
-        url=httpserver.url_for('/track'),
         omit_values=False,
         flush_queue_size=3,
         flush_interval=timedelta(seconds=1),
     )
-    p = IterativelyPlugin('My-Key', options)
+    p = IterativelyPlugin('My-Key', httpserver.url_for('/track'), options)
 
     assert p.id() == 'iteratively'
     try:
@@ -168,12 +167,11 @@ def test_iteratively_omit_values(httpserver: HTTPServer):
     httpserver.expect_request(re.compile('/track')).respond_with_data()
 
     options = IterativelyOptions(
-        url=httpserver.url_for('/track'),
         omit_values=True,
         flush_queue_size=3,
         flush_interval=timedelta(seconds=1),
     )
-    p = IterativelyPlugin('My-Key', options)
+    p = IterativelyPlugin('My-Key', httpserver.url_for('/track'), options)
 
     assert p.id() == 'iteratively'
     try:
@@ -305,12 +303,11 @@ def test_iteratively_disabled(httpserver: HTTPServer):
     httpserver.expect_request(re.compile('/track')).respond_with_data()
 
     options = IterativelyOptions(
-        url=httpserver.url_for('/track'),
         disabled=True,
         flush_queue_size=3,
         flush_interval=timedelta(seconds=1),
     )
-    p = IterativelyPlugin('My-Key', options)
+    p = IterativelyPlugin('My-Key', httpserver.url_for('/track'), options)
 
     assert p.id() == 'iteratively'
     try:
@@ -374,13 +371,12 @@ def test_iteratively_disabled(httpserver: HTTPServer):
 
 def test_iteratively_retry(httpserver: HTTPServer):
     options = IterativelyOptions(
-        url=httpserver.url_for('/track'),
         flush_queue_size=3,
         flush_interval=timedelta(seconds=1),
         retry_options=IterativelyRetryOptions(max_retries=3, delay_initial=timedelta(seconds=0.1), delay_maximum=timedelta(seconds=0.5)),
     )
     logger = CustomLogger()
-    p = IterativelyPlugin('My-Key', options)
+    p = IterativelyPlugin('My-Key', httpserver.url_for('/track'), options)
     try:
         p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=logger))
 
