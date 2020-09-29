@@ -1,18 +1,18 @@
 [tool.poetry]
-name = "itly.plugin-schema-validator"
-version = "0.1.6"
+name = "itly-plugin-schema-validator"
+version = "0.1.7"
 description = "Iteratively Analytics SDK - Schema Validator Plugin"
 readme="README.md"
 authors = ["Iteratively"]
 license = "MIT"
 packages = [
-    { include = "itly" }
+    { include = "itly_plugin_schema_validator" }
 ]
 
 [tool.poetry.dependencies]
 python = "^3.6"
 jsonschema = "^3.2.0"
-"itly.sdk" = "^0.1.0"
+"itly_sdk" = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.1"

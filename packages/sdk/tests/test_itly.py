@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple
 
 import pytest
 
-from itly.sdk import Itly, Options, Environment, Event, Properties, Logger, Plugin, PluginLoadOptions, ValidationResponse, ValidationOptions
+from itly_sdk import Itly, Options, Environment, Event, Properties, Logger, Plugin, PluginLoadOptions, ValidationResponse, ValidationOptions
 
 
 class CustomLogger(Logger):

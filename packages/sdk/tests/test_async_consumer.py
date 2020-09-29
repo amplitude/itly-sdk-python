@@ -1,7 +1,7 @@
 import time
 from datetime import timedelta
 
-from itly.sdk.internal import AsyncConsumer, AsyncConsumerMessage
+from itly_sdk.internal import AsyncConsumer, AsyncConsumerMessage
 
 
 def test_consumer():

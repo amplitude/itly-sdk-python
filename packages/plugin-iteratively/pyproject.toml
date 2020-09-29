@@ -1,18 +1,18 @@
 [tool.poetry]
-name = "itly.plugin-iteratively"
-version = "0.1.9"
+name = "itly-plugin-iteratively"
+version = "0.1.10"
 description = "Iteratively Analytics SDK - Iteratively Plugin"
 readme="README.md"
 authors = ["Iteratively"]
 license = "MIT"
 packages = [
-    { include = "itly" }
+    { include = "itly_plugin_iteratively" }
 ]
 
 [tool.poetry.dependencies]
 python = "^3.6"
 requests = "^2.24.0"
-"itly.sdk" = "^0.1.0"
+"itly_sdk" = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.1"

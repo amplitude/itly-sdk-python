@@ -16,9 +16,9 @@ build-schema-validator:
 build-segment:
 	cd ./packages/plugin-segment/; poetry build
 
-publish-test-all: publish-test-sdk publish-test-amplitude publish-test-iteratively publish-test-schema-validator publish-test-segment
+publish-test-all: publish-test-sdk publish-test-amplitude publish-test-iteratively publish-test-mixpanel publish-test-schema-validator publish-test-segment
 
-publish-all: publish-sdk publish-amplitude publish-iteratively publish-schema-validator publish-segment
+publish-all: publish-sdk publish-amplitude publish-iteratively publish-mixpanel publish-schema-validator publish-segment
 
 publish-test-sdk:
 	cd ./packages/sdk/; poetry publish -r testpypi

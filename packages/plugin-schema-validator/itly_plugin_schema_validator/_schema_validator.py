@@ -3,7 +3,7 @@ from typing import Dict, Optional
 
 import jsonschema
 
-from itly.sdk import Plugin, Event, ValidationResponse, PluginLoadOptions
+from itly_sdk import Plugin, Event, ValidationResponse, PluginLoadOptions
 
 
 class SchemaValidatorPlugin(Plugin):

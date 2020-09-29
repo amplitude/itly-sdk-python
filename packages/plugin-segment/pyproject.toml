@@ -1,18 +1,18 @@
 [tool.poetry]
-name = "itly.plugin-segment"
-version = "0.1.5"
+name = "itly-plugin-segment"
+version = "0.1.6"
 description = "Iteratively Analytics SDK - Segment Plugin"
 readme="README.md"
 authors = ["Iteratively"]
 license = "MIT"
 packages = [
-    { include = "itly" }
+    { include = "itly_plugin_segment" }
 ]
 
 [tool.poetry.dependencies]
 python = "^3.6"
 analytics-python = "^1.2.9"
-"itly.sdk" = "^0.1.0"
+"itly_sdk" = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.1"
