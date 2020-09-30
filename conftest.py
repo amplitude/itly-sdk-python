@@ -12,6 +12,7 @@ sys.path.extend([
     './packages/plugin-mixpanel',
     './packages/plugin-schema-validator',
     './packages/plugin-segment',
+    './packages/plugin-snowplow',
     './packages/sdk',
 ])
 

@@ -65,4 +65,5 @@ pip install YOUR-PATH/itly-sdk-python/packages/plugin-iteratively
 pip install YOUR-PATH/itly-sdk-python/packages/plugin-mixpanel
 pip install YOUR-PATH/itly-sdk-python/packages/plugin-schema-validator
 pip install YOUR-PATH/itly-sdk-python/packages/plugin-segment
+pip install YOUR-PATH/itly-sdk-python/packages/plugin-snowplow
 ```

@@ -16,9 +16,12 @@ build-schema-validator:
 build-segment:
 	cd ./packages/plugin-segment/; poetry build
 
-publish-test-all: publish-test-sdk publish-test-amplitude publish-test-iteratively publish-test-mixpanel publish-test-schema-validator publish-test-segment
+build-snowplow:
+	cd ./packages/plugin-snowplow/; poetry build
 
-publish-all: publish-sdk publish-amplitude publish-iteratively publish-mixpanel publish-schema-validator publish-segment
+publish-test-all: publish-test-sdk publish-test-amplitude publish-test-iteratively publish-test-mixpanel publish-test-schema-validator publish-test-segment publish-test-snowplow
+
+publish-all: publish-sdk publish-amplitude publish-iteratively publish-mixpanel publish-schema-validator publish-segment publish-snowplow
 
 publish-test-sdk:
 	cd ./packages/sdk/; poetry publish -r testpypi
@@ -38,6 +41,9 @@ publish-test-schema-validator:
 publish-test-segment:
 	cd ./packages/plugin-segment/; poetry publish -r testpypi
 
+publish-test-snowplow:
+	cd ./packages/plugin-snowplow/; poetry publish -r testpypi
+
 publish-sdk:
 	cd ./packages/sdk/; poetry publish
 
@@ -55,3 +61,6 @@ publish-schema-validator:
 
 publish-segment:
 	cd ./packages/plugin-segment/; poetry publish
+
+publish-snowplow:
+	cd ./packages/plugin-snowplow/; poetry publish
