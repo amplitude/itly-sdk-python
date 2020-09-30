@@ -9,6 +9,11 @@ packages = [
     { include = "itly_plugin_mixpanel" }
 ]
 
+[[tool.poetry.source]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+secondary = true
+
 [tool.poetry.dependencies]
 python = "^3.6"
 mixpanel = "^4.7.0"

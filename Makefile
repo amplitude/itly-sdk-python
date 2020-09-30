@@ -1,3 +1,44 @@
+# SETUP (INSTALL)
+install-all: \
+ install-sdk \
+ install-schema-validator \
+ install-iteratively \
+ install-amplitude \
+ install-mixpanel \
+ install-segment \
+ install-snowplow
+
+install-sdk:
+	cd ./packages/sdk/; poetry install
+
+install-amplitude:
+	cd ./packages/plugin-amplitude/; poetry install
+
+install-iteratively:
+	cd ./packages/plugin-iteratively/; poetry install
+
+install-mixpanel:
+	cd ./packages/plugin-mixpanel/; poetry install
+
+install-schema-validator:
+	cd ./packages/plugin-schema-validator/; poetry install
+
+install-segment:
+	cd ./packages/plugin-segment/; poetry install
+
+install-snowplow:
+	cd ./packages/plugin-snowplow/; poetry install
+
+# BUILD
+build-all: \
+ build-sdk \
+ build-schema-validator \
+ build-iteratively \
+ build-amplitude \
+ build-mixpanel \
+ build-segment \
+ build-snowplow
+
 build-sdk:
 	cd ./packages/sdk/; poetry build
 
@@ -19,9 +60,15 @@ build-segment:
 build-snowplow:
 	cd ./packages/plugin-snowplow/; poetry build
 
-publish-test-all: publish-test-sdk publish-test-amplitude publish-test-iteratively publish-test-mixpanel publish-test-schema-validator publish-test-segment publish-test-snowplow
-
-publish-all: publish-sdk publish-amplitude publish-iteratively publish-mixpanel publish-schema-validator publish-segment publish-snowplow
+# PUBLISH (Test PyPi)
+publish-test-all: \
+ publish-test-sdk \
+ publish-test-schema-validator \
+ publish-test-iteratively \
+ publish-test-amplitude \
+ publish-test-mixpanel \
+ publish-test-segment \
+ publish-test-snowplow
 
 publish-test-sdk:
 	cd ./packages/sdk/; poetry publish -r testpypi
@@ -43,6 +90,16 @@ publish-test-segment:
 
 publish-test-snowplow:
 	cd ./packages/plugin-snowplow/; poetry publish -r testpypi
+
+# PUBLISH (PyPi)
+publish-all: \
+ publish-sdk \
+ publish-schema-validator \
+ publish-iteratively \
+ publish-amplitude \
+ publish-mixpanel \
+ publish-segment \
+ publish-snowplow
 
 publish-sdk:
 	cd ./packages/sdk/; poetry publish

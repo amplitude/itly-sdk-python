@@ -9,6 +9,11 @@ packages = [
     { include = "itly_plugin_schema_validator" }
 ]
 
+[[tool.poetry.source]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+secondary = true
+
 [tool.poetry.dependencies]
 python = "^3.6"
 jsonschema = "^3.2.0"

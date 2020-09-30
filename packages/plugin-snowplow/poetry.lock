@@ -203,6 +203,19 @@ version = "1.0.1"
 
 [[package]]
 category = "main"
+description = "Iteratively Analytics SDK"
+name = "itly-sdk"
+optional = false
+python-versions = ">=3.6,<4.0"
+version = "0.1.19"
+
+[package.source]
+reference = "testpypi"
+type = "legacy"
+url = "https://test.pypi.org/simple"
+
+[[package]]
+category = "main"
 description = "Messaging library for Python."
 name = "kombu"
 optional = false
@@ -457,7 +470,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "e8668c89ef36d546e3182e437b368551efedf1bbd669f3fcb9d08d20ba81ffb3"
+content-hash = "de9ccd548ea66e72e7f47fe255b6bc17353fd5cb933c3d2c32284842f882048a"
 lock-version = "1.0"
 python-versions = "^3.6"
 
@@ -595,6 +608,10 @@ importlib-metadata = [
 iniconfig = [
     {file = "iniconfig-1.0.1-py3-none-any.whl", hash = "sha256:80cf40c597eb564e86346103f609d74efce0f6b4d4f30ec8ce9e2c26411ba437"},
     {file = "iniconfig-1.0.1.tar.gz", hash = "sha256:e5f92f89355a67de0595932a6c6c02ab4afddc6fcdc0bfc5becd0d60884d3f69"},
+]
+itly-sdk = [
+    {file = "itly-sdk-0.1.19.tar.gz", hash = "sha256:60b55970f5e29a7bfd3de2638a7f852db9b33ea2fd6c05824107ad9dac5b5d2e"},
+    {file = "itly_sdk-0.1.19-py3-none-any.whl", hash = "sha256:aa64290a4feaf95228964564b767ee4868714f06237c4c0078b65dd6fdefbd47"},
 ]
 kombu = [
     {file = "kombu-4.6.11-py2.py3-none-any.whl", hash = "sha256:be48cdffb54a2194d93ad6533d73f69408486483d189fe9f5990ee24255b0e0a"},
