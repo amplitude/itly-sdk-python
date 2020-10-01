@@ -1,34 +1,36 @@
-from typing import Optional, NamedTuple, Any
+from typing import Optional, NamedTuple, Any, Callable
 
 from snowplow_tracker import Subject, Tracker, AsyncEmitter, SelfDescribingJson
 
-from itly_sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
+from itly_sdk import Plugin, PluginLoadOptions, Properties, Event
 
 
 class SnowplowOptions(NamedTuple):
-    pass
+    protocol: str = "http"
+    port: Optional[int] = None
+    method: str = "post"
+    buffer_size: Optional[int] = None
+    on_success: Optional[Callable[[int], None]] = None
+    on_failure: Optional[Callable[[int, Any], None]] = None
+    thread_count: int = 1
+    byte_limit: Optional[int] = None
 
 
 class SnowplowPlugin(Plugin):
-    def __init__(self, vendor: str, url: str, options: Optional[SnowplowOptions] = None) -> None:
-        self._protocol: Optional[str] = None
-        if url.startswith("http://"):
-            self._protocol = "http"
-        elif url.startswith("https://"):
-            self._protocol = "https"
-
-        self._endpoint: str = (url[len(self._protocol + "://"):] if self._protocol is not None else url).rstrip("/")
+    def __init__(self, vendor: str, endpoint: str, options: Optional[SnowplowOptions] = None) -> None:
         self._vendor = vendor
+        self._endpoint: str = endpoint
         self._options: SnowplowOptions = options if options is not None else SnowplowOptions()
         self._tracker: Optional[Tracker] = None
-        self._logger: Logger = Logger.NONE
 
     def id(self) -> str:
         return 'snowplow'
 
     def load(self, options: PluginLoadOptions) -> None:
-        self._logger = options.logger
-        emitter = AsyncEmitter(self._endpoint, protocol=self._protocol, method="post", on_failure=self._on_failure)
+        emitter = AsyncEmitter(
+            endpoint=self._endpoint,
+            **self._options._asdict(),
+        )
         self._tracker = Tracker(emitter)
 
     def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
@@ -60,6 +62,3 @@ class SnowplowPlugin(Plugin):
     def flush(self) -> None:
         assert self._tracker is not None
         self._tracker.flush()
-
-    def _on_failure(self, sent_count: int, unsent: Any) -> None:
-        self._logger.error("Error. Can't send events")

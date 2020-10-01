@@ -12,7 +12,8 @@ from itly_sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 def test_snowplow(httpserver: HTTPServer):
     httpserver.expect_request('/v1/batch').respond_with_data()
 
-    p = SnowplowPlugin("ly.iterative.test", httpserver.url_for(""))
+    endpoint = httpserver.url_for("").replace("http://", "")
+    p = SnowplowPlugin("ly.iterative.test", endpoint, )
 
     assert p.id() == 'snowplow'
     p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
