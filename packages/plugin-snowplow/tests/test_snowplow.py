@@ -5,7 +5,7 @@ from typing import Any, List
 
 from pytest_httpserver import HTTPServer
 
-from itly_plugin_snowplow import SnowplowPlugin
+from itly_plugin_snowplow import SnowplowPlugin, SnowplowOptions
 from itly_sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 
@@ -13,7 +13,7 @@ def test_snowplow(httpserver: HTTPServer):
     httpserver.expect_request('/v1/batch').respond_with_data()
 
     endpoint = httpserver.url_for("").replace("http://", "")
-    p = SnowplowPlugin("ly.iterative.test", endpoint, )
+    p = SnowplowPlugin("ly.iterative.test", SnowplowOptions(endpoint))
 
     assert p.id() == 'snowplow'
     p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))

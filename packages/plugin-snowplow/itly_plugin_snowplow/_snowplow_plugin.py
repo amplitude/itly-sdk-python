@@ -6,6 +6,7 @@ from itly_sdk import Plugin, PluginLoadOptions, Properties, Event
 
 
 class SnowplowOptions(NamedTuple):
+    endpoint: str
     protocol: str = "http"
     port: Optional[int] = None
     method: str = "post"
@@ -17,9 +18,8 @@ class SnowplowOptions(NamedTuple):
 
 
 class SnowplowPlugin(Plugin):
-    def __init__(self, vendor: str, endpoint: str, options: Optional[SnowplowOptions] = None) -> None:
+    def __init__(self, vendor: str, options: Optional[SnowplowOptions] = None) -> None:
         self._vendor = vendor
-        self._endpoint: str = endpoint
         self._options: SnowplowOptions = options if options is not None else SnowplowOptions()
         self._tracker: Optional[Tracker] = None
 
@@ -28,7 +28,6 @@ class SnowplowPlugin(Plugin):
 
     def load(self, options: PluginLoadOptions) -> None:
         emitter = AsyncEmitter(
-            endpoint=self._endpoint,
             **self._options._asdict(),
         )
         self._tracker = Tracker(emitter)
