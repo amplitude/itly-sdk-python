@@ -2,7 +2,7 @@ from typing import Optional, NamedTuple, Any, Callable
 
 from snowplow_tracker import Subject, Tracker, AsyncEmitter, SelfDescribingJson
 
-from itly_sdk import Plugin, PluginLoadOptions, Properties, Event
+from itly_sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 
 
 class SnowplowOptions(NamedTuple):
@@ -18,15 +18,19 @@ class SnowplowOptions(NamedTuple):
 
 
 class SnowplowPlugin(Plugin):
-    def __init__(self, vendor: str, options: Optional[SnowplowOptions] = None) -> None:
+    def __init__(self, vendor: str, options: SnowplowOptions) -> None:
         self._vendor = vendor
-        self._options: SnowplowOptions = options if options is not None else SnowplowOptions()
+        if options.on_failure is None:
+            options = options._replace(on_failure=self._on_failure)
+        self._options: SnowplowOptions = options
         self._tracker: Optional[Tracker] = None
+        self._logger: Logger = Logger.NONE
 
     def id(self) -> str:
         return 'snowplow'
 
     def load(self, options: PluginLoadOptions) -> None:
+        self._logger = options.logger
         emitter = AsyncEmitter(
             **self._options._asdict(),
         )
@@ -61,3 +65,6 @@ class SnowplowPlugin(Plugin):
     def flush(self) -> None:
         assert self._tracker is not None
         self._tracker.flush()
+
+    def _on_failure(self, sent_count: int, unsent: Any) -> None:
+        self._logger.error("Error. Can't send events")
