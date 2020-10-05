@@ -1,68 +1,99 @@
 # itly-sdk-python
 Iteratively Analytics SDK for Python
 
-## Run unit tests
+## Prerequisites
+1. Install Python (3+)
+    ```
+    $ brew install python
+    ```
+2. [Install poetry](https://python-poetry.org/docs/#installation)
 
-### Install pytest
+## Setup
+* Create & activate virtual environment
+    ```
+    $ python -m venv venv && source venv/bin/activate
+    ```
 
-```
-pip install pytest pytest-httpserver
-```
+* Install project development dependencies (e.g. pytest pytest-httpserver)
+    ```
+    $ pip install -r requirements.txt
+    ```
+* Install dependencies for subpackages
+    ```
+    $ make install-all
+    ```
 
-### Run tests
+## Test
+* Run [pytest](https://docs.pytest.org/en/stable/)
+    ```
+    $ pytest
+    ```
 
-```
-pytest
-```
-
-## Build and publish packages
-
-### Prerequisites
-
-#### Install Poetry
-
-[Installation](https://python-poetry.org/docs/#installation)
-
-#### If Test PyPi used
-
-1. Generate API token on ["Account Settings" page](https://test.pypi.org/manage/account/)
-
-2. Add Test PyPi to Poetry config: `poetry config repositories.testpypi https://test.pypi.org/legacy/`
-
-3. Add the Test PyPi token: `poetry config pypi-token.testpypi TOKEN` 
-
-#### If real PyPi used
-
-1. Generate API token on ["Account Settings" page](https://pypi.org/manage/account/)
-
-2. Add the PyPi token: `poetry config pypi-token.pypi TOKEN` 
-
-
-### Build packages
-
+## Build
 1. Increase versions in `pyproject.toml` files for affected packages.
+2. Build affected packages.
+    ```
+    # Build a single package 
+    $ make build-sdk
+    
+    # Build multiple packages
+    $ make build-iteratively build-segment ...
+    
+    # Build all packages
+    $ make build-all
+    ```
 
-2. Build affected packages. Example `make build-sdk build-segment`
+## Publishing
 
-### Publish packages to Test PyPi
+### Setup Test PyPi Account & Token
+1. Create an account on [test.pypi.org](https://test.pypi.org/). This is not shared with (Prod) PyPi.
+2. Generate API token in [Account Settings](https://test.pypi.org/manage/account/)
+3. Add Test PyPi repository to Poetry config
+    ```
+    $ poetry config repositories.testpypi https://test.pypi.org/legacy/
+    ```
+4. Add Test PyPi token to Poetry config
+    ```
+    poetry config pypi-token.testpypi TOKEN
+    ``` 
 
-`make publish-test-all`
+### Setup PyPi Account & Token
+1. Create an account on [pypi.org](https://pypi.org/). This is not shared with Test PyPi.
+2. Generate API token in [Account Settings](https://pypi.org/manage/account/)
+3. Add PyPi token to Poetry config
+    ```
+    poetry config pypi-token.pypi TOKEN
+    ``` 
+   
+### Publish
+* Test PyPi
+    ```
+    $ make publish-test-all
+    ```
 
-### Publish packages to real PyPi
+* PyPi (Production)
+    ```
+    $ make publish-all
+    ```
 
-`make publish-all`
+## Teardown (for a fresh start)
+* Deactivate & delete virtual environment
+    ```
+    $ deactivate && rm -rf venv
+    ```
 
-## Use SDK/plugins locally
+## Installing local SDK/plugins
 
-!!! Virtual environment should be used.
+* !!! Virtual environment should be used.
 
-```
-pip install requests mixpanel jsonschema analytics-python
-
-pip install YOUR-PATH/itly-sdk-python/packages/sdk
-pip install YOUR-PATH/itly-sdk-python/packages/plugin-amplitude
-pip install YOUR-PATH/itly-sdk-python/packages/plugin-iteratively
-pip install YOUR-PATH/itly-sdk-python/packages/plugin-mixpanel
-pip install YOUR-PATH/itly-sdk-python/packages/plugin-schema-validator
-pip install YOUR-PATH/itly-sdk-python/packages/plugin-segment
-```
+    ```
+    pip install requests mixpanel jsonschema analytics-python
+    
+    pip install YOUR-PATH/itly-sdk-python/packages/sdk
+    pip install YOUR-PATH/itly-sdk-python/packages/plugin-amplitude
+    pip install YOUR-PATH/itly-sdk-python/packages/plugin-iteratively
+    pip install YOUR-PATH/itly-sdk-python/packages/plugin-mixpanel
+    pip install YOUR-PATH/itly-sdk-python/packages/plugin-schema-validator
+    pip install YOUR-PATH/itly-sdk-python/packages/plugin-segment
+    pip install YOUR-PATH/itly-sdk-python/packages/plugin-snowplow
+    ```

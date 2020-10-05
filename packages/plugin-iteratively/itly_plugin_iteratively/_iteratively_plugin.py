@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import Optional, NamedTuple, List
 
-from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Environment, ValidationResponse, Logger
+from itly_sdk import Plugin, PluginLoadOptions, Properties, Event, Environment, ValidationResponse, Logger
 from ._iteratively_client import IterativelyClient, TrackType
 from ._retry_options import IterativelyRetryOptions
 

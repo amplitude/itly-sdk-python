@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple
 
 import pytest
 
-from itly.sdk import Itly, Options, Environment, Event, Properties, Logger, Plugin, PluginLoadOptions, ValidationResponse, ValidationOptions
+from itly_sdk import Itly, Options, Environment, Event, Properties, Logger, Plugin, PluginLoadOptions, ValidationResponse, ValidationOptions
 
 
 class CustomLogger(Logger):
@@ -365,28 +365,24 @@ def test_development_failed_validation() -> None:
         (None, "invalid event!!!", '''[itly-core] load()
 [plugin-custom] load()
 [itly-core] track(user_id=user-id, event=event, properties={"invalid": true})
-[plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] post_track(user_id=user-id, event=event, properties={"invalid": true}, validation_results=[ValidationResponse(valid=False, plugin_id='custom', message='invalid event!!!')])'''),
         # nopep8
         (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=False), None, '''[itly-core] load()
 [plugin-custom] load()
 [itly-core] track(user_id=user-id, event=event, properties={"invalid": true})
-[plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] post_track(user_id=user-id, event=event, properties={"invalid": true}, validation_results=[ValidationResponse(valid=False, plugin_id='custom', message='invalid event!!!')])'''),
         # nopep8
         (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=True), "invalid event!!!", '''[itly-core] load()
 [plugin-custom] load()
 [itly-core] track(user_id=user-id, event=event, properties={"invalid": true})
-[plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] post_track(user_id=user-id, event=event, properties={"invalid": true}, validation_results=[ValidationResponse(valid=False, plugin_id='custom', message='invalid event!!!')])'''),
         # nopep8
         (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=False), None, '''[itly-core] load()
 [plugin-custom] load()
 [itly-core] track(user_id=user-id, event=event, properties={"invalid": true})
-[plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] track(user_id=user-id, event=event, properties={"invalid": true})
 [plugin-custom] post_track(user_id=user-id, event=event, properties={"invalid": true}, validation_results=[ValidationResponse(valid=False, plugin_id='custom', message='invalid event!!!')])'''),
@@ -394,7 +390,6 @@ def test_development_failed_validation() -> None:
         (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=True), "invalid event!!!", '''[itly-core] load()
 [plugin-custom] load()
 [itly-core] track(user_id=user-id, event=event, properties={"invalid": true})
-[plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] track(user_id=user-id, event=event, properties={"invalid": true})
 [plugin-custom] post_track(user_id=user-id, event=event, properties={"invalid": true}, validation_results=[ValidationResponse(valid=False, plugin_id='custom', message='invalid event!!!')])'''),
@@ -413,7 +408,6 @@ def test_production_failed_validation() -> None:
         (None, None, '''[itly-core] load()
 [plugin-custom] load()
 [itly-core] track(user_id=user-id, event=event, properties={"invalid": true})
-[plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] track(user_id=user-id, event=event, properties={"invalid": true})
 [plugin-custom] post_track(user_id=user-id, event=event, properties={"invalid": true}, validation_results=[ValidationResponse(valid=False, plugin_id='custom', message='invalid event!!!')])'''),
@@ -421,21 +415,18 @@ def test_production_failed_validation() -> None:
         (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=False), None, '''[itly-core] load()
 [plugin-custom] load()
 [itly-core] track(user_id=user-id, event=event, properties={"invalid": true})
-[plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] post_track(user_id=user-id, event=event, properties={"invalid": true}, validation_results=[ValidationResponse(valid=False, plugin_id='custom', message='invalid event!!!')])'''),
         # nopep8
         (ValidationOptions(disabled=False, track_invalid=False, error_on_invalid=True), "invalid event!!!", '''[itly-core] load()
 [plugin-custom] load()
 [itly-core] track(user_id=user-id, event=event, properties={"invalid": true})
-[plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] post_track(user_id=user-id, event=event, properties={"invalid": true}, validation_results=[ValidationResponse(valid=False, plugin_id='custom', message='invalid event!!!')])'''),
         # nopep8
         (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=False), None, '''[itly-core] load()
 [plugin-custom] load()
 [itly-core] track(user_id=user-id, event=event, properties={"invalid": true})
-[plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] track(user_id=user-id, event=event, properties={"invalid": true})
 [plugin-custom] post_track(user_id=user-id, event=event, properties={"invalid": true}, validation_results=[ValidationResponse(valid=False, plugin_id='custom', message='invalid event!!!')])'''),
@@ -443,7 +434,6 @@ def test_production_failed_validation() -> None:
         (ValidationOptions(disabled=False, track_invalid=True, error_on_invalid=True), "invalid event!!!", '''[itly-core] load()
 [plugin-custom] load()
 [itly-core] track(user_id=user-id, event=event, properties={"invalid": true})
-[plugin-custom] validate(event=context, properties=None)
 [plugin-custom] validate(event=event, properties={"invalid": true})
 [plugin-custom] track(user_id=user-id, event=event, properties={"invalid": true})
 [plugin-custom] post_track(user_id=user-id, event=event, properties={"invalid": true}, validation_results=[ValidationResponse(valid=False, plugin_id='custom', message='invalid event!!!')])'''),

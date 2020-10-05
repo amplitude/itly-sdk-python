@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import Optional, NamedTuple
 
-from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
+from itly_sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 from ._amplitude_client import AmplitudeClient
 
 

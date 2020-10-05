@@ -3,8 +3,8 @@ from typing import Optional, List
 
 import pytest
 
-from itly.plugin_schema_validator import SchemaValidatorPlugin
-from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
+from itly_plugin_schema_validator import SchemaValidatorPlugin
+from itly_sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 DEFAULT_SCHEMAS = {
     'context': '{"$id":"https://iterative.ly/company/77b37977-cb3a-42eb-bce3-09f5f7c3adb7/context","$schema":"http://json-schema.org/draft-07/schema#","title":"Context","description":"","type":"object","properties":{"requiredString":{"description":"description for context requiredString","type":"string"},"optionalEnum":{"description":"description for context optionalEnum","enum":["Value 1","Value 2"]}},"additionalProperties":false,"required":["requiredString"]}',  # nopep8

@@ -2,7 +2,7 @@ from typing import Optional, NamedTuple
 
 from mixpanel import Mixpanel, BufferedConsumer
 
-from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
+from itly_sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 
 
 class MixpanelOptions(NamedTuple):

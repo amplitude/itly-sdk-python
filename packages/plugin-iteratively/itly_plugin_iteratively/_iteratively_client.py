@@ -8,8 +8,8 @@ from typing import Callable, List, Optional, Any
 import requests
 from requests import Session
 
-from itly.sdk import Event, Properties, ValidationResponse
-from itly.sdk.internal import AsyncConsumer, AsyncConsumerMessage, backoff
+from itly_sdk import Event, Properties, ValidationResponse
+from itly_sdk.internal import AsyncConsumer, AsyncConsumerMessage, backoff
 from ._retry_options import IterativelyRetryOptions
 
 

@@ -2,7 +2,7 @@ from typing import Optional, NamedTuple, Any
 
 import analytics
 
-from itly.sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
+from itly_sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 
 
 class SegmentOptions(NamedTuple):

@@ -6,8 +6,8 @@ from typing import List, Any
 
 from pytest_httpserver import HTTPServer
 
-from itly.plugin_iteratively import IterativelyPlugin, IterativelyOptions, IterativelyRetryOptions
-from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger, ValidationResponse
+from itly_plugin_iteratively import IterativelyPlugin, IterativelyOptions, IterativelyRetryOptions
+from itly_sdk import PluginLoadOptions, Environment, Properties, Event, Logger, ValidationResponse
 
 
 class CustomLogger(Logger):

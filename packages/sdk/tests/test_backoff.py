@@ -1,6 +1,6 @@
 import random
 
-from itly.sdk.internal import backoff
+from itly_sdk.internal import backoff
 
 
 def test_backoff():

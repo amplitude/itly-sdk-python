@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "itly.sdk"
-version = "0.1.17"
+name = "itly-sdk"
+version = "0.1.19"
 description = "Iteratively Analytics SDK"
 readme="README.md"
 authors = ["Iteratively"]
 license = "MIT"
 packages = [
-    { include = "itly" }
+    { include = "itly_sdk" }
 ]
 
 [tool.poetry.dependencies]

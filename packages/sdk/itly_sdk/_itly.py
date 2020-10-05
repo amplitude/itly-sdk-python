@@ -17,9 +17,9 @@ class Itly:
         self._plugins: List[Plugin] = []
         self._logger: Logger = Logger.NONE
         self._is_shutdown: bool = False
-        self._context: Event = Event("context")
+        self._context: Optional[Event] = None
 
-    def load(self, options: Options, context: Optional[Properties] = None) -> None:
+    def load(self, options: Optional[Options] = Options(), context: Optional[Properties] = None) -> None:
         if self._options is not None:
             raise Exception('Itly is already initialized. itly.load() should only be called once.')
 
@@ -32,10 +32,11 @@ class Itly:
 
         self._logger.info('load()')
 
-        self._context = Event(
-            name='context',
-            properties=context,
-        )
+        if context is not None:
+            self._context = Event(
+                name='context',
+                properties=context,
+            )
 
         for plugin in self._options.plugins:
             plugin_logger = LoggerPrefixSafeDecorator(self._options.logger, f'[plugin-{plugin.id()}] ')
@@ -136,14 +137,14 @@ class Itly:
                                          include_context: bool,
                                          action: Callable[[Plugin, Event], None],
                                          post_action: Callable[[Plugin, Event, List[ValidationResponse]], None]) -> None:
-        context_failed_validation_responses = self._validate(self._context) if include_context else []
+        context_failed_validation_responses = self._validate(self._context) if include_context and self._context is not None else []
         is_context_valid = len(context_failed_validation_responses) == 0
 
         event_failed_validation_responses = self._validate(event)
         is_event_valid = len(event_failed_validation_responses) == 0
 
         combined_event: Event = event
-        if include_context:
+        if include_context and self._context is not None:
             combined_event = Event(
                 name=event.name,
                 properties=Properties.concat([self._context.properties, event.properties]),

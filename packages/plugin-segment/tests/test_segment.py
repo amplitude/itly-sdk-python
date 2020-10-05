@@ -4,8 +4,8 @@ from typing import Any, List
 
 from pytest_httpserver import HTTPServer
 
-from itly.plugin_segment import SegmentPlugin, SegmentOptions
-from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
+from itly_plugin_segment import SegmentPlugin, SegmentOptions
+from itly_sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 
 def test_segment(httpserver: HTTPServer):

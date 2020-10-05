@@ -7,8 +7,8 @@ import urllib.parse
 
 from pytest_httpserver import HTTPServer
 
-from itly.plugin_amplitude import AmplitudePlugin, AmplitudeOptions
-from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
+from itly_plugin_amplitude import AmplitudePlugin, AmplitudeOptions
+from itly_sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 
 def test_amplitude(httpserver: HTTPServer):

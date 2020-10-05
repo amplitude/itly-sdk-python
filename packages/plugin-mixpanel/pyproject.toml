@@ -1,18 +1,23 @@
 [tool.poetry]
-name = "itly.plugin-mixpanel"
-version = "0.1.6"
+name = "itly-plugin-mixpanel"
+version = "0.1.8"
 description = "Iteratively Analytics SDK - Mixpanel Plugin"
 readme="README.md"
 authors = ["Iteratively"]
 license = "MIT"
 packages = [
-    { include = "itly" }
+    { include = "itly_plugin_mixpanel" }
 ]
+
+[[tool.poetry.source]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+secondary = true
 
 [tool.poetry.dependencies]
 python = "^3.6"
 mixpanel = "^4.7.0"
-"itly.sdk" = "^0.1.0"
+itly-sdk = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.1"

@@ -6,8 +6,8 @@ from typing import Any, List
 
 from pytest_httpserver import HTTPServer
 
-from itly.plugin_mixpanel import MixpanelPlugin, MixpanelOptions
-from itly.sdk import PluginLoadOptions, Environment, Properties, Event, Logger
+from itly_plugin_mixpanel import MixpanelPlugin, MixpanelOptions
+from itly_sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
 
 def test_mixpanel(httpserver: HTTPServer):
