@@ -19,7 +19,7 @@ class Itly:
         self._is_shutdown: bool = False
         self._context: Optional[Event] = None
 
-    def load(self, options: Optional[Options] = Options(), context: Optional[Properties] = None) -> None:
+    def load(self, context: Optional[Properties] = None, options: Optional[Options] = Options()) -> None:
         if self._options is not None:
             raise Exception('Itly is already initialized. itly.load() should only be called once.')
 

@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, NamedTuple
 
 from ._environment import Environment
 from ._logger import Logger
@@ -42,3 +42,19 @@ class Options:
     @property
     def logger(self) -> Logger:
         return self._logger
+
+    @classmethod
+    def from_options(cls,
+                     options: "Options",
+                     environment: Optional[Environment] = None,
+                     disabled: Optional[bool] = None,
+                     plugins: Optional[List[Plugin]] = None,
+                     validation: Optional[ValidationOptions] = None,
+                     logger: Logger = None):
+        return cls(
+            environment if environment is not None else options.environment,
+            disabled if disabled is not None else options.disabled,
+            plugins if plugins is not None else options.plugins,
+            validation if validation is not None else options.validation,
+            logger if logger is not None else options.logger,
+        )
