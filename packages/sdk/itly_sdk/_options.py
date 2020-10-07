@@ -43,18 +43,17 @@ class Options:
     def logger(self) -> Logger:
         return self._logger
 
-    @classmethod
-    def from_options(cls,
-                     options: "Options",
-                     environment: Optional[Environment] = None,
-                     disabled: Optional[bool] = None,
-                     plugins: Optional[List[Plugin]] = None,
-                     validation: Optional[ValidationOptions] = None,
-                     logger: Logger = None):
-        return cls(
-            environment if environment is not None else options.environment,
-            disabled if disabled is not None else options.disabled,
-            plugins if plugins is not None else options.plugins,
-            validation if validation is not None else options.validation,
-            logger if logger is not None else options.logger,
+    def with_overrides(self,
+                       environment: Optional[Environment] = None,
+                       disabled: Optional[bool] = None,
+                       plugins: Optional[List[Plugin]] = None,
+                       validation: Optional[ValidationOptions] = None,
+                       logger: Logger = None
+                       ) -> "Options":
+        return Options(
+            environment if environment is not None else self._environment,
+            disabled if disabled is not None else self._disabled,
+            plugins if plugins is not None else self._plugins,
+            validation if validation is not None else self._validation,
+            logger if logger is not None else self._logger,
         )
