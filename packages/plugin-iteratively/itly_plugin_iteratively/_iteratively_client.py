@@ -21,10 +21,12 @@ class TrackType(enum.Enum):
 
 
 class IterativelyClient:
-    def __init__(self, api_endpoint: str, api_key: str, flush_queue_size: int, flush_interval: timedelta, omit_values: bool, retry_options: IterativelyRetryOptions,
+    def __init__(self, api_endpoint: str, api_key: str, flush_queue_size: int, flush_interval: timedelta, request_timeout: timedelta,
+                 omit_values: bool, retry_options: IterativelyRetryOptions,
                  on_error: Callable[[str], None]) -> None:
         self._api_endpoint = api_endpoint
         self._api_key = api_key
+        self._request_timeout = request_timeout
         self._omit_values = omit_values
         self._retry_options = retry_options
         self._on_error = on_error
@@ -82,7 +84,7 @@ class IterativelyClient:
             return
         for delay in backoff(start=self._retry_options.delay_initial.total_seconds(),
                              stop=self._retry_options.delay_maximum.total_seconds(),
-                             count=self._retry_options.max_retries-1,
+                             count=self._retry_options.max_retries - 1,
                              factor=2.0,
                              jitter=1.0):
             time.sleep(delay)
@@ -93,7 +95,8 @@ class IterativelyClient:
 
     def _post_request(self, data: Any) -> bool:
         try:
-            response = self._session.post(self._api_endpoint, json=data, headers={'Authorization': 'Bearer ' + self._api_key})
+            response = self._session.post(self._api_endpoint, json=data, headers={'Authorization': 'Bearer ' + self._api_key},
+                                          timeout=self._request_timeout.total_seconds())
         except requests.ConnectionError:
             return True
         except requests.Timeout:

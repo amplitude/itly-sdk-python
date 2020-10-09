@@ -22,10 +22,11 @@ class Request(NamedTuple):
 
 
 class AmplitudeClient:
-    def __init__(self, api_key: str, on_error: Callable[[str], None], flush_queue_size: int, flush_interval: timedelta,
+    def __init__(self, api_key: str, on_error: Callable[[str], None], flush_queue_size: int, flush_interval: timedelta, request_timeout: timedelta,
                  events_endpoint: Optional[str], identification_endpoint: Optional[str]) -> None:
-        self.api_key = api_key
-        self.on_error = on_error
+        self._api_key = api_key
+        self._request_timeout = request_timeout
+        self._on_error = on_error
         self._queue: queue.Queue = AsyncConsumer.create_queue()
         self._endpoints = {
             "events": Endpoint(url=events_endpoint or "https://api.amplitude.com/2/httpapi", is_json=True),
@@ -59,24 +60,24 @@ class AmplitudeClient:
             if is_json:
                 data = {
                     message_type: [message.data for message in batch],
-                    "api_key": self.api_key
+                    "api_key": self._api_key
                 }
             else:
                 data = {
                     message_type: json.dumps([message.data for message in batch]),
-                    "api_key": self.api_key
+                    "api_key": self._api_key
                 }
             self._send_request(Request(url=endpoint_url, is_json=is_json, data=data))
         except Exception as e:
-            self.on_error(str(e))
+            self._on_error(str(e))
 
     def _send_request(self, request: Request) -> None:
         if request.is_json:
-            response = self._session.post(request.url, json=request.data)
+            response = self._session.post(request.url, json=request.data, timeout=self._request_timeout.total_seconds())
         else:
-            response = self._session.post(request.url, data=request.data)
+            response = self._session.post(request.url, data=request.data, timeout=self._request_timeout.total_seconds())
         if response.status_code >= 300:
-            self.on_error(f'Unexpected status code for {request.url}: {response.status_code}')
+            self._on_error(f'Unexpected status code for {request.url}: {response.status_code}')
 
     def shutdown(self) -> None:
         self._consumer.shutdown()
@@ -85,7 +86,7 @@ class AmplitudeClient:
         try:
             self._queue.put(message)
         except queue.Full:
-            self.on_error("async queue is full")
+            self._on_error("async queue is full")
 
     def flush(self) -> None:
         self._consumer.flush()

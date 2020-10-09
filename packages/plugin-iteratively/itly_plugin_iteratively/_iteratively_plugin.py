@@ -14,6 +14,7 @@ class IterativelyOptions(NamedTuple):
     flush_interval: timedelta = timedelta(seconds=1)
     disabled: Optional[bool] = None
     retry_options: IterativelyRetryOptions = IterativelyRetryOptions()
+    request_timeout: timedelta = timedelta(seconds=15)
 
 
 class IterativelyPlugin(Plugin):
@@ -36,6 +37,7 @@ class IterativelyPlugin(Plugin):
         assert self._options.url is not None
         self._client = IterativelyClient(api_endpoint=self._options.url, api_key=self._api_key,
                                          flush_queue_size=self._options.flush_queue_size, flush_interval=self._options.flush_interval,
+                                         request_timeout=self._options.request_timeout,
                                          retry_options=self._options.retry_options,
                                          omit_values=self._options.omit_values, on_error=self._on_error)
         self._logger = options.logger

@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Optional, NamedTuple
 
 from mixpanel import Mixpanel, BufferedConsumer
@@ -8,6 +9,7 @@ from itly_sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 class MixpanelOptions(NamedTuple):
     api_host: Optional[str] = None
     flush_queue_size: int = 10
+    request_timeout: timedelta = timedelta(seconds=15)
 
 
 class MixpanelPlugin(Plugin):
@@ -24,6 +26,7 @@ class MixpanelPlugin(Plugin):
     def load(self, options: PluginLoadOptions) -> None:
         self._consumer = BufferedConsumer(
             max_size=self._options.flush_queue_size,
+            request_timeout=int(self._options.request_timeout.total_seconds()),
             events_url=None if self._options.api_host is None else f'{self._options.api_host}/track',
             people_url=None if self._options.api_host is None else f'{self._options.api_host}/engage',
         )
