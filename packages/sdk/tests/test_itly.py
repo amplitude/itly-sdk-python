@@ -84,14 +84,14 @@ class OptionalEnum(enum.Enum):
 
 def test_load_default_options_succeeds() -> None:
     itly = Itly()
-    itly.load(Options())
+    itly.load()
 
 
 def test_double_load_throws_exception() -> None:
     itly = Itly()
-    itly.load(Options())
+    itly.load()
     with pytest.raises(Exception) as ctx:
-        itly.load(Options())
+        itly.load()
 
     assert str(ctx.value) == 'Itly is already initialized. itly.load() should only be called once.'
 
@@ -154,7 +154,7 @@ def test_shutdown_before_load_throws_error() -> None:
 
 def test_double_shutdown_throws_exception() -> None:
     itly = Itly()
-    itly.load(Options())
+    itly.load()
     itly.shutdown()
     with pytest.raises(Exception) as ctx:
         itly.shutdown()
@@ -164,7 +164,7 @@ def test_double_shutdown_throws_exception() -> None:
 
 def test_track_after_shutdown_throws_error() -> None:
     itly = Itly()
-    itly.load(Options())
+    itly.load()
     itly.shutdown()
     with pytest.raises(Exception) as ctx:
         itly.track('user-id', Event("event"))
@@ -175,7 +175,10 @@ def test_track_after_shutdown_throws_error() -> None:
 def test_identify_without_properties_succeeds() -> None:
     itly = Itly()
     logger = CustomLogger()
-    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=Properties(context_property=1)))
+    itly.load(
+        context=Properties(context_property=1),
+        options=Options(logger=logger, plugins=[CustomPlugin()])
+    )
     itly.identify('user-id')
 
     log_text = '\n'.join(logger.log_lines)
@@ -190,7 +193,10 @@ def test_identify_without_properties_succeeds() -> None:
 def test_identify_with_properties_succeeds() -> None:
     itly = Itly()
     logger = CustomLogger()
-    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=Properties(context_property=1)))
+    itly.load(
+        context=Properties(context_property=1),
+        options=Options(logger=logger, plugins=[CustomPlugin()])
+    )
     itly.identify('user-id', Properties(
         required_number=42.0,
     ))
@@ -207,7 +213,10 @@ def test_identify_with_properties_succeeds() -> None:
 def test_group_without_properties_succeeds() -> None:
     itly = Itly()
     logger = CustomLogger()
-    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=Properties(context_property=1)))
+    itly.load(
+        context=Properties(context_property=1),
+        options=Options(logger=logger, plugins=[CustomPlugin()])
+    )
     itly.group('user-id', 'group-id')
 
     log_text = '\n'.join(logger.log_lines)
@@ -222,7 +231,10 @@ def test_group_without_properties_succeeds() -> None:
 def test_group_with_properties_succeeds() -> None:
     itly = Itly()
     logger = CustomLogger()
-    itly.load(Options(logger=logger, plugins=[CustomPlugin()], context=Properties(context_property=1)))
+    itly.load(
+        context=Properties(context_property=1),
+        options=Options(logger=logger, plugins=[CustomPlugin()])
+    )
     itly.group('user-id', 'group-id', Properties(
         required_boolean=True,
     ))
@@ -241,15 +253,17 @@ def test_events_succeeds() -> None:
 
     itly = Itly()
     logger = CustomLogger()
-    itly.load(Options(
-        environment=Environment.PRODUCTION,
+    itly.load(
         context=Properties(
             requiredString='A required string',
             optionalEnum=OptionalEnum.Value1,
         ),
-        plugins=[CustomPlugin()],
-        logger=logger,
-    ))
+        options=Options(
+            environment=Environment.PRODUCTION,
+            plugins=[CustomPlugin()],
+            logger=logger,
+        ),
+    )
 
     itly.identify('user-id', Properties(user_prop=1))
     itly.alias(user_id, 'user-id')
@@ -319,16 +333,18 @@ def test_events_disabled() -> None:
 
     itly = Itly()
     logger = CustomLogger()
-    itly.load(Options(
-        environment=Environment.PRODUCTION,
+    itly.load(
         context=Properties(
             requiredString='A required string',
             optionalEnum=OptionalEnum.Value1,
         ),
-        plugins=[CustomPlugin()],
-        logger=logger,
-        disabled=True,
-    ))
+        options=Options(
+            environment=Environment.PRODUCTION,
+            plugins=[CustomPlugin()],
+            logger=logger,
+            disabled=True,
+        ),
+    )
 
     itly.identify('user-id', Properties(user_prop=1))
     itly.alias(user_id, 'user-id')
@@ -447,7 +463,7 @@ def _check_validation_results(environment: Environment, validation_results: List
     for validation_options, error_text, expected_log in validation_results:
         itly = Itly()
         logger = CustomLogger()
-        itly.load(Options(
+        itly.load(None, Options(
             environment=environment,
             logger=logger,
             plugins=[CustomPlugin()],

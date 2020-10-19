@@ -19,7 +19,7 @@ class Itly:
         self._is_shutdown: bool = False
         self._context: Optional[Event] = None
 
-    def load(self, options: Options) -> None:
+    def load(self, context: Optional[Properties] = None, options: Optional[Options] = Options()) -> None:
         if self._options is not None:
             raise Exception('Itly is already initialized. itly.load() should only be called once.')
 
@@ -32,10 +32,10 @@ class Itly:
 
         self._logger.info('load()')
 
-        if options.context is not None:
+        if context is not None:
             self._context = Event(
                 name='context',
-                properties=options.context,
+                properties=context,
             )
 
         for plugin in self._options.plugins:
