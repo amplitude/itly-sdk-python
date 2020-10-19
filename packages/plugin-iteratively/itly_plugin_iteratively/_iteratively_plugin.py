@@ -7,8 +7,6 @@ from ._retry_options import IterativelyRetryOptions
 
 
 class IterativelyOptions(NamedTuple):
-    url: Optional[str] = None
-    environment: Environment = Environment.DEVELOPMENT
     omit_values: bool = False
     flush_queue_size: int = 10
     flush_interval: timedelta = timedelta(seconds=1)
@@ -17,11 +15,11 @@ class IterativelyOptions(NamedTuple):
 
 
 class IterativelyPlugin(Plugin):
-    def __init__(self, api_key: str, options: IterativelyOptions) -> None:
+    def __init__(self, api_key: str, url: str, options: IterativelyOptions) -> None:
         self._api_key: str = api_key
-        self._options: IterativelyOptions = options._replace(
-            disabled=options.disabled if options.disabled is not None else options.environment == Environment.PRODUCTION
-        )
+        self._url: str = url
+        self._options: IterativelyOptions = options
+        self._disabled: Optional[bool] = options.disabled
         self._client: Optional[IterativelyClient] = None
         self._logger: Logger = Logger.NONE
 
@@ -29,19 +27,21 @@ class IterativelyPlugin(Plugin):
         return 'iteratively'
 
     def load(self, options: PluginLoadOptions) -> None:
-        if self._options.disabled:
+        if self._disabled is None:
+            self._disabled = options.environment == Environment.PRODUCTION
+
+        if self._disabled:
             options.logger.info("disabled")
             return
 
-        assert self._options.url is not None
-        self._client = IterativelyClient(api_endpoint=self._options.url, api_key=self._api_key,
+        self._client = IterativelyClient(api_endpoint=self._url, api_key=self._api_key,
                                          flush_queue_size=self._options.flush_queue_size, flush_interval=self._options.flush_interval,
                                          retry_options=self._options.retry_options,
                                          omit_values=self._options.omit_values, on_error=self._on_error)
         self._logger = options.logger
 
     def post_identify(self, user_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
-        if self._options.disabled:
+        if self._disabled:
             return
 
         assert self._client is not None
@@ -50,7 +50,7 @@ class IterativelyPlugin(Plugin):
                            validation=self._first_failed_validation(validation_results))
 
     def post_group(self, user_id: str, group_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
-        if self._options.disabled:
+        if self._disabled:
             return
 
         assert self._client is not None
@@ -59,7 +59,7 @@ class IterativelyPlugin(Plugin):
                            validation=self._first_failed_validation(validation_results))
 
     def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
-        if self._options.disabled:
+        if self._disabled:
             return
 
         assert self._client is not None
@@ -68,7 +68,7 @@ class IterativelyPlugin(Plugin):
                            validation=self._first_failed_validation(validation_results))
 
     def post_track(self, user_id: str, event: Event, validation_results: List[ValidationResponse]) -> None:
-        if self._options.disabled:
+        if self._disabled:
             return
 
         assert self._client is not None
@@ -78,14 +78,14 @@ class IterativelyPlugin(Plugin):
                            validation=self._first_failed_validation(validation_results))
 
     def flush(self) -> None:
-        if self._options.disabled:
+        if self._disabled:
             return
 
         assert self._client is not None
         self._client.flush()
 
     def shutdown(self) -> None:
-        if self._options.disabled:
+        if self._disabled:
             return
 
         assert self._client is not None

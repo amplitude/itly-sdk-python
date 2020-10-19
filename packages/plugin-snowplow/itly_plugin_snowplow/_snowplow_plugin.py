@@ -9,37 +9,21 @@ class SnowplowOptions(NamedTuple):
     """
     Snowplow Options
 
-    endpoint : str
-        The collector URL. Don't include "http://" - this is done automatically.
+    Based on Snowplow AsyncEmitter options
+    https://github.com/snowplow/snowplow-python-tracker/blob/master/snowplow_tracker/emitters.py#L62
 
-    protocol : str, optional
-        The protocol to use - http or https. Defaults to http.
-
-    port : int, optional
-        The collector port to connect to
-
-    method : str, optional
-        method
-
-    buffer_size : int, optional
-        The maximum number of queued events before the buffer is flushed. Default is 10.
-
-    on_success : function, optional
-       Callback executed after every HTTP request in a flush has status code 200.
-       Gets passed the number of events flushed.
-
-    on_failure : function, optional
-        Callback executed if at least one HTTP request in a flush has status code other than 200.
-        Gets passed two arguments:
-            1) The number of events which were successfully sent
-            2) If method is "post": The unsent data in string form;
-               If method is "get":  An array of dictionaries corresponding to the unsent events' payloads
-
-    thread_count : int, optional
-        Number of worker threads to use for HTTP requests
-
-    byte_limit : int, optional
-        The size event list after reaching which queued events will be flushed
+    :param protocol:    The protocol to use - http or https. Defaults to http.
+    :param port:        The collector port to connect to
+    :param method:      The HTTP request method
+    :param buffer_size: The maximum number of queued events before the buffer is flushed. Default is 10.
+    :param on_success:  Callback executed after every HTTP request in a flush has status code 200
+                        Gets passed the number of events flushed.
+    :param on_failure:  Callback executed if at least one HTTP request in a flush has status code other than 200
+                        Gets passed two arguments:
+                        1) The number of events which were successfully sent
+                        2) If method is "post": The unsent data in string form;
+                           If method is "get":  An array of dictionaries corresponding to the unsent events' payloads
+    :param byte_limit:  The size event list after reaching which queued events will be flushed
     """
 
     endpoint: str
@@ -101,6 +85,9 @@ class SnowplowPlugin(Plugin):
     def flush(self) -> None:
         assert self._tracker is not None
         self._tracker.flush()
+
+    def shutdown(self) -> None:
+        self.flush()
 
     def _on_failure(self, sent_count: int, unsent: Any) -> None:
         self._logger.error("Error. Can't send events")
