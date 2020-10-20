@@ -34,19 +34,35 @@ class Plugin(ABC):
     def identify(self, user_id: str, properties: Optional[Properties]) -> None:
         pass
 
-    def post_identify(self, user_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_identify(self,
+                      user_id: str,
+                      properties: Optional[Properties],
+                      validation_results: List[ValidationResponse]) -> None:
         pass
 
     def group(self, user_id: str, group_id: str, properties: Optional[Properties]) -> None:
         pass
 
-    def post_group(self, user_id: str, group_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_group(self,
+                   user_id: str,
+                   group_id: str,
+                   properties: Optional[Properties],
+                   validation_results: List[ValidationResponse]) -> None:
         pass
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
+    def page(self,
+             user_id: str,
+             category: Optional[str],
+             name: Optional[str],
+             properties: Optional[Properties]) -> None:
         pass
 
-    def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_page(self,
+                  user_id: str,
+                  category: Optional[str],
+                  name: Optional[str],
+                  properties: Optional[Properties],
+                  validation_results: List[ValidationResponse]) -> None:
         pass
 
     def track(self, user_id: str, event: Event) -> None:
@@ -124,9 +140,13 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error(f'Error in identify(). {e}')
 
-    def post_identify(self, user_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_identify(self,
+                      user_id: str,
+                      properties: Optional[Properties],
+                      validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_identify != Plugin.post_identify:
-            self._logger.info(f'post_identify(user_id={user_id}, properties={properties}, validation_results={validation_results})')
+            self._logger.info(
+                f'post_identify(user_id={user_id}, properties={properties}, validation_results={validation_results})')
         try:
             self._plugin.post_identify(user_id, properties, validation_results)
         except Exception as e:
@@ -140,15 +160,26 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error(f'Error in group(). {e}')
 
-    def post_group(self, user_id: str, group_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_group(self,
+                   user_id: str,
+                   group_id: str,
+                   properties: Optional[Properties],
+                   validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_group != Plugin.post_group:
-            self._logger.info(f'post_group(user_id={user_id}, group_id={group_id}, properties={properties}, validation_results={validation_results})')
+            self._logger.info(
+                f'post_group(user_id={user_id}, group_id={group_id}, properties={properties}, '
+                f'validation_results={validation_results})'
+            )
         try:
             self._plugin.post_group(user_id, group_id, properties, validation_results)
         except Exception as e:
             self._logger.error(f'Error in post_group(). {e}')
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
+    def page(self,
+             user_id: str,
+             category: Optional[str],
+             name: Optional[str],
+             properties: Optional[Properties]) -> None:
         if self._plugin.__class__.page != Plugin.page:
             self._logger.info(f'page(user_id={user_id}, category={category}, name={name}, properties={properties})')
         try:
@@ -156,9 +187,15 @@ class PluginSafeDecorator(Plugin):
         except Exception as e:
             self._logger.error(f'Error in page(). {e}')
 
-    def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_page(self,
+                  user_id: str,
+                  category: Optional[str],
+                  name: Optional[str],
+                  properties: Optional[Properties],
+                  validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_page != Plugin.post_page:
-            self._logger.info(f'post_page(user_id={user_id}, category={category}, name={name}, properties={properties}, validation_results={validation_results})')
+            self._logger.info(f'post_page(user_id={user_id}, category={category}, name={name}, properties={properties}, '
+                              f'validation_results={validation_results})')
         try:
             self._plugin.post_page(user_id, category, name, properties, validation_results)
         except Exception as e:
@@ -174,7 +211,8 @@ class PluginSafeDecorator(Plugin):
 
     def post_track(self, user_id: str, event: Event, validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_track != Plugin.post_track:
-            self._logger.info(f'post_track(user_id={user_id}, event={event.name}, properties={event.properties}, validation_results={validation_results})')
+            self._logger.info(f'post_track(user_id={user_id}, event={event.name}, properties={event.properties}, '
+                              f'validation_results={validation_results})')
         try:
             self._plugin.post_track(user_id, event, validation_results)
         except Exception as e:

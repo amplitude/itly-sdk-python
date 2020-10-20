@@ -4,7 +4,11 @@ from ._properties import Properties
 
 
 class Event:
-    def __init__(self, name: str, properties: Optional[Properties] = None, id_: Optional[str] = None, version: Optional[str] = None):
+    def __init__(self,
+                 name: str,
+                 properties: Optional[Properties] = None,
+                 id_: Optional[str] = None,
+                 version: Optional[str] = None):
         self._name: str = name
         self._properties: Optional[Properties] = properties
         self._id: Optional[str] = id_

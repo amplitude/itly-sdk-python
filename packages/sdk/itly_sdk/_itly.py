@@ -63,7 +63,9 @@ class Itly:
             identify_event,
             False,
             lambda plugin, event: plugin.identify(user_id, event.properties),
-            lambda plugin, event, validation_results: plugin.post_identify(user_id, event.properties, validation_results),
+            lambda plugin, event, validation_results: plugin.post_identify(user_id,
+                                                                           event.properties,
+                                                                           validation_results),
         )
 
     def group(self, user_id: str, group_id: str, group_properties: Optional[Properties] = None) -> None:
@@ -76,20 +78,33 @@ class Itly:
             group_event,
             False,
             lambda plugin, event: plugin.group(user_id, group_id, event.properties),
-            lambda plugin, event, validation_results: plugin.post_group(user_id, group_id, event.properties, validation_results),
+            lambda plugin, event, validation_results: plugin.post_group(user_id,
+                                                                        group_id,
+                                                                        event.properties,
+                                                                        validation_results),
         )
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], page_properties: Optional[Properties] = None) -> None:
+    def page(self,
+             user_id: str,
+             category: Optional[str],
+             name: Optional[str],
+             page_properties: Optional[Properties] = None) -> None:
         if self._disabled():
             return
 
         page_event = Event('page', page_properties)
-        self._logger.info(f'page(user_id={user_id}, category={category}, name={name}, properties={page_event.properties})')
+        self._logger.info(
+            f'page(user_id={user_id}, category={category}, name={name}, properties={page_event.properties})'
+        )
         self._validate_and_run_on_all_plugins(
             page_event,
             False,
             lambda plugin, event: plugin.page(user_id, category, name, event.properties),
-            lambda plugin, event, validation_results: plugin.post_page(user_id, category, name, event.properties, validation_results),
+            lambda plugin, event, validation_results: plugin.post_page(user_id,
+                                                                       category,
+                                                                       name,
+                                                                       event.properties,
+                                                                       validation_results),
         )
 
     def track(self, user_id: str, event: Event) -> None:
@@ -136,8 +151,11 @@ class Itly:
                                          event: Event,
                                          include_context: bool,
                                          action: Callable[[Plugin, Event], None],
-                                         post_action: Callable[[Plugin, Event, List[ValidationResponse]], None]) -> None:
-        context_failed_validation_responses = self._validate(self._context) if include_context and self._context is not None else []
+                                         post_action: Callable[[Plugin, Event, List[ValidationResponse]], None]
+                                         ) -> None:
+        context_failed_validation_responses = self._validate(
+            self._context
+        ) if include_context and self._context is not None else []
         is_context_valid = len(context_failed_validation_responses) == 0
 
         event_failed_validation_responses = self._validate(event)
@@ -157,7 +175,9 @@ class Itly:
             self._run_on_all_plugins(lambda plugin: action(plugin, combined_event))
 
         combined_failed_validation_responses = context_failed_validation_responses + event_failed_validation_responses
-        self._run_on_all_plugins(lambda plugin: post_action(plugin, combined_event, combined_failed_validation_responses))
+        self._run_on_all_plugins(lambda plugin: post_action(plugin,
+                                                            combined_event,
+                                                            combined_failed_validation_responses))
 
         if (not is_context_valid or not is_event_valid) and self._options.validation.error_on_invalid:
             raise ValueError(combined_failed_validation_responses[0].message)

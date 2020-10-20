@@ -10,6 +10,7 @@ class AmplitudeOptions(NamedTuple):
     flush_interval: timedelta = timedelta(seconds=1)
     events_endpoint: Optional[str] = None
     identification_endpoint: Optional[str] = None
+    request_timeout: timedelta = timedelta(seconds=15)
 
 
 class AmplitudePlugin(Plugin):
@@ -23,9 +24,13 @@ class AmplitudePlugin(Plugin):
         return 'amplitude'
 
     def load(self, options: PluginLoadOptions) -> None:
-        self._client = AmplitudeClient(api_key=self._api_key, on_error=self._on_error,
-                                       flush_queue_size=self._options.flush_queue_size, flush_interval=self._options.flush_interval,
-                                       events_endpoint=self._options.events_endpoint, identification_endpoint=self._options.identification_endpoint)
+        self._client = AmplitudeClient(api_key=self._api_key,
+                                       on_error=self._on_error,
+                                       flush_queue_size=self._options.flush_queue_size,
+                                       flush_interval=self._options.flush_interval,
+                                       request_timeout=self._options.request_timeout,
+                                       events_endpoint=self._options.events_endpoint,
+                                       identification_endpoint=self._options.identification_endpoint)
         self._logger = options.logger
 
     def identify(self, user_id: str, properties: Optional[Properties]) -> None:

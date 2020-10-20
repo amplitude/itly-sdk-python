@@ -59,7 +59,9 @@ def test_amplitude(httpserver: HTTPServer):
             {
                 'events': [
                     {'user_id': 'user-2', 'event_type': 'event-1', 'event_properties': {'item1': 'value1', 'item2': 1}},
-                    {'user_id': 'user-2', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}}], 'api_key': 'My-Key'
+                    {'user_id': 'user-2', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}}
+                ],
+                'api_key': 'My-Key'
             },
         ]
 

@@ -1,9 +1,11 @@
+# flake8: noqa E501
 import enum
 from typing import List, Optional, Tuple
 
 import pytest
 
-from itly_sdk import Itly, Options, Environment, Event, Properties, Logger, Plugin, PluginLoadOptions, ValidationResponse, ValidationOptions
+from itly_sdk import Itly, Options, Environment, Event, Properties, Logger, \
+    Plugin, PluginLoadOptions, ValidationResponse, ValidationOptions
 
 
 class CustomLogger(Logger):
@@ -39,19 +41,35 @@ class CustomPlugin(Plugin):
     def identify(self, user_id: str, properties: Optional[Properties]) -> None:
         pass
 
-    def post_identify(self, user_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_identify(self,
+                      user_id: str,
+                      properties: Optional[Properties],
+                      validation_results: List[ValidationResponse]) -> None:
         pass
 
     def group(self, user_id: str, group_id: str, properties: Optional[Properties]) -> None:
         pass
 
-    def post_group(self, user_id: str, group_id: str, properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_group(self,
+                   user_id: str,
+                   group_id: str,
+                   properties: Optional[Properties],
+                   validation_results: List[ValidationResponse]) -> None:
         pass
 
-    def page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties]) -> None:
+    def page(self,
+             user_id: str,
+             category: Optional[str],
+             name: Optional[str],
+             properties: Optional[Properties]) -> None:
         pass
 
-    def post_page(self, user_id: str, category: Optional[str], name: Optional[str], properties: Optional[Properties], validation_results: List[ValidationResponse]) -> None:
+    def post_page(self,
+                  user_id: str,
+                  category: Optional[str],
+                  name: Optional[str],
+                  properties: Optional[Properties],
+                  validation_results: List[ValidationResponse]) -> None:
         pass
 
     def track(self, user_id: str, event: Event) -> None:
@@ -459,7 +477,8 @@ def test_production_failed_validation() -> None:
     _check_validation_results(Environment.PRODUCTION, validation_results)
 
 
-def _check_validation_results(environment: Environment, validation_results: List[Tuple[ValidationOptions, Optional[str], str]]) -> None:
+def _check_validation_results(environment: Environment,
+                              validation_results: List[Tuple[ValidationOptions, Optional[str], str]]) -> None:
     for validation_options, error_text, expected_log in validation_results:
         itly = Itly()
         logger = CustomLogger()

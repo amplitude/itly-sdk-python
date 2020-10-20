@@ -5,8 +5,23 @@ import analytics
 from itly_sdk import Plugin, PluginLoadOptions, Properties, Event, Logger
 
 
+# Segment Options
+# https://segment.com/docs/connections/sources/catalog/libraries/server/python/#options
+# https://github.com/segmentio/analytics-python/blob/master/analytics/client.py#L28-L31
 class SegmentOptions(NamedTuple):
     host: Optional[str] = None
+    debug: Optional[bool] = False
+    max_queue_size: Optional[int] = 10000
+    send: Optional[bool] = True
+    # on_error: Optional[Callable[error, items], None] = None
+    # The following Options will be avaible in analytics-python:1.3.0 (currently beta)
+    # flush_at: Optional[int] = 100
+    # flush_interval: Optional[float] = 0.5
+    # gzip: Optional[bool] = False
+    # max_retries: Optional[int] = 3
+    # sync_mode: Optional[bool] = False
+    # timeout: Optional[int] = 15
+    # thread: Optional[int] = 1
 
 
 class SegmentPlugin(Plugin):
@@ -20,7 +35,11 @@ class SegmentPlugin(Plugin):
         return 'segment'
 
     def load(self, options: PluginLoadOptions) -> None:
-        self._client = analytics.Client(write_key=self._write_key, on_error=self._on_error, host=self._options.host)
+        self._client = analytics.Client(
+            write_key=self._write_key,
+            on_error=self._on_error,
+            **self._options._asdict()
+        )
         self._logger = options.logger
 
     def alias(self, user_id: str, previous_id: str) -> None:
