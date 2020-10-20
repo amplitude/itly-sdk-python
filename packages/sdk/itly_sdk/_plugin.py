@@ -167,7 +167,7 @@ class PluginSafeDecorator(Plugin):
                    validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_group != Plugin.post_group:
             self._logger.info(
-                f'post_group(user_id={user_id}, group_id={group_id}, properties={properties},'
+                f'post_group(user_id={user_id}, group_id={group_id}, properties={properties}, '
                 f'validation_results={validation_results})'
             )
         try:
@@ -194,7 +194,7 @@ class PluginSafeDecorator(Plugin):
                   properties: Optional[Properties],
                   validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_page != Plugin.post_page:
-            self._logger.info(f'post_page(user_id={user_id}, category={category}, name={name}, properties={properties},'
+            self._logger.info(f'post_page(user_id={user_id}, category={category}, name={name}, properties={properties}, '
                               f'validation_results={validation_results})')
         try:
             self._plugin.post_page(user_id, category, name, properties, validation_results)
@@ -211,7 +211,7 @@ class PluginSafeDecorator(Plugin):
 
     def post_track(self, user_id: str, event: Event, validation_results: List[ValidationResponse]) -> None:
         if self._plugin.__class__.post_track != Plugin.post_track:
-            self._logger.info(f'post_track(user_id={user_id}, event={event.name}, properties={event.properties},'
+            self._logger.info(f'post_track(user_id={user_id}, event={event.name}, properties={event.properties}, '
                               f'validation_results={validation_results})')
         try:
             self._plugin.post_track(user_id, event, validation_results)
