@@ -23,8 +23,10 @@ jobs:
         python -m pip install --upgrade pip
         curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
         source $HOME/.poetry/env
+        python -m venv venv && source venv/bin/activate
         pip install -r requirements.txt
         make install-all
+        pip install packages/sdk
 
     - name: Lint with flake8
       run: |
