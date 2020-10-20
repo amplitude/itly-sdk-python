@@ -21,7 +21,12 @@ class TrackType(enum.Enum):
 
 
 class IterativelyClient:
-    def __init__(self, api_endpoint: str, api_key: str, flush_queue_size: int, flush_interval: timedelta, request_timeout: timedelta,
+    def __init__(self,
+                 api_endpoint: str,
+                 api_key: str,
+                 flush_queue_size: int,
+                 flush_interval: timedelta,
+                 request_timeout: timedelta,
                  omit_values: bool, retry_options: IterativelyRetryOptions,
                  on_error: Callable[[str], None]) -> None:
         self._api_endpoint = api_endpoint
@@ -32,7 +37,10 @@ class IterativelyClient:
         self._on_error = on_error
         self._queue: queue.Queue = AsyncConsumer.create_queue()
         self._session = Session()
-        self._consumer = AsyncConsumer(self._queue, do_upload=self._upload_batch, flush_queue_size=flush_queue_size, flush_interval=flush_interval)
+        self._consumer = AsyncConsumer(self._queue,
+                                       do_upload=self._upload_batch,
+                                       flush_queue_size=flush_queue_size,
+                                       flush_interval=flush_interval)
         atexit.register(self.shutdown)
         self._consumer.start()
 
@@ -95,7 +103,9 @@ class IterativelyClient:
 
     def _post_request(self, data: Any) -> bool:
         try:
-            response = self._session.post(self._api_endpoint, json=data, headers={'Authorization': 'Bearer ' + self._api_key},
+            response = self._session.post(self._api_endpoint,
+                                          json=data,
+                                          headers={'Authorization': 'Bearer ' + self._api_key},
                                           timeout=self._request_timeout.total_seconds())
         except requests.ConnectionError:
             return True

@@ -14,7 +14,11 @@ class AsyncConsumer(Thread):
     def create_queue() -> queue.Queue:
         return queue.Queue(maxsize=10000)
 
-    def __init__(self, message_queue: queue.Queue, do_upload: Callable[[List[AsyncConsumerMessage]], None], flush_queue_size: int, flush_interval: timedelta) -> None:
+    def __init__(self,
+                 message_queue: queue.Queue,
+                 do_upload: Callable[[List[AsyncConsumerMessage]], None],
+                 flush_queue_size: int,
+                 flush_interval: timedelta) -> None:
         """Create a consumer thread."""
         Thread.__init__(self)
         # Make consumer a daemon thread so that it doesn't block program exit

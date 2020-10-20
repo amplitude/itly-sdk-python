@@ -22,18 +22,28 @@ class Request(NamedTuple):
 
 
 class AmplitudeClient:
-    def __init__(self, api_key: str, on_error: Callable[[str], None], flush_queue_size: int, flush_interval: timedelta, request_timeout: timedelta,
-                 events_endpoint: Optional[str], identification_endpoint: Optional[str]) -> None:
+    def __init__(self,
+                 api_key: str,
+                 on_error: Callable[[str], None],
+                 flush_queue_size: int,
+                 flush_interval: timedelta,
+                 request_timeout: timedelta,
+                 events_endpoint: Optional[str],
+                 identification_endpoint: Optional[str]) -> None:
         self._api_key = api_key
         self._request_timeout = request_timeout
         self._on_error = on_error
         self._queue: queue.Queue = AsyncConsumer.create_queue()
         self._endpoints = {
             "events": Endpoint(url=events_endpoint or "https://api.amplitude.com/2/httpapi", is_json=True),
-            "identification": Endpoint(url=identification_endpoint or "https://api.amplitude.com/identify", is_json=False),
+            "identification": Endpoint(url=identification_endpoint or "https://api.amplitude.com/identify",
+                                       is_json=False),
         }
         self._session = Session()
-        self._consumer = AsyncConsumer(message_queue=self._queue, do_upload=self._upload_batch, flush_queue_size=flush_queue_size, flush_interval=flush_interval)
+        self._consumer = AsyncConsumer(message_queue=self._queue,
+                                       do_upload=self._upload_batch,
+                                       flush_queue_size=flush_queue_size,
+                                       flush_interval=flush_interval)
         atexit.register(self.shutdown)
         self._consumer.start()
 

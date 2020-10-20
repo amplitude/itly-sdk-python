@@ -76,11 +76,11 @@ def test_snowplow(httpserver: HTTPServer):
             },
             {
                 'properties': {
-                        'data': {
-                             'data': {'item1': 'value5', 'item2': 5},
-                             'schema': 'iglu:ly.iterative.test/event-5/jsonschema/0-0-5'
-                        },
-                        'schema': 'iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0'
+                    'data': {
+                        'data': {'item1': 'value5', 'item2': 5},
+                        'schema': 'iglu:ly.iterative.test/event-5/jsonschema/0-0-5'
+                    },
+                    'schema': 'iglu:com.snowplowanalytics.snowplow/unstruct_event/jsonschema/1-0-0'
                 },
                 'uid': 'user-1'
             }

@@ -35,7 +35,8 @@ class SchemaValidatorPlugin(Plugin):
             )
         except Exception as ex:
             return self._create_invalid_response(
-                message=f"Passed in {event.name} properties did not validate against your tracking plan. An unknown error occurred during validation. {ex}"
+                message=f"Passed in {event.name} properties did not validate against your tracking plan."
+                        f"An unknown error occurred during validation. {ex}"
             )
 
         return None
