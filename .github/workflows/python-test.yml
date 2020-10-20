@@ -21,11 +21,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install -r requirements.txt
         curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
         source $HOME/.poetry/env
         python -m venv venv && source venv/bin/activate
-        pip install -r requirements.txt
         make install-all
         pip install packages/sdk
 
