@@ -28,10 +28,12 @@ class AmplitudeClient:
                  flush_queue_size: int,
                  flush_interval: timedelta,
                  request_timeout: timedelta,
+                 min_id_length: Optional[int],
                  events_endpoint: Optional[str],
                  identification_endpoint: Optional[str]) -> None:
         self._api_key = api_key
         self._request_timeout = request_timeout
+        self._min_id_length = min_id_length
         self._on_error = on_error
         self._queue: queue.Queue = AsyncConsumer.create_queue()
         self._endpoints = {
@@ -67,14 +69,16 @@ class AmplitudeClient:
         message_type = batch[0].message_type
         endpoint_url, is_json = self._endpoints[message_type]
         try:
-            if is_json:
+            if message_type == "events":
                 data = {
-                    message_type: [message.data for message in batch],
-                    "api_key": self._api_key
+                    "events": [message.data for message in batch],
+                    "api_key": self._api_key,
                 }
+                if self._min_id_length is not None:
+                    data["options"] = {"min_id_length": self._min_id_length}
             else:
                 data = {
-                    message_type: json.dumps([message.data for message in batch]),
+                    "identification": json.dumps([message.data for message in batch]),
                     "api_key": self._api_key
                 }
             self._send_request(Request(url=endpoint_url, is_json=is_json, data=data))
