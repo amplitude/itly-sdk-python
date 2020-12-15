@@ -11,6 +11,7 @@ class AmplitudeOptions(NamedTuple):
     events_endpoint: Optional[str] = None
     identification_endpoint: Optional[str] = None
     request_timeout: timedelta = timedelta(seconds=15)
+    min_id_length: Optional[int] = None
 
 
 class AmplitudePlugin(Plugin):
@@ -29,6 +30,7 @@ class AmplitudePlugin(Plugin):
                                        flush_queue_size=self._options.flush_queue_size,
                                        flush_interval=self._options.flush_interval,
                                        request_timeout=self._options.request_timeout,
+                                       min_id_length=self._options.min_id_length,
                                        events_endpoint=self._options.events_endpoint,
                                        identification_endpoint=self._options.identification_endpoint)
         self._logger = options.logger
