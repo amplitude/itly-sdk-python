@@ -44,7 +44,8 @@ class AmplitudePlugin(Plugin):
         assert self._client is not None
         self._client.track(user_id=user_id,
                            event_name=event.name,
-                           properties=event.properties.to_json() if event.properties is not None else None)
+                           properties=event.properties.to_json() if event.properties is not None else None,
+                           metadata=event.metadata.get(self.id()))
 
     def flush(self) -> None:
         assert self._client is not None

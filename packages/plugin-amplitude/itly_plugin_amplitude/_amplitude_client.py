@@ -7,6 +7,7 @@ from typing import Dict, Callable, List, Optional, NamedTuple, Any
 
 from requests import Session
 
+from itly_plugin_amplitude._amplitude_metadata import AmplitudeMetadata
 from itly_sdk.internal import AsyncConsumer, AsyncConsumerMessage
 
 
@@ -49,13 +50,13 @@ class AmplitudeClient:
         atexit.register(self.shutdown)
         self._consumer.start()
 
-    def track(self, user_id: str, event_name: str, properties: Dict[str, Any]) -> None:
-        data = {
-            "user_id": user_id,
-            "event_type": event_name,
-            "time": int(time.time() * 1000),
-            "event_properties": properties if properties is not None else {}
-        }
+    def track(self, user_id: str, event_name: str, properties: Dict[str, Any], metadata: Optional[AmplitudeMetadata]) -> None:
+        data = {k: v for (k, v) in vars(metadata).items() if v is not None} if metadata is not None else {}
+        data["user_id"] = user_id
+        data["event_type"] = event_name
+        data["event_properties"] = properties if properties is not None else {}
+        if "time" not in data:
+            data["time"] = int(time.time() * 1000)
         self._enqueue(AsyncConsumerMessage("events", data))
 
     def identify(self, user_id: str, properties: Dict[str, Any]) -> None:
