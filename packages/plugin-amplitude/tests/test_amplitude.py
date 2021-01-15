@@ -136,22 +136,26 @@ def test_amplitude(httpserver: HTTPServer):
 
 
 def test_amplitude_metadata(httpserver: HTTPServer):
-    httpserver.expect_request(re.compile('/events')).respond_with_data()
+    httpserver.expect_request(re.compile('/(events|identify)')).respond_with_data()
 
     options = AmplitudeOptions(
-        events_endpoint=httpserver.url_for('/events')
+        events_endpoint=httpserver.url_for('/events'),
+        identification_endpoint=httpserver.url_for('/identify'),
+        metadata=AmplitudeMetadata(os_name='ubuntu', city="York", os_version="111.0")
     )
     p = AmplitudePlugin('My-Key', options)
 
     try:
         p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
+        p.identify("user-1", Properties(item1='value1', item2=2))
+
         metadata = {
-            "amplitude": AmplitudeMetadata(platform="LinUx", price=123.45)
+            "amplitude": AmplitudeMetadata(platform="LinUx", os_version="123.45")
         }
         p.track("user-2", Event('event-1', Properties(item1='value1', item2=1), metadata=metadata))
         metadata = {
-            "amplitude": AmplitudeMetadata(os_name="win", price=987.45)
+            "amplitude": AmplitudeMetadata(os_name="win", os_version="987.45")
         }
         p.track("user-1", Event('event-2', Properties(item1='value2', item2=2), metadata=metadata))
 
@@ -160,11 +164,14 @@ def test_amplitude_metadata(httpserver: HTTPServer):
 
         requests = _get_cleaned_requests(httpserver)
         assert requests == [
+            [
+                {'city': 'York', 'os_name': 'ubuntu', 'os_version': '111.0', 'user_id': 'user-1', 'user_properties': {'item1': 'value1', 'item2': 2}}
+            ],
             {
                 'api_key': 'My-Key',
                 'events': [
-                    {'user_id': 'user-2', 'event_type': 'event-1', 'event_properties': {'item1': 'value1', 'item2': 1}, 'platform': 'LinUx', 'price': 123.45},
-                    {'user_id': 'user-1', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}, 'os_name': 'win', 'price': 987.45}
+                    {'user_id': 'user-2', 'event_type': 'event-1', 'event_properties': {'item1': 'value1', 'item2': 1}, 'city': 'York', 'platform': 'LinUx', 'os_name': 'ubuntu', 'os_version': "123.45"},
+                    {'user_id': 'user-1', 'event_type': 'event-2', 'event_properties': {'item1': 'value2', 'item2': 2}, 'city': 'York', 'os_name': 'win', 'os_version': "987.45"}
                 ],
             },
         ]

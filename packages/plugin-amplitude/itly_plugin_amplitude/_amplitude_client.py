@@ -59,11 +59,10 @@ class AmplitudeClient:
             data["time"] = int(time.time() * 1000)
         self._enqueue(AsyncConsumerMessage("events", data))
 
-    def identify(self, user_id: str, properties: Dict[str, Any]) -> None:
-        data = {
-            "user_id": user_id,
-            "user_properties": properties if properties is not None else {}
-        }
+    def identify(self, user_id: str, properties: Dict[str, Any], metadata: Optional[AmplitudeMetadata]) -> None:
+        data = {k: v for (k, v) in vars(metadata).items() if v is not None} if metadata is not None else {}
+        data["user_id"] = user_id
+        data["user_properties"] = properties if properties is not None else {}
         self._enqueue(AsyncConsumerMessage("identification", data))
 
     def _upload_batch(self, batch: List[AsyncConsumerMessage]) -> None:
