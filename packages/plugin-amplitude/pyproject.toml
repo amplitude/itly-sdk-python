@@ -17,7 +17,7 @@ secondary = true
 [tool.poetry.dependencies]
 python = "^3.6"
 requests = "^2.24.0"
-itly-sdk = "^0.1.21"
+itly-sdk = "^0.1.22"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.1"

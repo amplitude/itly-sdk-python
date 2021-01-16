@@ -207,7 +207,7 @@ description = "Iteratively Analytics SDK"
 name = "itly-sdk"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "0.1.21"
+version = "0.1.22"
 
 [package.source]
 reference = "testpypi"
