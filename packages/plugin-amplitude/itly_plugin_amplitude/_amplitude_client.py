@@ -3,6 +3,7 @@ import json
 import queue
 import time
 from datetime import timedelta
+from threading import Event
 from typing import Dict, Callable, List, Optional, NamedTuple, Any
 
 from requests import Session
@@ -65,7 +66,7 @@ class AmplitudeClient:
         data["user_properties"] = properties if properties is not None else {}
         self._enqueue(AsyncConsumerMessage("identification", data))
 
-    def _upload_batch(self, batch: List[AsyncConsumerMessage]) -> None:
+    def _upload_batch(self, batch: List[AsyncConsumerMessage], stop_event: Event) -> None:
         message_type = batch[0].message_type
         endpoint_url, is_json = self._endpoints[message_type]
         try:

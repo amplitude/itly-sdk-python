@@ -10,7 +10,7 @@ def test_consumer():
     q = AsyncConsumer.create_queue()
     consumer = AsyncConsumer(
         message_queue=q,
-        do_upload=lambda batch: batches.append([msg.data for msg in batch]),
+        do_upload=lambda batch, event: batches.append([msg.data for msg in batch]),
         flush_queue_size=3,
         flush_interval=timedelta(seconds=1)
     )
