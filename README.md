@@ -45,20 +45,8 @@ Iteratively Analytics SDK for Python
 
 ## Publishing
 
-### Setup Test PyPi Account & Token
-1. Create an account on [test.pypi.org](https://test.pypi.org/). This is not shared with (Prod) PyPi.
-2. Generate API token in [Account Settings](https://test.pypi.org/manage/account/)
-3. Add Test PyPi repository to Poetry config
-    ```
-    $ poetry config repositories.testpypi https://test.pypi.org/legacy/
-    ```
-4. Add Test PyPi token to Poetry config
-    ```
-    poetry config pypi-token.testpypi TOKEN
-    ``` 
-
 ### Setup PyPi Account & Token
-1. Create an account on [pypi.org](https://pypi.org/). This is not shared with Test PyPi.
+1. Create an account on [pypi.org](https://pypi.org/).
 2. Generate API token in [Account Settings](https://pypi.org/manage/account/)
 3. Add PyPi token to Poetry config
     ```
@@ -66,10 +54,6 @@ Iteratively Analytics SDK for Python
     ``` 
    
 ### Publish
-* Test PyPi
-    ```
-    $ make publish-test-all
-    ```
 
 * PyPi (Production)
     ```
