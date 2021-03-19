@@ -1,7 +1,7 @@
 import atexit
 import enum
 import queue
-import time
+import threading
 from datetime import datetime, timedelta
 from typing import Callable, List, Optional, Any
 
@@ -77,16 +77,16 @@ class IterativelyClient:
 
         self._enqueue(AsyncConsumerMessage("events", model))
 
-    def _upload_batch(self, batch: List[AsyncConsumerMessage]) -> None:
+    def _upload_batch(self, batch: List[AsyncConsumerMessage], stop_event: threading.Event) -> None:
         data = {
             'objects': [message.data for message in batch],
         }
         try:
-            self._send_request(data)
+            self._send_request(data, stop_event)
         except Exception as e:
             self._on_error(str(e))
 
-    def _send_request(self, data: Any) -> None:
+    def _send_request(self, data: Any, stop_event: threading.Event) -> None:
         need_retry = self._post_request(data)
         if not need_retry:
             return
@@ -95,7 +95,9 @@ class IterativelyClient:
                              count=self._retry_options.max_retries - 1,
                              factor=2.0,
                              jitter=1.0):
-            time.sleep(delay)
+            if stop_event.wait(delay):
+                return
+
             need_retry = self._post_request(data)
             if not need_retry:
                 return

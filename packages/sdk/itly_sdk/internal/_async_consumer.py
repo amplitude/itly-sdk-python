@@ -16,26 +16,25 @@ class AsyncConsumer(Thread):
 
     def __init__(self,
                  message_queue: queue.Queue,
-                 do_upload: Callable[[List[AsyncConsumerMessage]], None],
+                 do_upload: Callable[[List[AsyncConsumerMessage], Event], None],
                  flush_queue_size: int,
                  flush_interval: timedelta) -> None:
         """Create a consumer thread."""
-        Thread.__init__(self)
         # Make consumer a daemon thread so that it doesn't block program exit
-        self._daemon = True
+        Thread.__init__(self, daemon=True)
         self._do_upload = do_upload
         self._upload_size = flush_queue_size
         self._flush_interval = flush_interval
         self._queue = message_queue
         self._pending_message: Optional[AsyncConsumerMessage] = None
-        self._running = True
+        self._stop_event: Event = Event()
 
     def run(self) -> None:
-        while self._running:
+        while not self._stop_event.is_set():
             self.upload()
 
     def pause(self) -> None:
-        self._running = False
+        self._stop_event.set()
 
     def upload(self) -> None:
         batch, event = self.next()
@@ -45,7 +44,7 @@ class AsyncConsumer(Thread):
             return
 
         try:
-            self._do_upload(batch)
+            self._do_upload(batch, self._stop_event)
         except Exception:
             pass
         finally:
