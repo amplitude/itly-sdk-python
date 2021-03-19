@@ -60,6 +60,37 @@ build-segment:
 build-snowplow:
 	cd ./packages/plugin-snowplow/; poetry build
 
+# PUBLISH (Test PyPi)
+publish-test-all: \
+ publish-test-sdk \
+ publish-test-schema-validator \
+ publish-test-iteratively \
+ publish-test-amplitude \
+ publish-test-mixpanel \
+ publish-test-segment \
+ publish-test-snowplow
+
+publish-test-sdk:
+	cd ./packages/sdk/; poetry publish -r testpypi
+
+publish-test-amplitude:
+	cd ./packages/plugin-amplitude/; poetry publish -r testpypi
+
+publish-test-iteratively:
+	cd ./packages/plugin-iteratively/; poetry publish -r testpypi
+
+publish-test-mixpanel:
+	cd ./packages/plugin-mixpanel/; poetry publish -r testpypi
+
+publish-test-schema-validator:
+	cd ./packages/plugin-schema-validator/; poetry publish -r testpypi
+
+publish-test-segment:
+	cd ./packages/plugin-segment/; poetry publish -r testpypi
+
+publish-test-snowplow:
+	cd ./packages/plugin-snowplow/; poetry publish -r testpypi
+
 # PUBLISH (PyPi)
 publish-all: \
  publish-sdk \
