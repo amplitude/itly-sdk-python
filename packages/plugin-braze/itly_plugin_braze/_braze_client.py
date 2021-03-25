@@ -3,10 +3,11 @@ import json
 import queue
 from datetime import timedelta, datetime
 from threading import Event
-from typing import Dict, Callable, List, Optional, Any
+from typing import Dict, List, Optional, Any
 
 from requests import Session
 
+from itly_sdk import Logger
 from itly_sdk.internal import AsyncConsumer, AsyncConsumerMessage
 
 
@@ -14,18 +15,18 @@ class BrazeClient:
     def __init__(self,
                  base_url: str,
                  api_key: str,
-                 on_error: Callable[[str], None],
                  flush_queue_size: int,
                  flush_interval: timedelta,
                  request_timeout: timedelta,
+                 logger: Logger,
                  ) -> None:
         self._api_key = api_key
         self._request_timeout = request_timeout
-        self._on_error = on_error
         self._queue: queue.Queue = AsyncConsumer.create_queue()
         base_url = base_url.rstrip("/")
         self._user_track_url = f'{base_url}/users/track'
         self._session = Session()
+        self._logger = logger
         self._consumer = AsyncConsumer(message_queue=self._queue,
                                        do_upload=self._upload_batch,
                                        flush_queue_size=flush_queue_size,
@@ -39,20 +40,25 @@ class BrazeClient:
         self._enqueue(AsyncConsumerMessage("", {"attributes": data}))
 
     def track(self, user_id: str, event_name: str, properties: Optional[Dict[str, Any]]) -> None:
-        data = self._to_braze_properties(properties)
-        data["name"] = event_name
-        data["external_id"] = user_id
-        data["time"] = datetime.now().isoformat()
+        data = {
+            "external_id": user_id,
+            "name": event_name,
+            "time": datetime.now().isoformat(),
+            "properties": self._to_braze_properties(properties),
+        }
         self._enqueue(AsyncConsumerMessage("", {"events": data}))
 
     def _upload_batch(self, batch: List[AsyncConsumerMessage], stop_event: Event) -> None:
         body = {}
+        count = 0
         for event in batch:
             for key, value in event.data.items():
                 if key not in body:
                     body[key] = []
+                count += 1
                 body[key].append(value)
 
+        self._logger.info(f"uploading {count} items")
         try:
             response = self._session.post(
                 self._user_track_url,
@@ -61,9 +67,11 @@ class BrazeClient:
                 timeout=self._request_timeout.total_seconds(),
             )
             if response.status_code >= 300:
-                self._on_error(f'Unexpected status: {response.status_code}')
+                self._logger.error(f'unexpected response status: {response.status_code}')
+            else:
+                self._logger.info(f'response status: {response.status_code}')
         except Exception as e:
-            self._on_error(str(e))
+            self._logger.error(str(e))
 
     def flush(self) -> None:
         self._consumer.flush()
@@ -75,7 +83,7 @@ class BrazeClient:
         try:
             self._queue.put(message)
         except queue.Full:
-            self._on_error("async queue is full")
+            self._logger.error("async queue is full")
 
     @staticmethod
     def _to_braze_properties(properties: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:

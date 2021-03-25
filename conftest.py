@@ -48,3 +48,7 @@ def httpserver():
     server = _PluginHTTPServer(host=host, port=port)
     server.start()
     yield server
+    try:
+        server.stop()
+    except:
+        pass

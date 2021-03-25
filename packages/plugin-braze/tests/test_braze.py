@@ -3,125 +3,270 @@ import re
 import time
 from datetime import timedelta
 from typing import List, Any
-import urllib.parse
 
 from pytest_httpserver import HTTPServer
 
 from itly_plugin_braze import BrazePlugin, BrazeOptions
 from itly_sdk import PluginLoadOptions, Environment, Properties, Event, Logger
 
+time_short = 0.1
+timedelta_max = timedelta(seconds=999)
+identify_properties = Properties(item1='identify', item2=2)
+event_1 = Event('event-1', Properties(item1='value1', item2=1))
+event_2 = Event('event-2', Properties(item1='value2', item2=2))
+plugin_load_options = PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE)
 
-def test_braze(httpserver: HTTPServer):
-    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
 
-    options = BrazeOptions(
-        base_url=httpserver.url_for(''),
-        flush_queue_size=3,
-        flush_interval=timedelta(seconds=1),
-    )
-    p = BrazePlugin('My-Key', options)
-
+def test_Id_BrazePlugin_IsBraze():
+    p = BrazePlugin('My-Key', BrazeOptions(base_url=''))
     assert p.id() == 'braze'
-    try:
-        p.load(PluginLoadOptions(environment=Environment.DEVELOPMENT, logger=Logger.NONE))
 
-        p.identify("user-1", Properties(item1='value1', item2=2))
-        time.sleep(0.1)
-        requests = _get_cleaned_requests(httpserver)
-        assert requests == []
 
-        p.track("user-2", Event('event-1', Properties(item1='value1', item2=1)))
-        time.sleep(0.1)
-        requests = _get_cleaned_requests(httpserver)
-        assert requests == []
+def test_Identify_Immediate_Queued(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=100, flush_interval=timedelta_max))
+    p.load(plugin_load_options)
+    p.identify("user-1", identify_properties)
+    p.identify("user-2", identify_properties)
+    p.identify("user-3", identify_properties)
+    time.sleep(time_short)
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == []
+    p.shutdown()
 
-        p.track("user-2", Event('event-2', Properties(item1='value2', item2=2)))
-        time.sleep(0.8)
-        requests = _get_cleaned_requests(httpserver)
-        assert requests == [
-            {
-                'attributes': [{'external_id': 'user-1', 'item1': 'value1', 'item2': 2}],
-                'events': [
-                    {'external_id': 'user-2', 'item1': 'value1', 'item2': 1, 'name': 'event-1', },
-                    {'external_id': 'user-2', 'item1': 'value2', 'item2': 2, 'name': 'event-2', },
-                ],
-            }
-        ]
 
-        p.flush()
-        time.sleep(0.1)
-        requests = _get_cleaned_requests(httpserver)
-        assert requests == [
-            {
-                'attributes': [{'external_id': 'user-1', 'item1': 'value1', 'item2': 2}],
-                'events': [
-                    {'external_id': 'user-2', 'item1': 'value1', 'item2': 1, 'name': 'event-1', },
-                    {'external_id': 'user-2', 'item1': 'value2', 'item2': 2, 'name': 'event-2', },
-                ],
-            }
-        ]
+def test_Track_Immediate_Queued(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=100, flush_interval=timedelta_max))
+    p.load(plugin_load_options)
+    p.track("user-1", event_1)
+    p.track("user-1", event_2)
+    p.track("user-2", event_1)
+    time.sleep(time_short)
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == []
+    p.shutdown()
 
-        p.flush()
-        p.flush()
 
-        time.sleep(0.1)
-        requests = _get_cleaned_requests(httpserver)
-        assert requests == [
-            {
-                'attributes': [{'external_id': 'user-1', 'item1': 'value1', 'item2': 2}],
-                'events': [
-                    {'external_id': 'user-2', 'item1': 'value1', 'item2': 1, 'name': 'event-1', },
-                    {'external_id': 'user-2', 'item1': 'value2', 'item2': 2, 'name': 'event-2', },
-                ],
-            }
-        ]
+def test_TrackAndIdentify_Immediate_Queued(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=100, flush_interval=timedelta_max))
+    p.load(plugin_load_options)
+    p.track("user-1", event_1)
+    p.identify("user-3", identify_properties)
+    p.track("user-2", event_1)
+    time.sleep(time_short)
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == []
+    p.shutdown()
 
-        p.track("user-2", Event('event-3', Properties(item1='value3', item2=3)))
 
-        time.sleep(1.1)
-        requests = _get_cleaned_requests(httpserver)
-        assert requests == [
-            {
-                'attributes': [{'external_id': 'user-1', 'item1': 'value1', 'item2': 2}],
-                'events': [
-                    {'external_id': 'user-2', 'item1': 'value1', 'item2': 1, 'name': 'event-1', },
-                    {'external_id': 'user-2', 'item1': 'value2', 'item2': 2, 'name': 'event-2', },
-                ],
-            },
-            {
-                'events': [
-                    {'external_id': 'user-2', 'item1': 'value3', 'item2': 3, 'name': 'event-3', }
-                ],
-            }
-        ]
-        p.track("user-2", Event('event-4', Properties(item1='value4', item2=[4])))
-        p.track("user-1", Event('event-5', Properties(item1='value5', item2={'key':5})))
-    finally:
-        p.shutdown()
+def test_Identify_ExceedQueueSize_Flushed(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=2, flush_interval=timedelta_max))
+    p.load(plugin_load_options)
+    p.identify("user-1", identify_properties)
+    p.identify("user-2", identify_properties)
+    time.sleep(time_short)
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == [
+        {
+            'attributes': [
+                {'external_id': 'user-1', 'item1': 'identify', 'item2': 2},
+                {'external_id': 'user-2', 'item1': 'identify', 'item2': 2},
+            ],
+        },
+    ]
+    p.shutdown()
 
-        time.sleep(0.1)
-        httpserver.stop()
-        requests = _get_cleaned_requests(httpserver)
-        assert requests == [
-            {
-                'attributes': [{'external_id': 'user-1', 'item1': 'value1', 'item2': 2}],
-                'events': [
-                    {'external_id': 'user-2', 'item1': 'value1', 'item2': 1, 'name': 'event-1', },
-                    {'external_id': 'user-2', 'item1': 'value2', 'item2': 2, 'name': 'event-2', },
-                ],
-            },
-            {
-                'events': [
-                    {'external_id': 'user-2', 'item1': 'value3', 'item2': 3, 'name': 'event-3', }
-                ],
-            },
-            {
-                'events': [
-                    {'external_id': 'user-2', 'item1': 'value4', 'item2': '[4]', 'name': 'event-4', },
-                    {'external_id': 'user-1', 'item1': 'value5', 'item2': '{"key": 5}', 'name': 'event-5', },
-                ],
-            }
-        ]
+
+def test_Track_ExceedQueueSize_Flushed(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=2, flush_interval=timedelta_max))
+    p.load(plugin_load_options)
+    p.track("user-1", event_1)
+    p.track("user-2", event_2)
+    time.sleep(time_short)
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == [
+        {
+            'events': [
+                {'external_id': 'user-1', 'name': 'event-1', 'properties': {'item1': 'value1', 'item2': 1}},
+                {'external_id': 'user-2', 'name': 'event-2', 'properties': {'item1': 'value2', 'item2': 2}},
+            ],
+        },
+    ]
+    p.shutdown()
+
+
+def test_TrackAndIdentify_ExceedQueueSize_Flushed(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=3, flush_interval=timedelta_max))
+    p.load(plugin_load_options)
+    p.track("user-1", event_1)
+    p.identify("user-1", identify_properties)
+    p.track("user-2", event_2)
+    time.sleep(time_short)
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == [
+        {
+            'attributes': [
+                {'external_id': 'user-1', 'item1': 'identify', 'item2': 2},
+            ],
+            'events': [
+                {'external_id': 'user-1', 'name': 'event-1', 'properties': {'item1': 'value1', 'item2': 1}},
+                {'external_id': 'user-2', 'name': 'event-2', 'properties': {'item1': 'value2', 'item2': 2}},
+            ],
+        },
+    ]
+    p.shutdown()
+
+
+def test_Identify_ExceedFlushInterval_Flushed(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    flush_interval = timedelta(milliseconds=300)
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=100, flush_interval=flush_interval))
+    p.load(plugin_load_options)
+    p.identify("user-1", identify_properties)
+    p.identify("user-2", identify_properties)
+    time.sleep(flush_interval.total_seconds() + time_short)
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == [
+        {
+            'attributes': [
+                {'external_id': 'user-1', 'item1': 'identify', 'item2': 2},
+                {'external_id': 'user-2', 'item1': 'identify', 'item2': 2},
+            ],
+        },
+    ]
+    p.shutdown()
+
+
+def test_Track_ExceedFlushInterval_Flushed(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    flush_interval = timedelta(milliseconds=300)
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=100, flush_interval=flush_interval))
+    p.load(plugin_load_options)
+    p.track("user-1", event_1)
+    p.track("user-2", event_2)
+    time.sleep(flush_interval.total_seconds() + time_short)
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == [
+        {
+            'events': [
+                {'external_id': 'user-1', 'name': 'event-1', 'properties': {'item1': 'value1', 'item2': 1}},
+                {'external_id': 'user-2', 'name': 'event-2', 'properties': {'item1': 'value2', 'item2': 2}},
+            ],
+        },
+    ]
+    p.shutdown()
+
+
+def test_TrackAndIdentify_ExceedFlushInterval_Flushed(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    flush_interval = timedelta(milliseconds=300)
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=100, flush_interval=flush_interval))
+    p.load(plugin_load_options)
+    p.track("user-1", event_1)
+    p.identify("user-1", identify_properties)
+    p.track("user-2", event_2)
+    time.sleep(flush_interval.total_seconds() + time_short)
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == [
+        {
+            'attributes': [
+                {'external_id': 'user-1', 'item1': 'identify', 'item2': 2},
+            ],
+            'events': [
+                {'external_id': 'user-1', 'name': 'event-1', 'properties': {'item1': 'value1', 'item2': 1}},
+                {'external_id': 'user-2', 'name': 'event-2', 'properties': {'item1': 'value2', 'item2': 2}},
+            ],
+        },
+    ]
+    p.shutdown()
+
+
+def test_TrackAndIdentify_ExplicitFlush_Flushed(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=100, flush_interval=timedelta_max))
+    p.load(plugin_load_options)
+    p.track("user-1", event_1)
+    p.identify("user-1", identify_properties)
+    p.track("user-2", event_2)
+    p.flush()
+    time.sleep(time_short)
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == [
+        {
+            'attributes': [
+                {'external_id': 'user-1', 'item1': 'identify', 'item2': 2},
+            ],
+            'events': [
+                {'external_id': 'user-1', 'name': 'event-1', 'properties': {'item1': 'value1', 'item2': 1}},
+                {'external_id': 'user-2', 'name': 'event-2', 'properties': {'item1': 'value2', 'item2': 2}},
+            ],
+        },
+    ]
+    p.shutdown()
+
+
+def test_TrackAndIdentify_Shutdown_Flushed(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=100, flush_interval=timedelta_max))
+    p.load(plugin_load_options)
+    p.track("user-1", event_1)
+    p.identify("user-1", identify_properties)
+    p.track("user-2", event_2)
+    time.sleep(time_short)
+    p.shutdown()
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == [
+        {
+            'attributes': [
+                {'external_id': 'user-1', 'item1': 'identify', 'item2': 2},
+            ],
+            'events': [
+                {'external_id': 'user-1', 'name': 'event-1', 'properties': {'item1': 'value1', 'item2': 1}},
+                {'external_id': 'user-2', 'name': 'event-2', 'properties': {'item1': 'value2', 'item2': 2}},
+            ],
+        },
+    ]
+
+
+def test_TrackAndIdentify_ObjectAndArrayProperties_Stringified(httpserver: HTTPServer):
+    httpserver.expect_request(re.compile('/users/track')).respond_with_data()
+    p = BrazePlugin('My-Key',
+                    BrazeOptions(base_url=httpserver.url_for(''), flush_queue_size=100, flush_interval=timedelta_max))
+    p.load(plugin_load_options)
+    p.identify("user-1", Properties(item1=[11, 'value2'], item2={"a": True, "b": 17}))
+    p.track("user-2", Event('event-1', Properties(item1=['value1', 'value2'], item2={"a": 1, "b": "test"})))
+    p.flush()
+    requests = _get_cleaned_requests(httpserver)
+    assert requests == [
+        {
+            'attributes': [
+                {'external_id': 'user-1', 'item1': '[11, "value2"]', 'item2': '{"a": true, "b": 17}'},
+            ],
+            'events': [
+                {
+                    'external_id': 'user-2', 'name': 'event-1',
+                    'properties': {'item1': '["value1", "value2"]', 'item2': '{"a": 1, "b": "test"}'},
+                },
+            ],
+        },
+    ]
+    p.shutdown()
 
 
 def _get_cleaned_requests(httpserver: Any) -> List[Any]:
