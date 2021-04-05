@@ -8,6 +8,7 @@ from werkzeug.wrappers import Request
 
 sys.path.extend([
     './packages/plugin-amplitude',
+    './packages/plugin-braze',
     './packages/plugin-iteratively',
     './packages/plugin-mixpanel',
     './packages/plugin-schema-validator',
@@ -47,3 +48,7 @@ def httpserver():
     server = _PluginHTTPServer(host=host, port=port)
     server.start()
     yield server
+    try:
+        server.stop()
+    except:
+        pass

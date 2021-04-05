@@ -91,6 +91,7 @@ Iteratively Analytics SDK for Python
     
     pip install YOUR-PATH/itly-sdk-python/packages/sdk
     pip install YOUR-PATH/itly-sdk-python/packages/plugin-amplitude
+    pip install YOUR-PATH/itly-sdk-python/packages/plugin-braze
     pip install YOUR-PATH/itly-sdk-python/packages/plugin-iteratively
     pip install YOUR-PATH/itly-sdk-python/packages/plugin-mixpanel
     pip install YOUR-PATH/itly-sdk-python/packages/plugin-schema-validator

@@ -41,6 +41,7 @@ class AsyncConsumer(Thread):
         if len(batch) == 0:
             if event is not None:
                 event.set()
+                self._queue.task_done()
             return
 
         try:
@@ -50,6 +51,7 @@ class AsyncConsumer(Thread):
         finally:
             if event is not None:
                 event.set()
+                self._queue.task_done()
             # mark items as acknowledged from queue
             for _ in batch:
                 self._queue.task_done()
@@ -83,6 +85,7 @@ class AsyncConsumer(Thread):
 
     def shutdown(self) -> None:
         self.pause()
+        self._queue.put_nowait(AsyncConsumerMessage(message_type='flush', data=Event()))
         try:
             self.join()
         except RuntimeError:

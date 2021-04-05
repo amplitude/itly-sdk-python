@@ -4,6 +4,7 @@ install-all: \
  install-schema-validator \
  install-iteratively \
  install-amplitude \
+ install-braze \
  install-mixpanel \
  install-segment \
  install-snowplow
@@ -13,6 +14,9 @@ install-sdk:
 
 install-amplitude:
 	cd ./packages/plugin-amplitude/; poetry install
+
+install-braze:
+	cd ./packages/plugin-braze/; poetry install
 
 install-iteratively:
 	cd ./packages/plugin-iteratively/; poetry install
@@ -35,6 +39,7 @@ build-all: \
  build-schema-validator \
  build-iteratively \
  build-amplitude \
+ build-braze \
  build-mixpanel \
  build-segment \
  build-snowplow
@@ -44,6 +49,9 @@ build-sdk:
 
 build-amplitude:
 	cd ./packages/plugin-amplitude/; poetry build
+
+build-braze:
+	cd ./packages/plugin-braze/; poetry build
 
 build-iteratively:
 	cd ./packages/plugin-iteratively/; poetry build
@@ -66,6 +74,7 @@ publish-test-all: \
  publish-test-schema-validator \
  publish-test-iteratively \
  publish-test-amplitude \
+ publish-test-braze \
  publish-test-mixpanel \
  publish-test-segment \
  publish-test-snowplow
@@ -75,6 +84,9 @@ publish-test-sdk:
 
 publish-test-amplitude:
 	cd ./packages/plugin-amplitude/; poetry publish -r testpypi
+
+publish-test-braze:
+	cd ./packages/plugin-braze/; poetry publish -r testpypi
 
 publish-test-iteratively:
 	cd ./packages/plugin-iteratively/; poetry publish -r testpypi
@@ -97,6 +109,7 @@ publish-all: \
  publish-schema-validator \
  publish-iteratively \
  publish-amplitude \
+ publish-braze \
  publish-mixpanel \
  publish-segment \
  publish-snowplow
@@ -106,6 +119,9 @@ publish-sdk:
 
 publish-amplitude:
 	cd ./packages/plugin-amplitude/; poetry publish
+
+publish-braze:
+	cd ./packages/plugin-braze/; poetry publish
 
 publish-iteratively:
 	cd ./packages/plugin-iteratively/; poetry publish
